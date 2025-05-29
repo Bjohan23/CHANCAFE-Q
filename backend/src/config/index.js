@@ -1,10 +1,11 @@
 require('dotenv').config();
+const { Sequelize } = require('sequelize');
 
 /**
  * Configuración general de la aplicación
  * Centraliza todas las variables de entorno y configuraciones
  */
-module.exports = {
+const config = {
   // Configuración del servidor
   server: {
     port: process.env.PORT || 3000,
@@ -123,4 +124,56 @@ module.exports = {
     debugMode: process.env.DEBUG === 'true',
     mockExternalServices: process.env.MOCK_SERVICES === 'true'
   }
+};
+
+// Configuración de Sequelize
+const sequelizeConfig = {
+  host: config.database.host,
+  port: config.database.port,
+  dialect: config.database.dialect,
+  logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  timezone: '-05:00', // Zona horaria de Perú
+  define: {
+    timestamps: true,
+    underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    paranoid: false
+  },
+  pool: {
+    max: 10,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  },
+  retry: {
+    match: [
+      /ETIMEDOUT/,
+      /EHOSTUNREACH/,
+      /ECONNRESET/,
+      /ECONNREFUSED/,
+      /ENOTFOUND/,
+      /SequelizeConnectionError/,
+      /SequelizeConnectionRefusedError/,
+      /SequelizeHostNotFoundError/,
+      /SequelizeHostNotReachableError/,
+      /SequelizeInvalidConnectionError/,
+      /SequelizeConnectionTimedOutError/
+    ],
+    max: 3
+  }
+};
+
+// Crear instancia de Sequelize
+const database = new Sequelize(
+  config.database.name,
+  config.database.username,
+  config.database.password,
+  sequelizeConfig
+);
+
+// Exportar configuración y instancia de base de datos
+module.exports = {
+  config,
+  database
 };

@@ -1,5 +1,5 @@
-const bcrypt = require('bcryptjs');
-const config = require('../config');
+const bcrypt = require('bcrypt');
+const { config } = require('../config');
 
 /**
  * Utilidades para manejo de contraseñas con bcrypt

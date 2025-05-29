@@ -1,28 +1,8 @@
 const { Sequelize } = require('sequelize');
-const config = require('../config');
-const dbConfig = require('../config/database');
+const { config, database } = require('../config');
 
-// Obtener configuración según el entorno
-const env = process.env.NODE_ENV || 'development';
-const currentConfig = dbConfig[env];
-
-// Crear instancia de Sequelize
-const sequelize = new Sequelize(
-  currentConfig.database,
-  currentConfig.username,
-  currentConfig.password,
-  {
-    host: currentConfig.host,
-    port: currentConfig.port,
-    dialect: currentConfig.dialect,
-    logging: currentConfig.logging,
-    timezone: currentConfig.timezone,
-    define: currentConfig.define,
-    pool: currentConfig.pool,
-    retry: currentConfig.retry,
-    dialectOptions: currentConfig.dialectOptions || {}
-  }
-);
+// Usar la instancia de Sequelize ya configurada
+const sequelize = database;
 
 // Objeto para almacenar todos los modelos
 const db = {};

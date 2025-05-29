@@ -6,7 +6,7 @@ const morgan = require('morgan');
 
 // Importar configuraciones y middlewares
 const { config } = require('./config');
-const { errorHandler, logging, rateLimit } = require('./middlewares');
+const { ErrorHandler, LoggingMiddleware, RateLimitMiddleware } = require('./middlewares');
 const routes = require('./routes');
 
 // Crear instancia de Express
@@ -36,10 +36,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Rate limiting
-app.use(rateLimit);
+app.use(RateLimitMiddleware.general);
 
 // Logging personalizado
-app.use(logging);
+app.use(LoggingMiddleware.databaseLogger);
 
 // Health check básico
 app.get('/health', (req, res) => {
@@ -65,7 +65,7 @@ app.get('/', (req, res) => {
 });
 
 // Middleware de manejo de errores (debe ir al final)
-app.use(errorHandler);
+app.use(ErrorHandler.handleError);
 
 // Manejo de rutas no encontradas
 app.use('*', (req, res) => {

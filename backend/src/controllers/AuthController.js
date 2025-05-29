@@ -200,6 +200,42 @@ class AuthController {
 
     res.status(200).json(response);
   });
+
+  /**
+   * Registra un nuevo usuario (solo para admins o proceso específico)
+   * POST /api/v1/auth/register
+   */
+  static register = ErrorHandler.asyncHandler(async (req, res) => {
+    const userData = req.body;
+    const ipAddress = Helpers.getClientIP(req);
+
+    // En un sistema de asesores, el registro debe ser controlado
+    // Aquí podríamos validar que solo admins puedan crear usuarios
+    // o implementar un proceso específico de registro
+
+    const errorResponse = Helpers.errorResponse(
+      'El registro de usuarios debe realizarse a través del panel de administración',
+      'REGISTRATION_DISABLED',
+      {
+        message: 'Contacta al administrador para crear una nueva cuenta'
+      },
+      403
+    );
+    
+    res.status(403).json(errorResponse);
+  });
+
+  /**
+   * Obtiene información del usuario autenticado (alias para getMe)
+   * GET /api/v1/auth/me
+   */
+  static getCurrentUser = ErrorHandler.asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+
+    const result = await AuthService.checkUserStatus(userId);
+    
+    res.status(result.statusCode).json(result);
+  });
 }
 
 module.exports = AuthController;

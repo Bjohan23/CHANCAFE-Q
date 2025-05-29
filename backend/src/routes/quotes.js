@@ -1,11 +1,11 @@
 const express = require('express');
 const { QuoteController } = require('../controllers');
-const { authMiddleware } = require('../middlewares');
+const { AuthMiddleware } = require('../middlewares');
 
 const router = express.Router();
 
 // Todas las rutas requieren autenticación
-router.use(authMiddleware);
+router.use(AuthMiddleware);
 
 // CRUD de cotizaciones
 router.get('/', QuoteController.getAllQuotes);

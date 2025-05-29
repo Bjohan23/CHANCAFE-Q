@@ -1,5 +1,5 @@
 const rateLimit = require('express-rate-limit');
-const config = require('../config');
+const { config } = require('../config');
 const { Helpers } = require('../utils');
 
 /**
@@ -87,11 +87,6 @@ class RateLimitMiddleware {
           429
         )
       );
-    },
-
-    // Resetear contador en login exitoso
-    onLimitReached: (req, res, options) => {
-      console.log(`🚨 Rate limit alcanzado para login desde IP: ${Helpers.getClientIP(req)}`);
     }
   });
 
