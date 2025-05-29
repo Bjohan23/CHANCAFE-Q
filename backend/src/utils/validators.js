@@ -38,19 +38,78 @@ class Validators {
    */
   static authValidators = {
     login: [
-      body('code')
+      body('email')
         .notEmpty()
-        .withMessage('El código de usuario es requerido')
-        .isLength({ min: 3, max: 20 })
-        .withMessage('El código debe tener entre 3 y 20 caracteres')
-        .matches(/^[a-zA-Z0-9_-]+$/)
-        .withMessage('El código solo puede contener letras, números, guiones y guiones bajos'),
+        .withMessage('El email o username es requerido')
+        .isLength({ min: 3 })
+        .withMessage('El email o username debe tener al menos 3 caracteres'),
       
       body('password')
         .notEmpty()
         .withMessage('La contraseña es requerida')
         .isLength({ min: 6 })
         .withMessage('La contraseña debe tener al menos 6 caracteres')
+    ],
+
+    changePassword: [
+      body('currentPassword')
+        .notEmpty()
+        .withMessage('La contraseña actual es requerida'),
+      
+      body('newPassword')
+        .notEmpty()
+        .withMessage('La nueva contraseña es requerida')
+        .isLength({ min: 6 })
+        .withMessage('La nueva contraseña debe tener al menos 6 caracteres')
+        .custom((value, { req }) => {
+          if (value === req.body.currentPassword) {
+            throw new Error('La nueva contraseña debe ser diferente a la actual');
+          }
+          return true;
+        })
+    ],
+
+    register: [
+      body('first_name')
+        .notEmpty()
+        .withMessage('El nombre es requerido')
+        .isLength({ min: 2, max: 50 })
+        .withMessage('El nombre debe tener entre 2 y 50 caracteres')
+        .matches(/^[a-zA-ZáéíóúñÑÁÉÍÓÚ\s]+$/)
+        .withMessage('El nombre solo puede contener letras y espacios'),
+      
+      body('last_name')
+        .notEmpty()
+        .withMessage('El apellido es requerido')
+        .isLength({ min: 2, max: 50 })
+        .withMessage('El apellido debe tener entre 2 y 50 caracteres')
+        .matches(/^[a-zA-ZáéíóúñÑÁÉÍÓÚ\s]+$/)
+        .withMessage('El apellido solo puede contener letras y espacios'),
+      
+      body('email')
+        .notEmpty()
+        .withMessage('El email es requerido')
+        .isEmail()
+        .withMessage('Debe ser un email válido')
+        .normalizeEmail(),
+      
+      body('password')
+        .notEmpty()
+        .withMessage('La contraseña es requerida')
+        .isLength({ min: 6 })
+        .withMessage('La contraseña debe tener al menos 6 caracteres'),
+      
+      body('phone')
+        .optional({ nullable: true })
+        .matches(/^[0-9+\-\s()]+$/)
+        .withMessage('El teléfono debe contener solo números y símbolos válidos')
+        .isLength({ min: 9, max: 15 })
+        .withMessage('El teléfono debe tener entre 9 y 15 caracteres'),
+      
+      body('role')
+        .optional()
+        .isIn(['admin', 'supervisor', 'sales_rep'])
+        .withMessage('El rol debe ser: admin, supervisor o sales_rep')
     ],
 
     refreshToken: [

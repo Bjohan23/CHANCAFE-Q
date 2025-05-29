@@ -9,22 +9,79 @@ const { ActivityLog } = require('../models');
 class AuthService {
 
   /**
+   * Registra un nuevo usuario
+   * @param {Object} userData - Datos del usuario
+   * @param {string} ipAddress - IP del cliente
+   * @param {string} userAgent - User agent
+   * @returns {Promise<Object>} Resultado del registro
+   */
+  async register(userData, ipAddress, userAgent) {
+    try {
+      // Crear el usuario
+      const newUser = await AuthRepository.createUser(userData);
+      
+      if (!newUser.success) {
+        return Helpers.errorResponse(
+          newUser.message,
+          newUser.code,
+          null,
+          400
+        );
+      }
+
+      // Crear sesión inicial
+      const sessionData = await AuthRepository.createUserSession(
+        newUser.user,
+        ipAddress,
+        userAgent
+      );
+
+      // Registrar actividad de registro
+      await ActivityLog.logAction({
+        userId: newUser.user.id,
+        action: 'USER_REGISTER',
+        ipAddress: ipAddress,
+        notes: 'Usuario registrado exitosamente'
+      });
+
+      return Helpers.successResponse(
+        'Usuario registrado exitosamente',
+        {
+          user: sessionData.user,
+          token: sessionData.accessToken,
+          refreshToken: sessionData.refreshToken
+        },
+        201
+      );
+
+    } catch (error) {
+      console.error('Error en AuthService.register:', error);
+      return Helpers.errorResponse(
+        'Error interno del servidor',
+        'INTERNAL_SERVER_ERROR',
+        null,
+        500
+      );
+    }
+  }
+
+  /**
    * Procesa el login de un usuario
-   * @param {string} code - Código del usuario
+   * @param {string} email - Email del usuario
    * @param {string} password - Contraseña
    * @param {string} ipAddress - IP del cliente
    * @param {string} userAgent - User agent
    * @returns {Promise<Object>} Resultado del login
    */
-  async login(code, password, ipAddress, userAgent) {
+  async login(email, password, ipAddress, userAgent) {
     try {
       // Validar credenciales
-      const credentialCheck = await AuthRepository.verifyCredentials(code, password);
+      const credentialCheck = await AuthRepository.verifyCredentialsByEmail(email, password);
       
       if (!credentialCheck.success) {
         // Registrar intento fallido
         await AuthRepository.logLoginAttempt(
-          code, 
+          email, 
           false, 
           ipAddress, 
           userAgent, 
@@ -48,7 +105,7 @@ class AuthService {
 
       // Registrar login exitoso
       await AuthRepository.logLoginAttempt(
-        code,
+        email,
         true,
         ipAddress,
         userAgent
@@ -65,12 +122,8 @@ class AuthService {
         'Login exitoso',
         {
           user: sessionData.user,
-          tokens: {
-            accessToken: sessionData.accessToken,
-            refreshToken: sessionData.refreshToken,
-            expiresIn: sessionData.expiresIn,
-            tokenType: sessionData.tokenType
-          }
+          token: sessionData.accessToken,
+          refreshToken: sessionData.refreshToken
         },
         200
       );
@@ -258,8 +311,10 @@ class AuthService {
         {
           user: {
             id: sessionInfo.user.id,
-            code: sessionInfo.user.code,
-            name: sessionInfo.user.name,
+            first_name: sessionInfo.user.first_name,
+            last_name: sessionInfo.user.last_name,
+            full_name: sessionInfo.user.getFullName(),
+            email: sessionInfo.user.email,
             role: sessionInfo.user.role,
             status: sessionInfo.user.status
           },
@@ -367,8 +422,10 @@ class AuthService {
         'Estado del usuario obtenido',
         {
           id: user.id,
-          code: user.code,
-          name: user.name,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          full_name: user.getFullName(),
+          email: user.email,
           status: user.status,
           role: user.role,
           lastLogin: user.last_login

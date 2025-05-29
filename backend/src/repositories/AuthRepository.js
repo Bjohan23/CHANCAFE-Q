@@ -45,7 +45,57 @@ class AuthRepository {
   }
 
   /**
-   * Verifica las credenciales del usuario
+   * Verifica las credenciales del usuario por email
+   * @param {string} email - Email del usuario
+   * @param {string} password - Contraseña en texto plano
+   * @returns {Promise<Object>} Resultado de la verificación
+   */
+  async verifyCredentialsByEmail(email, password) {
+    try {
+      // Buscar usuario por email
+      const user = await this.findUserByEmail(email);
+      
+      if (!user) {
+        return {
+          success: false,
+          message: 'Usuario no encontrado',
+          code: 'USER_NOT_FOUND'
+        };
+      }
+
+      // Verificar si el usuario está activo
+      if (user.status !== 'active') {
+        return {
+          success: false,
+          message: 'Usuario inactivo o suspendido',
+          code: 'USER_INACTIVE'
+        };
+      }
+
+      // Verificar contraseña
+      const isPasswordValid = await PasswordUtils.verifyPassword(password, user.password);
+      
+      if (!isPasswordValid) {
+        return {
+          success: false,
+          message: 'Contraseña incorrecta',
+          code: 'INVALID_PASSWORD'
+        };
+      }
+
+      return {
+        success: true,
+        user: user,
+        message: 'Credenciales válidas'
+      };
+
+    } catch (error) {
+      throw new Error(`Error al verificar credenciales: ${error.message}`);
+    }
+  }
+
+  /**
+   * Verifica las credenciales del usuario por código
    * @param {string} code - Código del usuario
    * @param {string} password - Contraseña en texto plano
    * @returns {Promise<Object>} Resultado de la verificación
@@ -64,7 +114,7 @@ class AuthRepository {
       }
 
       // Verificar si el usuario está activo
-      if (!user.isActive()) {
+      if (user.status !== 'active') {
         return {
           success: false,
           message: 'Usuario inactivo o suspendido',
@@ -73,7 +123,7 @@ class AuthRepository {
       }
 
       // Verificar contraseña
-      const isPasswordValid = await PasswordUtils.verifyPassword(password, user.password_hash);
+      const isPasswordValid = await PasswordUtils.verifyPassword(password, user.password);
       
       if (!isPasswordValid) {
         return {
@@ -91,6 +141,51 @@ class AuthRepository {
 
     } catch (error) {
       throw new Error(`Error al verificar credenciales: ${error.message}`);
+    }
+  }
+
+  /**
+   * Crea un nuevo usuario
+   * @param {Object} userData - Datos del usuario
+   * @returns {Promise<Object>} Resultado de la creación
+   */
+  async createUser(userData) {
+    try {
+      // Verificar si el email ya existe
+      const existingUser = await User.findOne({
+        where: { email: userData.email.toLowerCase().trim() }
+      });
+
+      if (existingUser) {
+        return {
+          success: false,
+          message: 'Ya existe un usuario con ese email',
+          code: 'EMAIL_ALREADY_EXISTS'
+        };
+      }
+
+      // Encriptar contraseña
+      const hashedPassword = await PasswordUtils.hashPassword(userData.password);
+
+      // Crear usuario
+      const user = await User.create({
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        email: userData.email.toLowerCase().trim(),
+        password: hashedPassword,
+        phone: userData.phone,
+        role: userData.role || 'sales_rep',
+        status: userData.status || 'active'
+      });
+
+      return {
+        success: true,
+        user: user,
+        message: 'Usuario creado exitosamente'
+      };
+
+    } catch (error) {
+      throw new Error(`Error al crear usuario: ${error.message}`);
     }
   }
 
@@ -137,8 +232,9 @@ class AuthRepository {
         session: session,
         user: {
           id: user.id,
-          code: user.code,
-          name: user.name,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          full_name: user.getFullName(),
           email: user.email,
           role: user.role,
           status: user.status
@@ -345,20 +441,20 @@ class AuthRepository {
 
   /**
    * Registra un intento de login
-   * @param {string} code - Código del usuario
+   * @param {string} email - Email del usuario
    * @param {boolean} success - Si fue exitoso
    * @param {string} ipAddress - IP del intento
    * @param {string} userAgent - User agent
    * @param {string} reason - Razón del fallo si aplica
    */
-  async logLoginAttempt(code, success, ipAddress, userAgent, reason = null) {
+  async logLoginAttempt(email, success, ipAddress, userAgent, reason = null) {
     try {
       await ActivityLog.logAction({
         userId: null, // Se llena después si es exitoso
         action: success ? 'LOGIN_SUCCESS' : 'LOGIN_FAILED',
         entityType: 'auth',
         newValues: {
-          userCode: code,
+          userEmail: email,
           success: success,
           reason: reason,
           timestamp: new Date().toISOString()
@@ -366,8 +462,8 @@ class AuthRepository {
         ipAddress: ipAddress,
         userAgent: userAgent,
         notes: success 
-          ? `Login exitoso para usuario ${code}` 
-          : `Login fallido para usuario ${code}: ${reason}`
+          ? `Login exitoso para usuario ${email}` 
+          : `Login fallido para usuario ${email}: ${reason}`
       });
     } catch (error) {
       console.error('Error al registrar intento de login:', error);
@@ -395,15 +491,32 @@ class AuthRepository {
   /**
    * Cambia la contraseña de un usuario
    * @param {number} userId - ID del usuario
+   * @param {string} currentPassword - Contraseña actual
    * @param {string} newPassword - Nueva contraseña
    * @returns {Promise<boolean>} True si se cambió exitosamente
    */
-  async changePassword(userId, newPassword) {
+  async changePassword(userId, currentPassword, newPassword) {
     try {
+      // Buscar usuario
+      const user = await User.findByPk(userId);
+      
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      // Verificar contraseña actual
+      const isCurrentPasswordValid = await PasswordUtils.verifyPassword(currentPassword, user.password);
+      
+      if (!isCurrentPasswordValid) {
+        throw new Error('Contraseña actual incorrecta');
+      }
+
+      // Encriptar nueva contraseña
       const hashedPassword = await PasswordUtils.hashPassword(newPassword);
       
+      // Actualizar contraseña
       const [affectedRows] = await User.update(
-        { password_hash: hashedPassword },
+        { password: hashedPassword },
         { where: { id: userId } }
       );
 

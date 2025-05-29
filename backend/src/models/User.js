@@ -11,26 +11,26 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    code: {
-      type: DataTypes.STRING(20),
+    first_name: {
+      type: DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
-      comment: 'Código único del asesor'
+      comment: 'Nombre del asesor'
     },
-    name: {
-      type: DataTypes.STRING(100),
+    last_name: {
+      type: DataTypes.STRING(50),
       allowNull: false,
-      comment: 'Nombre completo del asesor'
+      comment: 'Apellido del asesor'
     },
     email: {
       type: DataTypes.STRING(100),
+      allowNull: false,
       unique: true,
       validate: {
         isEmail: true
       },
       comment: 'Email del asesor'
     },
-    password_hash: {
+    password: {
       type: DataTypes.STRING(255),
       allowNull: false,
       comment: 'Hash de la contraseña'
@@ -40,8 +40,8 @@ module.exports = (sequelize) => {
       comment: 'Teléfono del asesor'
     },
     role: {
-      type: DataTypes.ENUM('asesor', 'supervisor', 'admin'),
-      defaultValue: 'asesor',
+      type: DataTypes.ENUM('admin', 'supervisor', 'sales_rep'),
+      defaultValue: 'sales_rep',
       comment: 'Rol del usuario'
     },
     status: {
@@ -84,9 +84,6 @@ module.exports = (sequelize) => {
     underscored: true,
     indexes: [
       {
-        fields: ['code']
-      },
-      {
         fields: ['email']
       },
       {
@@ -94,6 +91,9 @@ module.exports = (sequelize) => {
       },
       {
         fields: ['role']
+      },
+      {
+        fields: ['first_name', 'last_name']
       }
     ],
     hooks: {
@@ -147,9 +147,15 @@ module.exports = (sequelize) => {
   // Métodos de instancia
   User.prototype.toJSON = function() {
     const values = Object.assign({}, this.get());
-    // No enviar el password_hash en las respuestas JSON
-    delete values.password_hash;
+    // No enviar el password en las respuestas JSON
+    delete values.password;
+    // Agregar nombre completo
+    values.full_name = `${this.first_name} ${this.last_name}`;
     return values;
+  };
+
+  User.prototype.getFullName = function() {
+    return `${this.first_name} ${this.last_name}`;
   };
 
   User.prototype.isActive = function() {
@@ -166,12 +172,6 @@ module.exports = (sequelize) => {
   };
 
   // Métodos estáticos
-  User.findByCode = function(code) {
-    return this.findOne({
-      where: { code },
-      include: ['clients', 'quotes']
-    });
-  };
 
   User.findByEmail = function(email) {
     return this.findOne({

@@ -41,14 +41,14 @@ class AuthController {
 
   /**
    * Inicia sesión de usuario
-   * POST /api/v1/auth/login
+   * POST /api/auth/login
    */
   static login = ErrorHandler.asyncHandler(async (req, res) => {
-    const { code, password } = req.body;
+    const { email, password } = req.body;
     const ipAddress = Helpers.getClientIP(req);
     const userAgent = req.headers['user-agent'] || '';
 
-    const result = await AuthService.login(code, password, ipAddress, userAgent);
+    const result = await AuthService.login(email, password, ipAddress, userAgent);
     
     res.status(result.statusCode).json(result);
   });
@@ -202,27 +202,28 @@ class AuthController {
   });
 
   /**
-   * Registra un nuevo usuario (solo para admins o proceso específico)
-   * POST /api/v1/auth/register
+   * Registra un nuevo usuario
+   * POST /api/auth/register
    */
   static register = ErrorHandler.asyncHandler(async (req, res) => {
-    const userData = req.body;
+    const { first_name, last_name, email, password, phone, role = 'sales_rep' } = req.body;
     const ipAddress = Helpers.getClientIP(req);
+    const userAgent = req.headers['user-agent'] || '';
 
-    // En un sistema de asesores, el registro debe ser controlado
-    // Aquí podríamos validar que solo admins puedan crear usuarios
-    // o implementar un proceso específico de registro
+    // Datos del usuario a crear
+    const userData = {
+      first_name,
+      last_name,
+      email,
+      password,
+      phone,
+      role,
+      status: 'active'
+    };
 
-    const errorResponse = Helpers.errorResponse(
-      'El registro de usuarios debe realizarse a través del panel de administración',
-      'REGISTRATION_DISABLED',
-      {
-        message: 'Contacta al administrador para crear una nueva cuenta'
-      },
-      403
-    );
+    const result = await AuthService.register(userData, ipAddress, userAgent);
     
-    res.status(403).json(errorResponse);
+    res.status(result.statusCode).json(result);
   });
 
   /**
