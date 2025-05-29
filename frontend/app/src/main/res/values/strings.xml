@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">CHANCAFE Q</string>
+    
+    <!-- Login Screen -->
+    <string name="login_title">Ingresar al Sistema</string>
+    <string name="login_user_label">Usuario:</string>
+    <string name="login_user_hint">Código de asesor</string>
+    <string name="login_password_label">Contraseña:</string>
+    <string name="login_password_hint">••••••••</string>
+    <string name="login_button">Ingresar</string>
+    <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_version">Versión 1.0.0</string>
+    
+    <!-- Dashboard Screen -->
+    <string name="dashboard_welcome">Bienvenido, %s</string>
+    <string name="dashboard_role">Asesor de Ventas</string>
+    <string name="dashboard_new_quote">Nueva Cotización</string>
+    <string name="dashboard_my_quotes">Mis Cotizaciones</string>
+    <string name="dashboard_clients">Clientes</string>
+    <string name="dashboard_products">Productos</string>
+    <string name="dashboard_credit_requests">Solicitudes de Crédito</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_agenda">Agenda</string>
+    <string name="nav_profile">Perfil</string>
+    
+    <!-- General -->
+    <string name="loading">Cargando...</string>
+    <string name="error_general">Ha ocurrido un error</string>
+    <string name="error_network">Error de conexión</string>
+    <string name="retry">Reintentar</string>
+</resources>

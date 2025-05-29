@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="80dp"
+    android:viewportWidth="200"
+    android:viewportHeight="80">
+    
+    <!-- Fondo del logo con degradado rojo -->
+    <path
+        android:fillColor="@color/chancafe_red"
+        android:pathData="M20,15 L180,15 Q190,15 190,25 L190,55 Q190,65 180,65 L20,65 Q10,65 10,55 L10,25 Q10,15 20,15 Z" />
+    
+    <!-- Sombra interna para efecto 3D -->
+    <path
+        android:fillColor="@color/chancafe_dark_red"
+        android:pathData="M20,55 L180,55 Q185,55 185,60 L185,55 Q185,65 180,65 L20,65 Q10,65 10,55 L10,60 Q15,55 20,55 Z"
+        android:alpha="0.3" />
+    
+    <!-- Texto "Chancafe" en blanco -->
+    <group>
+        <!-- Letra C -->
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M28,35 Q28,25 38,25 Q45,25 45,30 L42,30 Q42,28 38,28 Q31,28 31,35 Q31,45 38,45 Q42,45 42,43 L45,43 Q45,48 38,48 Q28,48 28,35 Z" />
+        
+        <!-- Letra h -->
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M50,22 L53,22 L53,32 Q53,30 55,30 Q58,30 58,32 L58,48 L55,48 L55,35 Q55,33 53,33 L53,48 L50,48 Z" />
+        
+        <!-- Letra a -->
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M63,35 Q63,30 68,30 Q73,30 73,35 L73,48 L70,48 L70,45 Q70,48 68,48 Q63,48 63,43 Q63,40 68,40 L70,40 L70,35 Q70,33 68,33 Q66,33 66,35 L63,35 M66,43 Q66,45 68,45 Q70,45 70,43 L70,42 L68,42 Q66,42 66,43 Z" />
+        
+        <!-- Letra n -->
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M78,30 L81,30 L81,35 Q81,33 83,33 Q86,33 86,35 L86,48 L83,48 L83,38 Q83,36 81,36 L81,48 L78,48 Z" />
+        
+        <!-- Letra c -->
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M91,39 Q91,30 98,30 Q103,30 103,35 L100,35 Q100,33 98,33 Q94,33 94,39 Q94,45 98,45 Q100,45 100,43 L103,43 Q103,48 98,48 Q91,48 91,39 Z" />
+        
+        <!-- Letra a -->
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M108,35 Q108,30 113,30 Q118,30 118,35 L118,48 L115,48 L115,45 Q115,48 113,48 Q108,48 108,43 Q108,40 113,40 L115,40 L115,35 Q115,33 113,33 Q111,33 111,35 L108,35 M111,43 Q111,45 113,45 Q115,45 115,43 L115,42 L113,42 Q111,42 111,43 Z" />
+        
+        <!-- Letra f -->
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M123,22 L126,22 L126,30 L130,30 L130,33 L126,33 L126,43 Q126,45 128,45 L130,45 L130,48 L128,48 Q123,48 123,43 L123,33 L121,33 L121,30 L123,30 Z" />
+        
+        <!-- Letra e -->
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M135,39 Q135,30 140,30 Q145,30 145,35 Q145,40 140,40 L138,40 Q138,42 140,42 Q142,42 142,41 L145,41 Q145,48 140,48 Q135,48 135,39 M138,37 L142,37 Q142,35 140,35 Q138,35 138,37 Z" />
+    </group>
+    
+    <!-- Elemento decorativo - grano de café estilizado -->
+    <group
+        android:translateX="155"
+        android:translateY="30">
+        <path
+            android:fillColor="@color/chancafe_yellow"
+            android:pathData="M0,10 Q5,5 10,10 Q15,15 10,20 Q5,25 0,20 Q-5,15 0,10 Z" />
+        <path
+            android:fillColor="@color/white"
+            android:pathData="M3,15 Q5,13 7,15 Q5,17 3,15 Z"
+            android:alpha="0.8" />
+    </group>
+    
+</vector>
