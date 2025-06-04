@@ -112,37 +112,37 @@ module.exports = (sequelize) => {
   });
 
   // Definir asociaciones
-  // User.associate = (models) => {
-  //   // Un usuario tiene muchos clientes
-  //   User.hasMany(models.Client, {
-  //     foreignKey: 'user_id',
-  //     as: 'clients'
-  //   });
+  User.associate = (models) => {
+    // Un usuario tiene muchos clientes
+    User.hasMany(models.Client, {
+      foreignKey: 'user_id',
+      as: 'clients'
+    });
 
-  //   // Un usuario tiene muchas cotizaciones
-  //   User.hasMany(models.Quote, {
-  //     foreignKey: 'user_id',
-  //     as: 'quotes'
-  //   });
+    // Un usuario tiene muchas cotizaciones
+    User.hasMany(models.Quote, {
+      foreignKey: 'user_id',
+      as: 'quotes'
+    });
 
-  //   // Un usuario tiene muchas solicitudes de crédito
-  //   User.hasMany(models.CreditRequest, {
-  //     foreignKey: 'user_id',
-  //     as: 'creditRequests'
-  //   });
+    // Un usuario tiene muchas solicitudes de crédito
+    User.hasMany(models.CreditRequest, {
+      foreignKey: 'user_id',
+      as: 'creditRequests'
+    });
 
-  //   // Un usuario tiene muchas sesiones
-  //   User.hasMany(models.UserSession, {
-  //     foreignKey: 'user_id',
-  //     as: 'sessions'
-  //   });
+    // Un usuario tiene muchas sesiones
+    User.hasMany(models.UserSession, {
+      foreignKey: 'user_id',
+      as: 'sessions'
+    });
 
-  //   // Un usuario tiene muchos logs de actividad
-  //   User.hasMany(models.ActivityLog, {
-  //     foreignKey: 'user_id',
-  //     as: 'activityLogs'
-  //   });
-  // };
+    // Un usuario tiene muchos logs de actividad
+    User.hasMany(models.ActivityLog, {
+      foreignKey: 'user_id',
+      as: 'activityLogs'
+    });
+  };
 
   // Métodos de instancia
   User.prototype.toJSON = function() {

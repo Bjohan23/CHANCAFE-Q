@@ -21,8 +21,6 @@ const generateToken = (user) => {
 // Función para manejar el login
 const loginUser = async (email, password) => {
   const user = await User.findOne({ where: { email } });
-  console.log("Usuario encontrado:--------->", user);
-  
   // Si no se encuentra el usuario, findOne devuelve null
   if (!user) {
     throw new Error("El usuario no existe");
