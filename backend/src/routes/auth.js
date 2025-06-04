@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Rutas públicas
 router.post('/login', Validators.authValidators.login, Validators.handleValidationErrors, AuthController.login);
-router.post('/register', Validators.authValidators.register, Validators.handleValidationErrors, AuthController.register);
+router.post('/register',  AuthController.register);
 router.post('/refresh-token', Validators.authValidators.refreshToken, Validators.handleValidationErrors, AuthController.refreshToken);
 
 // Rutas protegidas

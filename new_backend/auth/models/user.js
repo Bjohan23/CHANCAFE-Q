@@ -40,8 +40,8 @@ module.exports = (sequelize) => {
       comment: 'Teléfono del asesor'
     },
     role: {
-      type: DataTypes.ENUM('admin', 'supervisor', 'representante de ventas'),
-      defaultValue: 'representante de ventas',
+      type: DataTypes.ENUM('admin', 'supervisor', 'sales_rep'),
+      defaultValue: 'sales_rep',
       comment: 'Rol del usuario'
     },
     status: {

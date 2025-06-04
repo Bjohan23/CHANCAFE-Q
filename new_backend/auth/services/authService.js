@@ -1,9 +1,9 @@
 // services/authService.js
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user"); 
-const {getSequelize} = require('../../shared/config/db');
-const user = require("../models/user");
+const { getSequelize } = require('../../shared/config/db');
+const db = require('../../shared/models'); // Importar todos los modelos
+const { User } = db; // Extraer el modelo User
 
 // Función para generar un token JWT
 const generateToken = (user) => {
@@ -21,27 +21,39 @@ const generateToken = (user) => {
 // Función para manejar el login
 const loginUser = async (email, password) => {
   const user = await User.findOne({ where: { email } });
-  if (user.length < 1 ) {
+  console.log("Usuario encontrado:--------->", user);
+  
+  // Si no se encuentra el usuario, findOne devuelve null
+  if (!user) {
     throw new Error("El usuario no existe");
   }
 
-  const isMatch = await bcrypt.compare(password, user[0].password);
+  // Comparar contraseñas - usar directamente user.password (Sequelize getter)
+  const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     throw new Error("Contraseña incorrecta");
   }
 
-  const token = generateToken(user[0]);
+  // Generar token - pasar el usuario directamente, no user[0]
+  const token = generateToken(user);
 
+  // Crear objeto sin contraseña usando los campos correctos del modelo User
   const userWithoutPassword = {
-    id: user[0].id,
-    username: user[0].username,
-    email: user[0].email,
-    profile: user[0].profile,
-    profile_id: user[0].profile_id,
-    establishment_id: user[0].establishment_id,
-    warehouse_id: user[0].warehouse_id,
+    id: user.id,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+    status: user.status,
+    avatar_url: user.avatar_url,
+    hire_date: user.hire_date,
+    branch_office: user.branch_office,
+    commission_rate: user.commission_rate,
+    last_login: user.last_login,
+    full_name: user.getFullName() // Usar el método del modelo
   };
- // const userResponse = user[0]
+  
   return { user: userWithoutPassword, token };
 };
 

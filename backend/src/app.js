@@ -64,8 +64,6 @@ app.get('/', (req, res) => {
     });
 });
 
-// Middleware de manejo de errores (debe ir al final)
-app.use(ErrorHandler.handleError);
 
 // Manejo de rutas no encontradas
 app.use('*', (req, res) => {
@@ -76,5 +74,8 @@ app.use('*', (req, res) => {
         method: req.method
     });
 });
+
+// Middleware de manejo de errores (debe ir al final)
+app.use(ErrorHandler.handleError);
 
 module.exports = app;
