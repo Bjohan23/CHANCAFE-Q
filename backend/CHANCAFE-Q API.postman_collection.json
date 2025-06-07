@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "3a96ca30-9b43-4ab7-a3c5-f6b4465bd43a",
 		"name": "CHANCAFE-Q API",
-		"description": "Colección completa para la API de CHANCAFE Q - Backend Node.js/Express\n\n**Funcionalidades implementadas:**\n- ✅ Autenticación completa (Login, Register, Logout)\n- ✅ Gestión de perfil de usuario\n- ✅ Administración de usuarios (CRUD completo)\n- ✅ Control de roles y permisos\n- ✅ Cambio de contraseñas\n\n**Variables de entorno necesarias:**\n- `base_url`: URL base de la API (ej: http://localhost:3000/api)\n- `authToken`: Token JWT (se genera automáticamente en login)\n- `userId`: ID del usuario para pruebas",
+		"description": "Colección completa para la API de CHANCAFE Q - Backend Node.js/Express\n\n**Funcionalidades implementadas:**\n- ✅ Autenticación completa (Login, Register, Logout)\n- ✅ Gestión de perfil de usuario\n- ✅ Administración de usuarios (CRUD completo)\n- ✅ Control de roles y permisos\n- ✅ Cambio de contraseñas\n- ✅ Gestión de categorías (CRUD completo)\n- ✅ Jerarquía de categorías (padre/hijos)\n- ✅ Búsqueda y filtros de categorías\n\n**Variables de entorno necesarias:**\n- `base_url`: URL base de la API (ej: http://localhost:3000/api)\n- `authToken`: Token JWT (se genera automáticamente en login)\n- `userId`: ID del usuario para pruebas\n- `categoryId`: ID de categoría para pruebas",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "37068501",
 		"_collection_link": "https://martian-shadow-16460.postman.co/workspace/My-Workspace~0cf008d4-b014-4f79-8183-9e14ade1c76a/collection/37068501-3a96ca30-9b43-4ab7-a3c5-f6b4465bd43a?action=share&source=collection_link&creator=37068501"
@@ -826,6 +826,512 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "📁 Gestión de Categorías",
+			"description": "Endpoints para gestión completa de categorías de productos",
+			"item": [
+				{
+					"name": "Crear Categoría",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Category created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data).to.have.property('name');",
+									"    ",
+									"    // Guardar categoryId para otros tests",
+									"    pm.environment.set('categoryId', jsonData.data.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Cafés Especiales\",\n    \"description\": \"Categoría para cafés de origen y especialidades\",\n    \"image_url\": \"https://example.com/cafe-especial.jpg\",\n    \"status\": \"active\",\n    \"sort_order\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todas las Categorías",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Categories list received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories?page=1&limit=10&status=active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Página actual"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Categorías por página"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"description": "Filtrar por estado"
+								},
+								{
+									"key": "parentId",
+									"value": "",
+									"description": "Filtrar por categoría padre",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Buscar por nombre/descripción",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Categoría por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Category data received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/{{categoryId}}?include=products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{categoryId}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "products",
+									"description": "Incluir productos relacionados"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Categoría",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Category updated successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Cafés Premium\",\n    \"description\": \"Categoría actualizada para cafés premium y gourmet\",\n    \"sort_order\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/categories/{{categoryId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{categoryId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Categoría",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Category deleted successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/{{categoryId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{categoryId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Categorías Activas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Categorías Principales",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/parentCategories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"parentCategories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Árbol de Categorías",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/tree",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"tree"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Subcategorías",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/{{categoryId}}/subcategories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{categoryId}}",
+								"subcategories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Categorías",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/search?q=cafe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "cafe",
+									"description": "Término de búsqueda"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Categorías con Conteo de Productos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/withProductCount",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"withProductCount"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Estado de Categoría",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"inactive\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/categories/{{categoryId}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{categoryId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reordenar Categorías",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"categoryOrders\": [\n        { \"id\": 1, \"sortOrder\": 1 },\n        { \"id\": 2, \"sortOrder\": 2 },\n        { \"id\": 3, \"sortOrder\": 3 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/categories/reorder",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"reorder"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Estadísticas de Categorías",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -897,6 +1403,12 @@
 			"value": "",
 			"type": "string",
 			"description": "ID del usuario recién registrado"
+		},
+		{
+			"key": "categoryId",
+			"value": "1",
+			"type": "string",
+			"description": "ID de categoría para pruebas (se asigna automáticamente al crear)"
 		}
 	]
 }
