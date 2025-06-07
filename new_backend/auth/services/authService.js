@@ -1,121 +1,182 @@
 // services/authService.js
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { getSequelize } = require('../../shared/config/db');
-const db = require('../../shared/models'); // Importar todos los modelos
-const { User } = db; // Extraer el modelo User
+const userService = require('./userService');
 
-// Función para generar un token JWT
-const generateToken = (user) => {
-  const payload = {
-    userId: user.id,
-    email: user.email,
-  };
+/**
+ * AuthService - Servicio de autenticación que usa UserService
+ * Este servicio se enfoca únicamente en la autenticación,
+ * delegando la gestión de usuarios al UserService
+ */
+class AuthService {
 
-  const secret = process.env.JWT_SECRET;
-  const options = { expiresIn: "6h" };
-
-  return jwt.sign(payload, secret, options);
-};
-
-// Función para manejar el login
-const loginUser = async (email, password) => {
-  const user = await User.findOne({ where: { email } });
-  // Si no se encuentra el usuario, findOne devuelve null
-  if (!user) {
-    throw new Error("El usuario no existe");
+  /**
+   * Login de usuario
+   */
+  async loginUser(email, password) {
+    try {
+      return await userService.loginUser(email, password);
+    } catch (error) {
+      console.error('❌ Error en AuthService.loginUser:', error.message);
+      throw error;
+    }
   }
 
-  // Comparar contraseñas - usar directamente user.password (Sequelize getter)
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    throw new Error("Contraseña incorrecta");
+  /**
+   * Registro de usuario
+   */
+  async registerUser(userData) {
+    try {
+      return await userService.registerUser(userData);
+    } catch (error) {
+      console.error('❌ Error en AuthService.registerUser:', error.message);
+      throw error;
+    }
   }
 
-  // Generar token - pasar el usuario directamente, no user[0]
-  const token = generateToken(user);
-
-  // Crear objeto sin contraseña usando los campos correctos del modelo User
-  const userWithoutPassword = {
-    id: user.id,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    email: user.email,
-    phone: user.phone,
-    role: user.role,
-    status: user.status,
-    avatar_url: user.avatar_url,
-    hire_date: user.hire_date,
-    branch_office: user.branch_office,
-    commission_rate: user.commission_rate,
-    last_login: user.last_login,
-    full_name: user.getFullName() // Usar el método del modelo
-  };
-  
-  return { user: userWithoutPassword, token };
-};
-
-const registerUser = async (userData) => {
-  // Función para generar avatar aleatorio si no se proporciona uno
-  const generateRandomAvatar = () => {
-    const avatars = ['avatar.png', 'avatar2.png'];
-    const randomIndex = Math.floor(Math.random() * avatars.length);
-    return `/storage/img/${avatars[randomIndex]}`;
-  };
-
-  // Si no hay avatar_url, asignar uno aleatorio
-  const avatarUrlRandom = userData.avatar_url || generateRandomAvatar();
-
-  const {
-    first_name,
-    last_name,
-    email,
-    password,
-    phone,
-    role,
-    status = 'active',
-    avatar_url = avatarUrlRandom,
-    hire_date,
-    branch_office,
-    commission_rate
-  } = userData;
-
-  const existingUser = await User.findOne({ where: { email } });
-  if (existingUser) {
-    throw new Error("ya existe un usuario con este email");
+  /**
+   * Verificar token JWT
+   */
+  verifyToken(token) {
+    try {
+      return userService.verifyToken(token);
+    } catch (error) {
+      console.error('❌ Error en AuthService.verifyToken:', error.message);
+      throw error;
+    }
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = await User.create({
-    first_name,
-    last_name,
-    email,
-    password: hashedPassword,
-    phone,
-    role,
-    status,
-    avatar_url,
-    hire_date,
-    branch_office,
-    commission_rate
-  });
+  /**
+   * Obtener usuario autenticado por token
+   */
+  async getAuthenticatedUser(token) {
+    try {
+      const decoded = this.verifyToken(token);
+      const user = await userService.getUserById(decoded.userId);
+      return user;
+    } catch (error) {
+      console.error('❌ Error en AuthService.getAuthenticatedUser:', error.message);
+      throw error;
+    }
+  }
 
-  const token = generateToken(newUser);
-  const userWithoutPassword = {
-    id: newUser.id,
-    first_name: newUser.first_name,
-    last_name: newUser.last_name,
-    email: newUser.email,
-    phone: newUser.phone,
-    role: newUser.role,
-    status: newUser.status,
-    avatar_url: newUser.avatar_url,
-    hire_date: newUser.hire_date,
-    branch_office: newUser.branch_office,
-    commission_rate: newUser.commission_rate
-  };
-  
-  return { user: userWithoutPassword, token };
+  /**
+   * Refrescar token
+   */
+  async refreshToken(token) {
+    try {
+      const decoded = this.verifyToken(token);
+      const user = await userService.getUserById(decoded.userId);
+      
+      if (!user || !user.isActive) {
+        throw new Error("Usuario no válido para refrescar token");
+      }
+
+      const newToken = userService.generateToken(user);
+      
+      return {
+        token: newToken,
+        user: user,
+        message: "Token refrescado exitosamente"
+      };
+    } catch (error) {
+      console.error('❌ Error en AuthService.refreshToken:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Logout (invalidar token)
+   * Nota: En una implementación más robusta, podrías mantener una blacklist de tokens
+   */
+  async logout(token) {
+    try {
+      // Aquí podrías agregar lógica para invalidar el token
+      // Por ejemplo, añadiéndolo a una blacklist en Redis
+      
+      console.log('🔓 Usuario deslogueado exitosamente');
+      return {
+        message: "Logout exitoso"
+      };
+    } catch (error) {
+      console.error('❌ Error en AuthService.logout:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Cambiar contraseña
+   */
+  async changePassword(userId, currentPassword, newPassword) {
+    try {
+      return await userService.changePassword(userId, currentPassword, newPassword);
+    } catch (error) {
+      console.error('❌ Error en AuthService.changePassword:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Solicitar restablecimiento de contraseña
+   * Nota: Implementación básica - en producción incluirías envío de email
+   */
+  async requestPasswordReset(email) {
+    try {
+      const user = await userService.getUserByEmail(email);
+      
+      // Generar token de restablecimiento (válido por 1 hora)
+      const resetToken = userService.generateToken({
+        id: user.id,
+        email: user.email,
+        purpose: 'password_reset'
+      });
+
+      // En una implementación real, enviarías este token por email
+      console.log('📧 Token de restablecimiento generado:', resetToken);
+      
+      return {
+        message: "Se ha enviado un email con las instrucciones para restablecer la contraseña",
+        // En desarrollo puedes retornar el token, en producción NO
+        resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined
+      };
+    } catch (error) {
+      console.error('❌ Error en AuthService.requestPasswordReset:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Restablecer contraseña con token
+   */
+  async resetPassword(resetToken, newPassword) {
+    try {
+      const decoded = this.verifyToken(resetToken);
+      
+      if (decoded.purpose !== 'password_reset') {
+        throw new Error("Token inválido para restablecimiento de contraseña");
+      }
+
+      // Cambiar contraseña directamente (sin verificar la actual)
+      const user = await userService.getUserById(decoded.userId);
+      const updatedUser = await userService.updateUser(decoded.userId, {
+        password: newPassword
+      });
+
+      return {
+        message: "Contraseña restablecida exitosamente",
+        user: updatedUser
+      };
+    } catch (error) {
+      console.error('❌ Error en AuthService.resetPassword:', error.message);
+      throw error;
+    }
+  }
 }
 
-module.exports = { loginUser ,registerUser };
+// Mantener compatibilidad con la exportación anterior
+const authServiceInstance = new AuthService();
+
+module.exports = {
+  loginUser: authServiceInstance.loginUser.bind(authServiceInstance),
+  registerUser: authServiceInstance.registerUser.bind(authServiceInstance),
+  // Exportar también la instancia completa
+  authService: authServiceInstance
+};

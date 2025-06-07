@@ -113,6 +113,45 @@ module.exports = (sequelize) => {
       defaultValue: 0,
       comment: 'Meses de garantía'
     },
+    // 🆕 NUEVOS CAMPOS AGREGADOS
+    is_digital: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      comment: 'Producto digital/físico'
+    },
+    tax_exempt: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      comment: 'Exento de impuestos'
+    },
+    created_by: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'Usuario que creó el producto',
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    },
+    barcode: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'Código de barras'
+    },
+    supplier_sku: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'SKU del proveedor'
+    },
+    supplier_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'Proveedor principal',
+      references: {
+        model: 'suppliers',
+        key: 'id'
+      }
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
@@ -140,6 +179,15 @@ module.exports = (sequelize) => {
       },
       {
         fields: ['brand']
+      },
+      {
+        fields: ['barcode']
+      },
+      {
+        fields: ['created_by']
+      },
+      {
+        fields: ['supplier_id']
       }
     ]
   });
@@ -156,6 +204,26 @@ module.exports = (sequelize) => {
     Product.hasMany(models.QuoteItem, {
       foreignKey: 'product_id',
       as: 'quoteItems'
+    });
+
+    // Un producto puede tener un usuario creador
+    Product.belongsTo(models.User, {
+      foreignKey: 'created_by',
+      as: 'creator'
+    });
+
+    // Un producto puede tener un proveedor
+    Product.belongsTo(models.Supplier, {
+      foreignKey: 'supplier_id',
+      as: 'supplier'
+    });
+
+    // Un producto puede estar en múltiples categorías (muchos a muchos)
+    Product.belongsToMany(models.Category, {
+      through: models.ProductCategories,
+      foreignKey: 'product_id',
+      otherKey: 'category_id',
+      as: 'categories'
     });
   };
 
@@ -191,14 +259,21 @@ module.exports = (sequelize) => {
   Product.findBySku = function(sku) {
     return this.findOne({
       where: { sku },
-      include: ['category']
+      include: ['category', 'creator', 'supplier']
+    });
+  };
+
+  Product.findByBarcode = function(barcode) {
+    return this.findOne({
+      where: { barcode },
+      include: ['category', 'creator', 'supplier']
     });
   };
 
   Product.findActiveProducts = function() {
     return this.findAll({
       where: { status: 'active' },
-      include: ['category'],
+      include: ['category', 'supplier'],
       order: [['name', 'ASC']]
     });
   };
@@ -220,7 +295,18 @@ module.exports = (sequelize) => {
         category_id: categoryId,
         status: 'active'
       },
-      include: ['category'],
+      include: ['category', 'supplier'],
+      order: [['name', 'ASC']]
+    });
+  };
+
+  Product.findBySupplier = function(supplierId) {
+    return this.findAll({
+      where: {
+        supplier_id: supplierId,
+        status: 'active'
+      },
+      include: ['category', 'supplier'],
       order: [['name', 'ASC']]
     });
   };
@@ -235,7 +321,9 @@ module.exports = (sequelize) => {
           { description: { [Op.like]: `%${searchTerm}%` } },
           { brand: { [Op.like]: `%${searchTerm}%` } },
           { model: { [Op.like]: `%${searchTerm}%` } },
-          { sku: { [Op.like]: `%${searchTerm}%` } }
+          { sku: { [Op.like]: `%${searchTerm}%` } },
+          { barcode: { [Op.like]: `%${searchTerm}%` } },
+          { supplier_sku: { [Op.like]: `%${searchTerm}%` } }
         ]
       },
       include: ['category'],

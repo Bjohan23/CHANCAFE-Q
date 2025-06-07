@@ -94,6 +94,32 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       comment: 'Notas adicionales del cliente'
     },
+    // 🆕 NUEVOS CAMPOS AGREGADOS
+    website: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: 'Sitio web del cliente'
+    },
+    industry: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'Industria/sector'
+    },
+    company_size: {
+      type: DataTypes.ENUM('micro', 'small', 'medium', 'large'),
+      allowNull: true,
+      comment: 'Tamaño de empresa'
+    },
+    tax_id: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      comment: 'RUC/Tax ID adicional'
+    },
+    preferred_contact_method: {
+      type: DataTypes.ENUM('email', 'phone', 'whatsapp'),
+      defaultValue: 'email',
+      comment: 'Método de contacto preferido'
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
@@ -122,6 +148,12 @@ module.exports = (sequelize) => {
       {
         unique: true,
         fields: ['document_type', 'document_number']
+      },
+      {
+        fields: ['industry']
+      },
+      {
+        fields: ['company_size']
       }
     ],
     hooks: {
@@ -132,6 +164,10 @@ module.exports = (sequelize) => {
         // Limpiar y formatear el número de documento
         if (client.document_number) {
           client.document_number = client.document_number.replace(/\D/g, '');
+        }
+        // Formatear website si se proporciona
+        if (client.website && !client.website.startsWith('http')) {
+          client.website = 'https://' + client.website;
         }
       },
       beforeUpdate: (client) => {
@@ -188,6 +224,25 @@ module.exports = (sequelize) => {
     return this.status === 'active' && this.credit_limit > 0;
   };
 
+  Client.prototype.getPreferredContactInfo = function() {
+    switch (this.preferred_contact_method) {
+      case 'email': return this.email;
+      case 'phone': return this.phone;
+      case 'whatsapp': return this.phone;
+      default: return this.email || this.phone;
+    }
+  };
+
+  Client.prototype.getCompanySizeLabel = function() {
+    const labels = {
+      micro: 'Microempresa',
+      small: 'Pequeña empresa',
+      medium: 'Mediana empresa',
+      large: 'Gran empresa'
+    };
+    return labels[this.company_size] || 'No especificado';
+  };
+
   // Métodos estáticos
   Client.findByDocument = function(documentType, documentNumber) {
     return this.findOne({
@@ -224,6 +279,38 @@ module.exports = (sequelize) => {
         status: 'active'
       },
       order: [['contact_name', 'ASC']]
+    });
+  };
+
+  Client.findByIndustry = function(industry) {
+    return this.findAll({
+      where: {
+        industry,
+        status: 'active'
+      },
+      order: [['contact_name', 'ASC']]
+    });
+  };
+
+  Client.findByCompanySize = function(companySize) {
+    return this.findAll({
+      where: {
+        company_size: companySize,
+        status: 'active'
+      },
+      order: [['contact_name', 'ASC']]
+    });
+  };
+
+  Client.getIndustriesReport = function() {
+    return this.findAll({
+      attributes: [
+        'industry',
+        [this.sequelize.fn('COUNT', this.sequelize.col('id')), 'client_count']
+      ],
+      where: { status: 'active' },
+      group: ['industry'],
+      order: [[this.sequelize.fn('COUNT', this.sequelize.col('id')), 'DESC']]
     });
   };
 

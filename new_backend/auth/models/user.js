@@ -142,6 +142,19 @@ module.exports = (sequelize) => {
       foreignKey: 'user_id',
       as: 'activityLogs'
     });
+
+    // 🆕 NUEVAS RELACIONES AGREGADAS
+    // Un usuario puede crear muchos productos
+    User.hasMany(models.Product, {
+      foreignKey: 'created_by',
+      as: 'createdProducts'
+    });
+
+    // Un usuario puede crear muchas plantillas de cotización
+    User.hasMany(models.QuoteTemplate, {
+      foreignKey: 'created_by',
+      as: 'quoteTemplates'
+    });
   };
 
   // Métodos de instancia

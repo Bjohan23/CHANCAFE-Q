@@ -7,6 +7,7 @@ const authMiddleware = require('../shared/middlewares/authMiddleware')
 
 // Rutas públicas (no requieren autenticación)
 router.use('/auth', authRoutes)
+// router.use('/auth', authRoutes)
 
 // Middleware de autenticación para rutas protegidas
 router.use(authMiddleware)

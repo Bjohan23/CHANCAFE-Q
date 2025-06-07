@@ -82,10 +82,24 @@ module.exports = (sequelize) => {
       as: 'subcategories'
     });
 
-    // Una categoría tiene muchos productos
+    // Una categoría tiene muchos productos (relación original)
     Category.hasMany(models.Product, {
       foreignKey: 'category_id',
       as: 'products'
+    });
+
+    // Una categoría puede tener múltiples productos (relación muchos a muchos)
+    Category.belongsToMany(models.Product, {
+      through: models.ProductCategories,
+      foreignKey: 'category_id',
+      otherKey: 'product_id',
+      as: 'assignedProducts'
+    });
+
+    // Una categoría tiene muchas relaciones producto-categoría
+    Category.hasMany(models.ProductCategories, {
+      foreignKey: 'category_id',
+      as: 'productCategories'
     });
   };
 

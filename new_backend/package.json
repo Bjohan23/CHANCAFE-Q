@@ -9,7 +9,9 @@
     "start:dev": "cross-env NODE_ENV=development nodemon app.js",
     "start:qa": "cross-env NODE_ENV=qas nodemon app.js",
     "start:prod": "cross-env NODE_ENV=production node app.js",
-    "build": "echo 'No build step needed for Node.js app'"
+    "build": "echo 'No build step needed for Node.js app'",
+    "migrate": "node apply-database-improvements.js",
+    "db:improve": "node apply-database-improvements.js"
   },
   "keywords": [],
   "author": "",

@@ -118,6 +118,36 @@ module.exports = (sequelize) => {
       type: DataTypes.DATE,
       comment: 'Fecha de conversión a venta'
     },
+    // 🆕 NUEVOS CAMPOS AGREGADOS
+    revision_number: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1,
+      comment: 'Número de revisión de la cotización'
+    },
+    original_quote_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'ID de cotización original (para revisiones)',
+      references: {
+        model: 'quotes',
+        key: 'id'
+      }
+    },
+    pdf_generated_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: 'Última vez que se generó el PDF'
+    },
+    client_reference: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'Referencia del cliente'
+    },
+    project_name: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      comment: 'Nombre del proyecto'
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
@@ -148,15 +178,42 @@ module.exports = (sequelize) => {
       },
       {
         fields: ['valid_until']
+      },
+      {
+        fields: ['revision_number']
+      },
+      {
+        fields: ['original_quote_id']
       }
     ],
     hooks: {
-      beforeCreate: (quote) => {
+      beforeCreate: async (quote) => {
         // Establecer fecha de validez por defecto (30 días)
         if (!quote.valid_until) {
           const validUntil = new Date();
           validUntil.setDate(validUntil.getDate() + 30);
           quote.valid_until = validUntil;
+        }
+        
+        // Generar número de cotización automático si no existe
+        if (!quote.quote_number) {
+          const year = new Date().getFullYear();
+          const lastQuote = await Quote.findOne({
+            where: {
+              quote_number: {
+                [sequelize.Sequelize.Op.like]: `COT-${year}-%`
+              }
+            },
+            order: [['quote_number', 'DESC']]
+          });
+          
+          let nextNumber = 1;
+          if (lastQuote) {
+            const lastNumber = parseInt(lastQuote.quote_number.split('-')[2]);
+            nextNumber = lastNumber + 1;
+          }
+          
+          quote.quote_number = `COT-${year}-${nextNumber.toString().padStart(6, '0')}`;
         }
       }
     }
@@ -186,6 +243,18 @@ module.exports = (sequelize) => {
     Quote.hasOne(models.CreditRequest, {
       foreignKey: 'quote_id',
       as: 'creditRequest'
+    });
+
+    // Una cotización puede ser revisión de otra cotización
+    Quote.belongsTo(Quote, {
+      foreignKey: 'original_quote_id',
+      as: 'originalQuote'
+    });
+
+    // Una cotización puede tener múltiples revisiones
+    Quote.hasMany(Quote, {
+      foreignKey: 'original_quote_id',
+      as: 'revisions'
     });
   };
 
@@ -234,6 +303,35 @@ module.exports = (sequelize) => {
     return this.save();
   };
 
+  Quote.prototype.generatePDF = function() {
+    this.pdf_generated_at = new Date();
+    return this.save();
+  };
+
+  Quote.prototype.createRevision = function(changes = {}) {
+    const revisionData = {
+      ...this.toJSON(),
+      id: undefined,
+      quote_number: undefined, // Se generará uno nuevo
+      original_quote_id: this.id,
+      revision_number: this.revision_number + 1,
+      status: 'draft',
+      sent_at: null,
+      approved_at: null,
+      converted_at: null,
+      pdf_generated_at: null,
+      created_at: new Date(),
+      updated_at: new Date(),
+      ...changes
+    };
+    
+    return Quote.create(revisionData);
+  };
+
+  Quote.prototype.isRevision = function() {
+    return this.original_quote_id !== null;
+  };
+
   Quote.prototype.calculateTotals = function() {
     // Este método se llamará después de que se actualicen los items
     // Los totales se recalculan automáticamente en la base de datos
@@ -244,7 +342,7 @@ module.exports = (sequelize) => {
   Quote.findByNumber = function(quoteNumber) {
     return this.findOne({
       where: { quote_number: quoteNumber },
-      include: ['advisor', 'client', 'items']
+      include: ['advisor', 'client', 'items', 'originalQuote', 'revisions']
     });
   };
 
@@ -291,6 +389,22 @@ module.exports = (sequelize) => {
       },
       include: ['advisor', 'client'],
       order: [['valid_until', 'ASC']]
+    });
+  };
+
+  Quote.findOriginalQuotes = function() {
+    return this.findAll({
+      where: { original_quote_id: null },
+      include: ['advisor', 'client', 'revisions'],
+      order: [['created_at', 'DESC']]
+    });
+  };
+
+  Quote.findRevisions = function(originalQuoteId) {
+    return this.findAll({
+      where: { original_quote_id: originalQuoteId },
+      include: ['advisor', 'client'],
+      order: [['revision_number', 'DESC']]
     });
   };
 
