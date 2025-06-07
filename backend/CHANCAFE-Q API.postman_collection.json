@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "3a96ca30-9b43-4ab7-a3c5-f6b4465bd43a",
 		"name": "CHANCAFE-Q API",
-		"description": "Colección completa para la API de CHANCAFE Q - Backend Node.js/Express",
+		"description": "Colección completa para la API de CHANCAFE Q - Backend Node.js/Express\n\n**Funcionalidades implementadas:**\n- ✅ Autenticación completa (Login, Register, Logout)\n- ✅ Gestión de perfil de usuario\n- ✅ Administración de usuarios (CRUD completo)\n- ✅ Control de roles y permisos\n- ✅ Cambio de contraseñas\n\n**Variables de entorno necesarias:**\n- `base_url`: URL base de la API (ej: http://localhost:3000/api)\n- `authToken`: Token JWT (se genera automáticamente en login)\n- `userId`: ID del usuario para pruebas",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "37068501",
 		"_collection_link": "https://martian-shadow-16460.postman.co/workspace/My-Workspace~0cf008d4-b014-4f79-8183-9e14ade1c76a/collection/37068501-3a96ca30-9b43-4ab7-a3c5-f6b4465bd43a?action=share&source=collection_link&creator=37068501"
@@ -10,6 +10,7 @@
 	"item": [
 		{
 			"name": "🔐 Autenticación",
+			"description": "Endpoints de autenticación básica (públicos - no requieren token)",
 			"item": [
 				{
 					"name": "Login",
@@ -22,17 +23,18 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Response has token\", function () {",
+									"pm.test(\"Response has token and user data\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.success).to.be.true;",
 									"    pm.expect(jsonData.data).to.have.property('token');",
+									"    pm.expect(jsonData.data).to.have.property('user');",
 									"    ",
-									"    // Guardar el token para usar en otras requests",
+									"    // Guardar el token y userId para usar en otras requests",
 									"    pm.environment.set('authToken', jsonData.data.token);",
+									"    pm.environment.set('userId', jsonData.data.user.id);",
 									"    ",
-									"    if(jsonData.data.refreshToken) {",
-									"        pm.environment.set('refreshToken', jsonData.data.refreshToken);",
-									"    }",
+									"    console.log('Token guardado:', jsonData.data.token);",
+									"    console.log('User ID guardado:', jsonData.data.user.id);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -80,6 +82,10 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.success).to.be.true;",
 									"    pm.expect(jsonData.data).to.have.property('user');",
+									"    pm.expect(jsonData.data).to.have.property('token');",
+									"    ",
+									"    // También guardar datos del usuario registrado",
+									"    pm.environment.set('newUserId', jsonData.data.user.id);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -97,7 +103,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"first_name\": \"admin\",\n    \"last_name\": \"admin\", \n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\",\n    \"phone\": \"987654321\",\n    \"role\": \"sales_rep\",\n    \"status\": \"active\",\n    \"hire_date\": \"2025-06-03\",\n    \"branch_office\": \"Lima Centro\",\n    \"commission_rate\": 0.05\n}"
+							"raw": "{\n    \"first_name\": \"Carlos\",\n    \"last_name\": \"Mendoza\", \n    \"email\": \"carlos.mendoza@chancafe.com\",\n    \"password\": \"carlos123\",\n    \"phone\": \"987654321\",\n    \"role\": \"sales_rep\",\n    \"status\": \"active\",\n    \"hire_date\": \"2025-06-07\",\n    \"branch_office\": \"Lima Centro\",\n    \"commission_rate\": 5.00\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
@@ -114,6 +120,25 @@
 				},
 				{
 					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Logout successful\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -134,6 +159,671 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Cambiar Contraseña",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Password changed successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currentPassword\": \"admin123\",\n    \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👤 Perfil de Usuario",
+			"description": "Endpoints para gestión del perfil personal del usuario autenticado",
+			"item": [
+				{
+					"name": "Obtener Mi Perfil",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Profile data received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data).to.have.property('email');",
+									"    pm.expect(jsonData.data).to.have.property('first_name');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Mi Perfil",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Profile updated successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Carlos Actualizado\",\n    \"last_name\": \"Mendoza Actualizado\",\n    \"phone\": \"999888777\",\n    \"branch_office\": \"Lima Norte\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/users/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👥 Gestión de Usuarios",
+			"description": "Endpoints para administración de usuarios (requieren permisos administrativos)",
+			"item": [
+				{
+					"name": "Listar Todos los Usuarios",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Users list received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users?page=1&limit=10&status=active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Página actual"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Usuarios por página"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"description": "Filtrar por estado"
+								},
+								{
+									"key": "role",
+									"value": "",
+									"description": "Filtrar por rol",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Buscar por nombre/email",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Usuario por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User data received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users/{{userId}}?include=clients,quotes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"{{userId}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "clients,quotes",
+									"description": "Incluir relaciones"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User updated successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Carlos Editado\",\n    \"last_name\": \"Mendoza Editado\",\n    \"phone\": \"999777555\",\n    \"role\": \"supervisor\",\n    \"commission_rate\": 7.50\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/users/{{userId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User deleted successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users/{{userId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Estado de Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User status changed successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"inactive\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/users/{{userId}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"{{userId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Rol de Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User role changed successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/users/{{userId}}/role",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"{{userId}}",
+								"role"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📊 Consultas y Reportes",
+			"description": "Endpoints para obtener datos específicos y estadísticas",
+			"item": [
+				{
+					"name": "Obtener Usuarios Activos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Active users received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users/active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Estadísticas de Usuarios",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Stats received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.have.property('total');",
+									"    pm.expect(jsonData.data).to.have.property('active');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usuarios por Rol",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Users by role received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users/by-role/sales_rep",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"by-role",
+								"sales_rep"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usuarios por Sucursal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Users by branch received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users/by-branch/Lima Centro",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"by-branch",
+								"Lima Centro"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -145,7 +835,13 @@
 				"type": "text/javascript",
 				"exec": [
 					"// Script global que se ejecuta antes de cada request",
-					"console.log('Ejecutando request a:', pm.request.url.toString());"
+					"console.log('🚀 Ejecutando request a:', pm.request.url.toString());",
+					"",
+					"// Verificar si necesita token y está disponible",
+					"const needsAuth = pm.request.url.path.some(p => p !== 'login' && p !== 'register');",
+					"if (needsAuth && !pm.environment.get('authToken')) {",
+					"    console.warn('⚠️ Este endpoint requiere autenticación. Ejecuta Login primero.');",
+					"}"
 				]
 			}
 		},
@@ -160,8 +856,13 @@
 					"});",
 					"",
 					"// Log de respuesta para debugging",
-					"console.log('Response status:', pm.response.status);",
-					"console.log('Response time:', pm.response.responseTime + 'ms');"
+					"console.log('📊 Response status:', pm.response.status);",
+					"console.log('⏱️ Response time:', pm.response.responseTime + 'ms');",
+					"",
+					"// Log errores si existen",
+					"if (pm.response.status >= 400) {",
+					"    console.error('❌ Error response:', pm.response.json());",
+					"}"
 				]
 			}
 		}
@@ -170,22 +871,32 @@
 		{
 			"key": "base_url",
 			"value": "http://localhost:3000/api",
-			"type": "string"
+			"type": "string",
+			"description": "URL base de la API"
 		},
 		{
 			"key": "server_url",
 			"value": "http://localhost:3000",
-			"type": "string"
+			"type": "string",
+			"description": "URL del servidor"
 		},
 		{
 			"key": "authToken",
 			"value": "",
-			"type": "string"
+			"type": "string",
+			"description": "Token JWT de autenticación (se asigna automáticamente en login)"
 		},
 		{
-			"key": "refreshToken",
+			"key": "userId",
+			"value": "1",
+			"type": "string",
+			"description": "ID del usuario para pruebas (se asigna automáticamente en login)"
+		},
+		{
+			"key": "newUserId",
 			"value": "",
-			"type": "string"
+			"type": "string",
+			"description": "ID del usuario recién registrado"
 		}
 	]
 }
