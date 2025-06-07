@@ -14,8 +14,8 @@ router.post('/login', userController.login);
 router.post('/register', userController.register);
 
 // ===== RUTAS PROTEGIDAS DE AUTENTICACIÓN =====
-router.post('/auth/logout', authMiddleware, userController.logout);
-router.post('/auth/change-password', authMiddleware, userController.changePassword);
+router.post('/logout', authMiddleware, userController.logout);
+router.post('/change-password', authMiddleware, userController.changePassword);
 
 // ===== RUTAS DE PERFIL DE USUARIO =====
 router.get('/users/profile', authMiddleware, userController.getProfile);
