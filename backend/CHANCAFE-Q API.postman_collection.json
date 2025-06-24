@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "3a96ca30-9b43-4ab7-a3c5-f6b4465bd43a",
 		"name": "CHANCAFE-Q API",
-		"description": "Colección completa para la API de CHANCAFE Q - Backend Node.js/Express\n\n**Funcionalidades implementadas:**\n- ✅ Autenticación completa (Login, Register, Logout)\n- ✅ Gestión de perfil de usuario\n- ✅ Administración de usuarios (CRUD completo)\n- ✅ Control de roles y permisos\n- ✅ Cambio de contraseñas\n- ✅ Gestión de categorías (CRUD completo)\n- ✅ Jerarquía de categorías (padre/hijos)\n- ✅ Búsqueda y filtros de categorías\n\n**Variables de entorno necesarias:**\n- `base_url`: URL base de la API (ej: http://localhost:3000/api)\n- `authToken`: Token JWT (se genera automáticamente en login)\n- `userId`: ID del usuario para pruebas\n- `categoryId`: ID de categoría para pruebas",
+		"description": "Colección completa para la API de CHANCAFE Q - Backend Node.js/Express\n\n**Funcionalidades implementadas:**\n- ✅ Autenticación completa (Login, Register, Logout)\n- ✅ Gestión de perfil de usuario\n- ✅ Administración de usuarios (CRUD completo)\n- ✅ Control de roles y permisos\n- ✅ Cambio de contraseñas\n- ✅ Gestión de categorías (CRUD completo)\n- ✅ Jerarquía de categorías (padre/hijos)\n- ✅ Búsqueda y filtros de categorías\n- ✅ Gestión de proveedores (CRUD completo)\n- ✅ Búsqueda avanzada de proveedores\n- ✅ Filtros por RUC, términos de pago, tiempo de entrega\n- ✅ Gestión de productos (CRUD completo)\n- ✅ Búsqueda avanzada de productos\n- ✅ Filtros por categoría, proveedor, marca, precios\n- ✅ Gestión de stock y estado\n- ✅ Productos destacados y reportes\n\n**Variables de entorno necesarias:**\n- `base_url`: URL base de la API (ej: http://localhost:3000/api)\n- `authToken`: Token JWT (se genera automáticamente en login)\n- `userId`: ID del usuario para pruebas\n- `categoryId`: ID de categoría para pruebas\n- `supplierId`: ID de proveedor para pruebas\n- `productId`: ID de producto para pruebas",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "37068501",
 		"_collection_link": "https://martian-shadow-16460.postman.co/workspace/My-Workspace~0cf008d4-b014-4f79-8183-9e14ade1c76a/collection/37068501-3a96ca30-9b43-4ab7-a3c5-f6b4465bd43a?action=share&source=collection_link&creator=37068501"
@@ -1332,6 +1332,536 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "🏢 Gestión de Proveedores",
+			"description": "Endpoints para gestión completa de proveedores",
+			"item": [
+				{
+					"name": "Crear Proveedor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Supplier created successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data).to.have.property('name');",
+									"    ",
+									"    // Guardar supplierId para otros tests",
+									"    pm.environment.set('supplierId', jsonData.data.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Café del Valle SAC\",\n    \"business_name\": \"Café del Valle Sociedad Anónima Cerrada\",\n    \"tax_id\": \"20123456789\",\n    \"contact_name\": \"Juan Pérez\",\n    \"email\": \"contacto@cafedelvalle.com\",\n    \"phone\": \"+51987654321\",\n    \"address\": \"Av. Principal 123, Cusco, Perú\",\n    \"website\": \"https://cafedelvalle.com\",\n    \"status\": \"active\",\n    \"payment_terms\": \"30 días\",\n    \"delivery_time\": \"5-7 días\",\n    \"notes\": \"Proveedor especializado en café orgánico de altura\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/suppliers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todos los Proveedores",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Suppliers list received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers?page=1&limit=10&status=active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Página actual"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Proveedores por página"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"description": "Filtrar por estado"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Buscar por nombre/razón social/contacto",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Proveedor por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Supplier data received\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/{{supplierId}}?include=products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"{{supplierId}}"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "products",
+									"description": "Incluir productos del proveedor"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Proveedor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Supplier updated successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Café del Valle Premium SAC\",\n    \"contact_name\": \"Juan Pérez Actualizado\",\n    \"phone\": \"+51999888777\",\n    \"payment_terms\": \"45 días\",\n    \"notes\": \"Proveedor premium de café orgánico especializado en granos de altura\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/suppliers/{{supplierId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"{{supplierId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Proveedor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Supplier deleted successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/{{supplierId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"{{supplierId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Proveedores Activos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/active",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Proveedores",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/search?q=cafe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "cafe",
+									"description": "Término de búsqueda"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Proveedores con Conteo de Productos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/withProductCount",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"withProductCount"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Proveedor por RUC",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/byTaxId/20123456789",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"byTaxId",
+								"20123456789"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Información de Contacto",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/{{supplierId}}/contactInfo",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"{{supplierId}}",
+								"contactInfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar por Términos de Pago",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/byPaymentTerms?terms=30",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"byPaymentTerms"
+							],
+							"query": [
+								{
+									"key": "terms",
+									"value": "30",
+									"description": "Términos de pago a buscar"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar por Tiempo de Entrega",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/byDeliveryTime?time=5-7",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"byDeliveryTime"
+							],
+							"query": [
+								{
+									"key": "time",
+									"value": "5-7",
+									"description": "Tiempo de entrega a buscar"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Estado de Proveedor",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"inactive\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/suppliers/{{supplierId}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"{{supplierId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Estadísticas de Proveedores",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resumen por Estado",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/suppliers/statusSummary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"suppliers",
+								"statusSummary"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -1409,6 +1939,18 @@
 			"value": "1",
 			"type": "string",
 			"description": "ID de categoría para pruebas (se asigna automáticamente al crear)"
+		},
+		{
+			"key": "supplierId",
+			"value": "1",
+			"type": "string",
+			"description": "ID de proveedor para pruebas (se asigna automáticamente al crear)"
+		},
+		{
+			"key": "productId",
+			"value": "1",
+			"type": "string",
+			"description": "ID de producto para pruebas (se asigna automáticamente al crear)"
 		}
 	]
 }
