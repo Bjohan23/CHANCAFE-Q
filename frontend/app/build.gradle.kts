@@ -51,16 +51,16 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
 
-    // Room (comentadas para uso futuro)
-    // implementation(libs.room.runtime)
-    // annotationProcessor(libs.room.compiler)
+    // Room Database
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
 
-    // Networking (comentadas para uso futuro)
-    // implementation(libs.retrofit)
-    // implementation(libs.retrofit.gson)
-    // implementation(libs.okhttp)
-    // implementation(libs.okhttp.logging)
-    // implementation(libs.gson)
+    // Networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

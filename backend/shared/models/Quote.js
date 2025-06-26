@@ -44,6 +44,10 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(150),
       comment: 'Título de la cotización'
     },
+    description: {
+      type: DataTypes.TEXT,
+      comment: 'Descripción de la cotización'
+    },
     notes: {
       type: DataTypes.TEXT,
       comment: 'Notas adicionales'
@@ -78,7 +82,7 @@ module.exports = (sequelize) => {
       defaultValue: 0.00,
       comment: 'Monto de IGV'
     },
-    total: {
+    total_amount: {
       type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
       defaultValue: 0.00,
@@ -119,10 +123,20 @@ module.exports = (sequelize) => {
       comment: 'Fecha de conversión a venta'
     },
     // 🆕 NUEVOS CAMPOS AGREGADOS
-    revision_number: {
+    revision: {
       type: DataTypes.INTEGER,
       defaultValue: 1,
       comment: 'Número de revisión de la cotización'
+    },
+    pdf_generated: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      comment: 'Indica si se ha generado el PDF'
+    },
+    pdf_url: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      comment: 'URL del PDF generado'
     },
     original_quote_id: {
       type: DataTypes.INTEGER,
@@ -180,7 +194,7 @@ module.exports = (sequelize) => {
         fields: ['valid_until']
       },
       {
-        fields: ['revision_number']
+        fields: ['revision']
       },
       {
         fields: ['original_quote_id']
@@ -314,7 +328,7 @@ module.exports = (sequelize) => {
       id: undefined,
       quote_number: undefined, // Se generará uno nuevo
       original_quote_id: this.id,
-      revision_number: this.revision_number + 1,
+      revision: this.revision + 1,
       status: 'draft',
       sent_at: null,
       approved_at: null,
@@ -404,7 +418,7 @@ module.exports = (sequelize) => {
     return this.findAll({
       where: { original_quote_id: originalQuoteId },
       include: ['advisor', 'client'],
-      order: [['revision_number', 'DESC']]
+      order: [['revision', 'DESC']]
     });
   };
 

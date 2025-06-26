@@ -54,10 +54,15 @@ module.exports = (sequelize) => {
       defaultValue: 'PEN',
       comment: 'Moneda del crédito'
     },
-    payment_term_months: {
+    payment_terms: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      comment: 'Plazo de pago en meses'
+      comment: 'Términos de pago en días'
+    },
+    exchange_rate: {
+      type: DataTypes.DECIMAL(8, 4),
+      defaultValue: 1.0000,
+      comment: 'Tipo de cambio al momento de la solicitud'
     },
     interest_rate: {
       type: DataTypes.DECIMAL(5, 2),
@@ -71,8 +76,12 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       comment: 'Propósito del crédito'
     },
+    description: {
+      type: DataTypes.TEXT,
+      comment: 'Descripción detallada de la solicitud'
+    },
     status: {
-      type: DataTypes.ENUM('pending', 'under_review', 'approved', 'rejected', 'cancelled'),
+      type: DataTypes.ENUM('pending', 'under_review', 'approved', 'rejected', 'cancelled', 'expired'),
       defaultValue: 'pending',
       comment: 'Estado de la solicitud'
     },
@@ -85,7 +94,7 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       comment: 'Garantías ofrecidas'
     },
-    documents_submitted: {
+    documents: {
       type: DataTypes.JSON,
       comment: 'Documentos presentados'
     },
@@ -101,9 +110,42 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       comment: 'Motivo de rechazo'
     },
+    notes: {
+      type: DataTypes.TEXT,
+      comment: 'Notas adicionales'
+    },
     internal_notes: {
       type: DataTypes.TEXT,
       comment: 'Notas internas del análisis'
+    },
+    approved_amount: {
+      type: DataTypes.DECIMAL(12, 2),
+      allowNull: true,
+      comment: 'Monto aprobado (puede ser diferente al solicitado)'
+    },
+    approved_terms: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'Términos aprobados en días'
+    },
+    approved_by: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'ID del usuario que aprobó/rechazó',
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    },
+    approved_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: 'Fecha de aprobación/rechazo'
+    },
+    expires_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: 'Fecha de expiración de la aprobación'
     },
     submitted_at: {
       type: DataTypes.DATE,

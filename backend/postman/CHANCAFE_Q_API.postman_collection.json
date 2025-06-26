@@ -1,0 +1,1273 @@
+{
+	"info": {
+		"name": "CHANCAFE Q - API Complete Collection",
+		"description": "Colección completa de la API CHANCAFE Q con todos los endpoints organizados por módulos.\n\n## Módulos incluidos:\n- 🔐 Authentication & User Management\n- 👥 Client Management\n- 📄 Quote Management\n- 💳 Credit Request Management\n- 📦 Product Management\n- 🏷️ Category Management\n- 🏢 Supplier Management\n\n## Instrucciones de uso:\n1. Importar environment (Development o Production)\n2. Ejecutar 'Register User' o 'Login' para obtener token\n3. El token se guardará automáticamente en las variables\n4. Usar los demás endpoints con autenticación automática\n\n## Variables automáticas:\n- `token`: Se actualiza automáticamente al hacer login\n- `user_id`: ID del usuario logueado\n- `client_id`, `quote_id`, etc.: Se actualizan al crear recursos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has user and token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('user');",
+									"    pm.expect(jsonData.data).to.have.property('token');",
+									"});",
+									"",
+									"// Save token and user_id automatically",
+									"if (pm.response.code === 200) {",
+									"    var responseJson = pm.response.json();",
+									"    if (responseJson.data && responseJson.data.token) {",
+									"        pm.environment.set(\"token\", responseJson.data.token);",
+									"    }",
+									"    if (responseJson.data && responseJson.data.user && responseJson.data.user.id) {",
+									"        pm.environment.set(\"user_id\", responseJson.data.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"email\": \"admin@chancafe.com\",\n    \"password\": \"123456\",\n    \"role\": \"admin\",\n    \"phone\": \"+51987654321\",\n    \"branch_office\": \"Lima Centro\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/auth/register",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Registra un nuevo usuario en el sistema. Por defecto crea un usuario administrador."
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has user and token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('user');",
+									"    pm.expect(jsonData.data).to.have.property('token');",
+									"});",
+									"",
+									"// Save token and user_id automatically",
+									"if (pm.response.code === 200) {",
+									"    var responseJson = pm.response.json();",
+									"    if (responseJson.data && responseJson.data.token) {",
+									"        pm.environment.set(\"token\", responseJson.data.token);",
+									"        console.log(\"Token saved automatically\");",
+									"    }",
+									"    if (responseJson.data && responseJson.data.user && responseJson.data.user.id) {",
+									"        pm.environment.set(\"user_id\", responseJson.data.user.id);",
+									"        console.log(\"User ID saved: \" + responseJson.data.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@chancafe.com\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/auth/login",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Inicia sesión y obtiene un token JWT que se guarda automáticamente."
+					}
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if token exists",
+									"if (!pm.environment.get(\"token\")) {",
+									"    console.log(\"Warning: No token found. Please login first.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/auth/logout",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "logout"]
+						},
+						"description": "Cierra la sesión del usuario actual."
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currentPassword\": \"123456\",\n    \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/auth/change-password",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "change-password"]
+						},
+						"description": "Cambia la contraseña del usuario autenticado."
+					}
+				}
+			],
+			"description": "Endpoints para autenticación y gestión de sesiones."
+		},
+		{
+			"name": "👤 User Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has users array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('users');",
+									"    pm.expect(jsonData.data.users).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/auth/users?page=1&limit=10",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "users"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"disabled": true
+								},
+								{
+									"key": "role",
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "admin",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Obtiene lista de usuarios con filtros opcionales de paginación, estado, rol y búsqueda."
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/auth/users/{{user_id}}",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "users", "{{user_id}}"]
+						},
+						"description": "Obtiene información de un usuario específico por su ID."
+					}
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/auth/users/profile",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "users", "profile"]
+						},
+						"description": "Obtiene el perfil del usuario autenticado actualmente."
+					}
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Admin Updated\",\n    \"last_name\": \"User Updated\",\n    \"phone\": \"+51987654322\",\n    \"branch_office\": \"Lima Norte\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/auth/users/profile",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "users", "profile"]
+						},
+						"description": "Actualiza el perfil del usuario autenticado."
+					}
+				},
+				{
+					"name": "Get User Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/auth/users/stats",
+							"host": ["{{api_url}}"],
+							"path": ["auth", "users", "stats"]
+						},
+						"description": "Obtiene estadísticas de usuarios (solo administradores)."
+					}
+				}
+			],
+			"description": "Endpoints para gestión de usuarios del sistema."
+		},
+		{
+			"name": "👥 Client Management",
+			"item": [
+				{
+					"name": "Create Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has client\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('client');",
+									"});",
+									"",
+									"// Save client_id automatically",
+									"if (pm.response.code === 200) {",
+									"    var responseJson = pm.response.json();",
+									"    if (responseJson.data && responseJson.data.client && responseJson.data.client.id) {",
+									"        pm.environment.set(\"client_id\", responseJson.data.client.id);",
+									"        console.log(\"Client ID saved: \" + responseJson.data.client.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"documentType\": \"DNI\",\n    \"documentNumber\": \"12345678\",\n    \"clientType\": \"individual\",\n    \"firstName\": \"Juan Carlos\",\n    \"lastName\": \"Pérez García\",\n    \"email\": \"juan.perez@email.com\",\n    \"phone\": \"+51987654321\",\n    \"address\": \"Av. Principal 123\",\n    \"district\": \"Miraflores\",\n    \"province\": \"Lima\",\n    \"department\": \"Lima\",\n    \"postalCode\": \"15074\",\n    \"creditLimit\": 5000,\n    \"paymentTerms\": 30,\n    \"contactMethod\": \"email\",\n    \"contactPreference\": \"morning\",\n    \"assignedUserId\": {{user_id}},\n    \"notes\": \"Cliente potencial para productos premium\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/clients",
+							"host": ["{{api_url}}"],
+							"path": ["clients"]
+						},
+						"description": "Crea un nuevo cliente individual con información completa."
+					}
+				},
+				{
+					"name": "Create Business Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Save additional client_id if needed",
+									"if (pm.response.code === 200) {",
+									"    var responseJson = pm.response.json();",
+									"    if (responseJson.data && responseJson.data.client && responseJson.data.client.id) {",
+									"        pm.environment.set(\"business_client_id\", responseJson.data.client.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"documentType\": \"RUC\",\n    \"documentNumber\": \"20123456789\",\n    \"clientType\": \"business\",\n    \"businessName\": \"Empresa Ejemplo S.A.C.\",\n    \"email\": \"contacto@empresaejemplo.com\",\n    \"phone\": \"+51987654322\",\n    \"address\": \"Av. Empresarial 456\",\n    \"district\": \"San Isidro\",\n    \"province\": \"Lima\",\n    \"department\": \"Lima\",\n    \"creditLimit\": 50000,\n    \"paymentTerms\": 45,\n    \"contactMethod\": \"email\",\n    \"industry\": \"Tecnología\",\n    \"companySize\": \"medium\",\n    \"website\": \"https://empresaejemplo.com\",\n    \"assignedUserId\": {{user_id}},\n    \"notes\": \"Cliente empresarial con alto potencial\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/clients",
+							"host": ["{{api_url}}"],
+							"path": ["clients"]
+						},
+						"description": "Crea un nuevo cliente empresarial con información comercial."
+					}
+				},
+				{
+					"name": "Get All Clients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/clients?page=1&limit=10",
+							"host": ["{{api_url}}"],
+							"path": ["clients"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"disabled": true
+								},
+								{
+									"key": "clientType",
+									"value": "individual",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "Juan",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Obtiene lista de clientes con filtros opcionales."
+					}
+				},
+				{
+					"name": "Get Client by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/clients/{{client_id}}",
+							"host": ["{{api_url}}"],
+							"path": ["clients", "{{client_id}}"]
+						},
+						"description": "Obtiene información completa de un cliente específico."
+					}
+				},
+				{
+					"name": "Get Client by Document",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/clients/document/12345678",
+							"host": ["{{api_url}}"],
+							"path": ["clients", "document", "12345678"]
+						},
+						"description": "Busca un cliente por su número de documento."
+					}
+				},
+				{
+					"name": "Update Client",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Juan Carlos Updated\",\n    \"lastName\": \"Pérez García\",\n    \"email\": \"juan.perez.updated@email.com\",\n    \"phone\": \"+51987654399\",\n    \"creditLimit\": 7500,\n    \"notes\": \"Cliente actualizado con mejor límite de crédito\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/clients/{{client_id}}",
+							"host": ["{{api_url}}"],
+							"path": ["clients", "{{client_id}}"]
+						},
+						"description": "Actualiza información de un cliente existente."
+					}
+				},
+				{
+					"name": "Change Client Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"suspended\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/clients/{{client_id}}/status",
+							"host": ["{{api_url}}"],
+							"path": ["clients", "{{client_id}}", "status"]
+						},
+						"description": "Cambia el estado de un cliente (active, inactive, suspended, blacklisted)."
+					}
+				},
+				{
+					"name": "Update Credit Limit",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"creditLimit\": 10000\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/clients/{{client_id}}/credit-limit",
+							"host": ["{{api_url}}"],
+							"path": ["clients", "{{client_id}}", "credit-limit"]
+						},
+						"description": "Actualiza el límite de crédito de un cliente."
+					}
+				},
+				{
+					"name": "Get Client Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/clients/stats",
+							"host": ["{{api_url}}"],
+							"path": ["clients", "stats"]
+						},
+						"description": "Obtiene estadísticas generales de clientes."
+					}
+				},
+				{
+					"name": "Get Active Clients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/clients/active",
+							"host": ["{{api_url}}"],
+							"path": ["clients", "active"]
+						},
+						"description": "Obtiene solo los clientes activos."
+					}
+				}
+			],
+			"description": "Endpoints para gestión completa de clientes individuales y empresariales."
+		},
+		{
+			"name": "📄 Quote Management",
+			"item": [
+				{
+					"name": "Create Quote with Items",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Save quote_id automatically",
+									"if (pm.response.code === 200) {",
+									"    var responseJson = pm.response.json();",
+									"    if (responseJson.data && responseJson.data.quote && responseJson.data.quote.id) {",
+									"        pm.environment.set(\"quote_id\", responseJson.data.quote.id);",
+									"        console.log(\"Quote ID saved: \" + responseJson.data.quote.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clientId\": {{client_id}},\n    \"userId\": {{user_id}},\n    \"title\": \"Cotización para productos de café premium\",\n    \"description\": \"Cotización detallada para suministro de productos de café premium para oficina corporativa\",\n    \"currency\": \"PEN\",\n    \"exchangeRate\": 1,\n    \"taxPercentage\": 18,\n    \"discountPercentage\": 5,\n    \"validUntil\": \"2025-12-31\",\n    \"projectName\": \"Suministro Café Corporativo Q1 2025\",\n    \"notes\": \"Entrega programada para inicio de año\",\n    \"internalNotes\": \"Cliente con buen historial de pago\",\n    \"items\": [\n        {\n            \"productName\": \"Café Premium Grano 1kg\",\n            \"productDescription\": \"Café de origen peruano, tostado artesanal\",\n            \"quantity\": 20,\n            \"unitPrice\": 45.00,\n            \"discountPercentage\": 0,\n            \"notes\": \"Entrega mensual\"\n        },\n        {\n            \"productName\": \"Máquina Espresso Profesional\",\n            \"productDescription\": \"Máquina automática para oficina\",\n            \"quantity\": 2,\n            \"unitPrice\": 2500.00,\n            \"discountPercentage\": 10,\n            \"notes\": \"Incluye instalación y capacitación\"\n        },\n        {\n            \"productName\": \"Kit Accesorios Café\",\n            \"productDescription\": \"Tazas, cucharillas y servilletas\",\n            \"quantity\": 1,\n            \"unitPrice\": 150.00,\n            \"discountPercentage\": 0\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/quotes",
+							"host": ["{{api_url}}"],
+							"path": ["quotes"]
+						},
+						"description": "Crea una nueva cotización con múltiples items y cálculos automáticos."
+					}
+				},
+				{
+					"name": "Get All Quotes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/quotes?page=1&limit=10",
+							"host": ["{{api_url}}"],
+							"path": ["quotes"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "draft",
+									"disabled": true
+								},
+								{
+									"key": "clientId",
+									"value": "{{client_id}}",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "café",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Obtiene lista de cotizaciones con filtros."
+					}
+				},
+				{
+					"name": "Get Quote with Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/quotes/{{quote_id}}/items",
+							"host": ["{{api_url}}"],
+							"path": ["quotes", "{{quote_id}}", "items"]
+						},
+						"description": "Obtiene una cotización completa con todos sus items."
+					}
+				},
+				{
+					"name": "Update Quote",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Cotización para productos de café premium - ACTUALIZADA\",\n    \"description\": \"Cotización actualizada con nuevos términos\",\n    \"discountPercentage\": 7,\n    \"validUntil\": \"2025-12-31\",\n    \"notes\": \"Descuento especial aplicado por volumen\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/quotes/{{quote_id}}",
+							"host": ["{{api_url}}"],
+							"path": ["quotes", "{{quote_id}}"]
+						},
+						"description": "Actualiza información general de una cotización."
+					}
+				},
+				{
+					"name": "Change Quote Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"sent\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/quotes/{{quote_id}}/status",
+							"host": ["{{api_url}}"],
+							"path": ["quotes", "{{quote_id}}", "status"]
+						},
+						"description": "Cambia el estado de una cotización (draft, sent, approved, rejected, expired, converted)."
+					}
+				},
+				{
+					"name": "Recalculate Quote Totals",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/quotes/{{quote_id}}/recalculate",
+							"host": ["{{api_url}}"],
+							"path": ["quotes", "{{quote_id}}", "recalculate"]
+						},
+						"description": "Recalcula automáticamente los totales de la cotización."
+					}
+				},
+				{
+					"name": "Add Quote Item",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save quote_item_id automatically",
+									"if (pm.response.code === 200) {",
+									"    var responseJson = pm.response.json();",
+									"    if (responseJson.data && responseJson.data.item && responseJson.data.item.id) {",
+									"        pm.environment.set(\"quote_item_id\", responseJson.data.item.id);",
+									"        console.log(\"Quote Item ID saved: \" + responseJson.data.item.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productName\": \"Filtros de Café Premium\",\n    \"productDescription\": \"Filtros especiales para máquina espresso\",\n    \"quantity\": 100,\n    \"unitPrice\": 2.50,\n    \"discountPercentage\": 5,\n    \"notes\": \"Reposición mensual incluida\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/quotes/{{quote_id}}/items",
+							"host": ["{{api_url}}"],
+							"path": ["quotes", "{{quote_id}}", "items"]
+						},
+						"description": "Agrega un nuevo item a una cotización existente."
+					}
+				},
+				{
+					"name": "Update Quote Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 150,\n    \"unitPrice\": 2.25,\n    \"discountPercentage\": 8,\n    \"notes\": \"Cantidad aumentada por demanda\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/quotes/items/{{quote_item_id}}",
+							"host": ["{{api_url}}"],
+							"path": ["quotes", "items", "{{quote_item_id}}"]
+						},
+						"description": "Actualiza un item específico de una cotización."
+					}
+				},
+				{
+					"name": "Delete Quote Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/quotes/items/{{quote_item_id}}",
+							"host": ["{{api_url}}"],
+							"path": ["quotes", "items", "{{quote_item_id}}"]
+						},
+						"description": "Elimina un item específico de una cotización."
+					}
+				},
+				{
+					"name": "Get Quote Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/quotes/stats",
+							"host": ["{{api_url}}"],
+							"path": ["quotes", "stats"]
+						},
+						"description": "Obtiene estadísticas de cotizaciones por estado y montos."
+					}
+				}
+			],
+			"description": "Endpoints para gestión completa de cotizaciones con items y cálculos automáticos."
+		},
+		{
+			"name": "💳 Credit Request Management",
+			"item": [
+				{
+					"name": "Create Credit Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save credit_request_id automatically",
+									"if (pm.response.code === 200) {",
+									"    var responseJson = pm.response.json();",
+									"    if (responseJson.data && responseJson.data.creditRequest && responseJson.data.creditRequest.id) {",
+									"        pm.environment.set(\"credit_request_id\", responseJson.data.creditRequest.id);",
+									"        console.log(\"Credit Request ID saved: \" + responseJson.data.creditRequest.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clientId\": {{client_id}},\n    \"userId\": {{user_id}},\n    \"requestedAmount\": 25000,\n    \"currency\": \"PEN\",\n    \"exchangeRate\": 1,\n    \"paymentTerms\": 180,\n    \"purpose\": \"Expansión de negocio\",\n    \"description\": \"Solicitud de crédito para ampliación de local comercial y compra de nueva maquinaria para aumentar la capacidad de producción\",\n    \"priority\": \"high\",\n    \"documents\": {\n        \"financial_statements\": \"estados_financieros_2024.pdf\",\n        \"business_plan\": \"plan_expansion_2025.pdf\",\n        \"tax_returns\": \"declaraciones_renta_2023_2024.pdf\"\n    },\n    \"notes\": \"Cliente con excelente historial crediticio\",\n    \"internalNotes\": \"Revisar garantías adicionales disponibles\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/credit-requests",
+							"host": ["{{api_url}}"],
+							"path": ["credit-requests"]
+						},
+						"description": "Crea una nueva solicitud de crédito con documentación."
+					}
+				},
+				{
+					"name": "Get All Credit Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/credit-requests?page=1&limit=10",
+							"host": ["{{api_url}}"],
+							"path": ["credit-requests"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "pending",
+									"disabled": true
+								},
+								{
+									"key": "priority",
+									"value": "high",
+									"disabled": true
+								},
+								{
+									"key": "minAmount",
+									"value": "10000",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Obtiene lista de solicitudes de crédito con filtros."
+					}
+				},
+				{
+					"name": "Get Credit Request by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/credit-requests/{{credit_request_id}}",
+							"host": ["{{api_url}}"],
+							"path": ["credit-requests", "{{credit_request_id}}"]
+						},
+						"description": "Obtiene información detallada de una solicitud de crédito."
+					}
+				},
+				{
+					"name": "Update Risk Assessment",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"riskAssessment\": {\n        \"credit_score\": 785,\n        \"debt_to_income_ratio\": 0.35,\n        \"payment_history\": \"excellent\",\n        \"collateral_value\": 50000,\n        \"risk_level\": \"low\",\n        \"recommendation\": \"approve\",\n        \"analyst_notes\": \"Cliente con excelente historial y garantías suficientes\",\n        \"reviewed_by\": \"Analista Senior\",\n        \"review_date\": \"2025-06-26\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/credit-requests/{{credit_request_id}}/risk-assessment",
+							"host": ["{{api_url}}"],
+							"path": ["credit-requests", "{{credit_request_id}}", "risk-assessment"]
+						},
+						"description": "Actualiza la evaluación de riesgo de una solicitud."
+					}
+				},
+				{
+					"name": "Approve Credit Request",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"approvedAmount\": 22000,\n    \"approvedTerms\": 150,\n    \"approvalConditions\": \"Garantía hipotecaria requerida. Seguros de vida obligatorios. Revisión trimestral de estados financieros.\",\n    \"expiresAt\": \"2025-12-31\",\n    \"notes\": \"Aprobado con condiciones especiales por el monto y perfil del cliente\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/credit-requests/{{credit_request_id}}/approve",
+							"host": ["{{api_url}}"],
+							"path": ["credit-requests", "{{credit_request_id}}", "approve"]
+						},
+						"description": "Aprueba una solicitud de crédito con condiciones específicas."
+					}
+				},
+				{
+					"name": "Reject Credit Request",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rejectionReason\": \"Insuficientes garantías para el monto solicitado. Ratio deuda/ingreso excede los parámetros establecidos.\",\n    \"notes\": \"Se recomienda solicitar un monto menor o presentar garantías adicionales\"\n}"
+						},
+						"url": {
+							"raw": "{{api_url}}/credit-requests/{{credit_request_id}}/reject",
+							"host": ["{{api_url}}"],
+							"path": ["credit-requests", "{{credit_request_id}}", "reject"]
+						},
+						"description": "Rechaza una solicitud de crédito con razones específicas."
+					}
+				},
+				{
+					"name": "Get Expiring Credit Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/credit-requests/expiring?days=30",
+							"host": ["{{api_url}}"],
+							"path": ["credit-requests", "expiring"],
+							"query": [
+								{
+									"key": "days",
+									"value": "30"
+								}
+							]
+						},
+						"description": "Obtiene solicitudes aprobadas que vencerán pronto."
+					}
+				},
+				{
+					"name": "Get Credit Request Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/credit-requests/stats",
+							"host": ["{{api_url}}"],
+							"path": ["credit-requests", "stats"]
+						},
+						"description": "Obtiene estadísticas de solicitudes por estado y montos."
+					}
+				}
+			],
+			"description": "Endpoints para gestión completa de solicitudes de crédito con workflow de aprobación."
+		},
+		{
+			"name": "📦 Product Management",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/products?page=1&limit=10",
+							"host": ["{{api_url}}"],
+							"path": ["products"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Obtiene lista de productos con paginación."
+					}
+				}
+			],
+			"description": "Endpoints para gestión de productos."
+		},
+		{
+			"name": "🏷️ Category Management",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/categories",
+							"host": ["{{api_url}}"],
+							"path": ["categories"]
+						},
+						"description": "Obtiene lista de todas las categorías."
+					}
+				}
+			],
+			"description": "Endpoints para gestión de categorías."
+		},
+		{
+			"name": "🏢 Supplier Management",
+			"item": [
+				{
+					"name": "Get All Suppliers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/suppliers",
+							"host": ["{{api_url}}"],
+							"path": ["suppliers"]
+						},
+						"description": "Obtiene lista de todos los proveedores."
+					}
+				}
+			],
+			"description": "Endpoints para gestión de proveedores."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global pre-request script",
+					"// Check if token exists for protected routes",
+					"const isAuthRoute = pm.request.url.path.includes('auth');",
+					"const isRegisterOrLogin = pm.request.url.path.includes('register') || pm.request.url.path.includes('login');",
+					"",
+					"if (!isAuthRoute || !isRegisterOrLogin) {",
+					"    const token = pm.environment.get('token');",
+					"    if (!token) {",
+					"        console.log('⚠️  Warning: No authentication token found. Please login first.');",
+					"    }",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script",
+					"pm.test('Response time is less than 5000ms', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+					"});",
+					"",
+					"pm.test('Response has correct Content-Type', function () {",
+					"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "collection_version",
+			"value": "1.0.0"
+		}
+	]
+}

@@ -11,9 +11,9 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    user_id: {
+    assigned_user_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       comment: 'ID del asesor asignado',
       references: {
         model: 'users',
@@ -21,7 +21,7 @@ module.exports = (sequelize) => {
       }
     },
     document_type: {
-      type: DataTypes.ENUM('dni', 'ruc', 'passport', 'ce'),
+      type: DataTypes.ENUM('DNI', 'RUC', 'passport', 'CE'),
       allowNull: false,
       comment: 'Tipo de documento'
     },
@@ -34,10 +34,15 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(150),
       comment: 'Razón social (para empresas)'
     },
-    contact_name: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-      comment: 'Nombre del contacto'
+    first_name: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'Nombre (para personas naturales)'
+    },
+    last_name: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      comment: 'Apellido (para personas naturales)'
     },
     email: {
       type: DataTypes.STRING(100),
@@ -81,7 +86,7 @@ module.exports = (sequelize) => {
       comment: 'Tipo de cliente'
     },
     status: {
-      type: DataTypes.ENUM('active', 'inactive', 'blacklist'),
+      type: DataTypes.ENUM('active', 'inactive', 'suspended', 'blacklisted'),
       defaultValue: 'active',
       comment: 'Estado del cliente'
     },
@@ -89,6 +94,21 @@ module.exports = (sequelize) => {
       type: DataTypes.DECIMAL(12, 2),
       defaultValue: 0.00,
       comment: 'Límite de crédito'
+    },
+    payment_terms: {
+      type: DataTypes.INTEGER,
+      defaultValue: 30,
+      comment: 'Términos de pago en días'
+    },
+    contact_method: {
+      type: DataTypes.ENUM('email', 'phone', 'whatsapp', 'visit'),
+      defaultValue: 'email',
+      comment: 'Método de contacto'
+    },
+    contact_preference: {
+      type: DataTypes.ENUM('morning', 'afternoon', 'evening', 'anytime'),
+      defaultValue: 'anytime',
+      comment: 'Preferencia de horario de contacto'
     },
     notes: {
       type: DataTypes.TEXT,
@@ -115,11 +135,6 @@ module.exports = (sequelize) => {
       allowNull: true,
       comment: 'RUC/Tax ID adicional'
     },
-    preferred_contact_method: {
-      type: DataTypes.ENUM('email', 'phone', 'whatsapp'),
-      defaultValue: 'email',
-      comment: 'Método de contacto preferido'
-    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
@@ -134,7 +149,7 @@ module.exports = (sequelize) => {
     underscored: true,
     indexes: [
       {
-        fields: ['user_id']
+        fields: ['assigned_user_id']
       },
       {
         fields: ['document_number']
@@ -185,8 +200,9 @@ module.exports = (sequelize) => {
   Client.associate = (models) => {
     // Un cliente pertenece a un usuario (asesor)
     Client.belongsTo(models.User, {
-      foreignKey: 'user_id',
-      as: 'advisor'
+      foreignKey: 'assigned_user_id',
+      as: 'assignedUser',
+      allowNull: true
     });
 
     // Un cliente tiene muchas cotizaciones
@@ -217,7 +233,11 @@ module.exports = (sequelize) => {
   };
 
   Client.prototype.getDisplayName = function() {
-    return this.business_name || this.contact_name;
+    if (this.client_type === 'business') {
+      return this.business_name;
+    } else {
+      return `${this.first_name} ${this.last_name}`.trim();
+    }
   };
 
   Client.prototype.canRequestCredit = function() {
@@ -225,10 +245,11 @@ module.exports = (sequelize) => {
   };
 
   Client.prototype.getPreferredContactInfo = function() {
-    switch (this.preferred_contact_method) {
+    switch (this.contact_method) {
       case 'email': return this.email;
       case 'phone': return this.phone;
       case 'whatsapp': return this.phone;
+      case 'visit': return this.getFullAddress();
       default: return this.email || this.phone;
     }
   };
@@ -255,16 +276,16 @@ module.exports = (sequelize) => {
 
   Client.findByAdvisor = function(advisorId) {
     return this.findAll({
-      where: { user_id: advisorId },
-      order: [['contact_name', 'ASC']],
-      include: ['advisor']
+      where: { assigned_user_id: advisorId },
+      order: [['first_name', 'ASC'], ['last_name', 'ASC'], ['business_name', 'ASC']],
+      include: ['assignedUser']
     });
   };
 
   Client.findActiveClients = function() {
     return this.findAll({
       where: { status: 'active' },
-      order: [['contact_name', 'ASC']]
+      order: [['first_name', 'ASC'], ['last_name', 'ASC'], ['business_name', 'ASC']]
     });
   };
 
@@ -273,12 +294,13 @@ module.exports = (sequelize) => {
     return this.findAll({
       where: {
         [Op.or]: [
-          { contact_name: { [Op.like]: `%${name}%` } },
+          { first_name: { [Op.like]: `%${name}%` } },
+          { last_name: { [Op.like]: `%${name}%` } },
           { business_name: { [Op.like]: `%${name}%` } }
         ],
         status: 'active'
       },
-      order: [['contact_name', 'ASC']]
+      order: [['first_name', 'ASC'], ['last_name', 'ASC'], ['business_name', 'ASC']]
     });
   };
 
@@ -288,7 +310,7 @@ module.exports = (sequelize) => {
         industry,
         status: 'active'
       },
-      order: [['contact_name', 'ASC']]
+      order: [['first_name', 'ASC'], ['last_name', 'ASC'], ['business_name', 'ASC']]
     });
   };
 
@@ -298,7 +320,7 @@ module.exports = (sequelize) => {
         company_size: companySize,
         status: 'active'
       },
-      order: [['contact_name', 'ASC']]
+      order: [['first_name', 'ASC'], ['last_name', 'ASC'], ['business_name', 'ASC']]
     });
   };
 

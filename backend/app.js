@@ -172,7 +172,7 @@ console.log('📁 Configurados directorios estáticos: /uploads, /storage');
 // Rutas principales
 console.log('🛣️  Configurando rutas...');
 const routes = require('./routes');
-app.use('/v1/api', routes);
+app.use('/api', routes);
 
 // Middleware de manejo de errores
 app.use((err, req, res, next) => {
@@ -203,15 +203,31 @@ async function startServer() {
             process.exit(1);
         }
 
-        // 2. Importar todos los modelos
-        console.log('2️⃣  Cargando modelos de base de datos...');
+        // 2. Inicializar modelos de base de datos
+        console.log('2️⃣  Inicializando modelos de base de datos...');
         try {
-            require('./shared/models/index');
-            console.log('✅ Modelos cargados correctamente');
+            const { initializeModels } = require('./shared/models/index');
+            const { getSequelize } = require('./shared/config/db');
+            const sequelize = getSequelize();
+            
+            // Inicializar modelos
+            const models = initializeModels(sequelize);
+            console.log('✅ Modelos inicializados correctamente');
+            
+            // Verificar que todos los modelos críticos estén disponibles
+            const requiredModels = ['User', 'Client', 'Quote', 'QuoteItem', 'CreditRequest'];
+            const missingModels = requiredModels.filter(modelName => !models[modelName]);
+            
+            if (missingModels.length > 0) {
+                console.warn('⚠️  Modelos faltantes:', missingModels.join(', '));
+            } else {
+                console.log('✅ Todos los modelos críticos están disponibles');
+            }
         } catch (error) {
-            console.error('❌ Error al cargar modelos:', error.message);
-            // No detener el servidor si no hay modelos, solo advertir
-            console.log('⚠️  Continuando sin modelos...');
+            console.error('❌ Error al inicializar modelos:', error.message);
+            console.error('Stack:', error.stack);
+            // Detener el servidor si hay errores críticos de modelos
+            process.exit(1);
         }
 
         // 3. Sincronizar la base de datos
