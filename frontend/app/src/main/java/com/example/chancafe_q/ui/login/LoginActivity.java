@@ -36,10 +36,24 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Verificar si ya está autenticado
+        if (isUserAlreadyLoggedIn()) {
+            navigateToDashboard();
+            return;
+        }
+
         initViews();
         initViewModel();
         setupObservers();
         setupClickListeners();
+    }
+
+    /**
+     * Verifica si el usuario ya está logueado
+     */
+    private boolean isUserAlreadyLoggedIn() {
+        // TODO: Implementar verificación de sesión persistente
+        return false;
     }
 
     /**
@@ -70,17 +84,20 @@ public class LoginActivity extends AppCompatActivity {
         // Observar el resultado del login
         loginViewModel.getLoginResult().observe(this, response -> {
             if (response != null) {
-                if (response.isSuccess()) {
+                if (response.isSuccess() && response.getData() != null) {
                     // Login exitoso - navegar al Dashboard
-                    Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                    intent.putExtra("user_name", response.getData().getName());
-                    intent.putExtra("user_code", response.getData().getCode());
-                    intent.putExtra("user_role", response.getData().getRole());
-                    startActivity(intent);
-                    finish();
+                    navigateToDashboard();
+                    
+                    // Mostrar mensaje de bienvenida
+                    if (response.getData().getUser() != null) {
+                        String welcomeMessage = "Bienvenido, " + response.getData().getUser().getName();
+                        Toast.makeText(this, welcomeMessage, Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     // Login fallido - mostrar error
-                    Toast.makeText(this, response.getMessage(), Toast.LENGTH_LONG).show();
+                    String errorMessage = response.getMessage() != null ? 
+                        response.getMessage() : "Error al iniciar sesión";
+                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
                 }
                 // Limpiar el resultado para evitar reacciones múltiples
                 loginViewModel.clearLoginResult();
@@ -92,9 +109,9 @@ public class LoginActivity extends AppCompatActivity {
             if (isLoading != null) {
                 btnLogin.setEnabled(!isLoading);
                 if (isLoading) {
-                    btnLogin.setText("Ingresando...");
+                    btnLogin.setText("Iniciando sesión...");
                 } else {
-                    btnLogin.setText(getString(R.string.login_button));
+                    btnLogin.setText("Iniciar Sesión");
                 }
             }
         });
@@ -134,6 +151,24 @@ public class LoginActivity extends AppCompatActivity {
             // TODO: Implementar funcionalidad de recuperar contraseña
             Toast.makeText(this, "Funcionalidad en desarrollo", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    /**
+     * Navega al Dashboard y pasa los datos del usuario
+     */
+    private void navigateToDashboard() {
+        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+        
+        // Agregar datos del usuario si están disponibles
+        if (loginViewModel.getCurrentUser() != null) {
+            intent.putExtra("user_name", loginViewModel.getCurrentUser().getName());
+            intent.putExtra("user_code", loginViewModel.getCurrentUser().getCode());
+            intent.putExtra("user_role", loginViewModel.getCurrentUser().getRole());
+            intent.putExtra("user_email", loginViewModel.getCurrentUser().getEmail());
+        }
+        
+        startActivity(intent);
+        finish();
     }
 
     @Override

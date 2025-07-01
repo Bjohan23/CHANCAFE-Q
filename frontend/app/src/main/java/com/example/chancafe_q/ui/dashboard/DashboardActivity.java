@@ -84,10 +84,18 @@ public class DashboardActivity extends AppCompatActivity {
         String userName = getIntent().getStringExtra("user_name");
         String userCode = getIntent().getStringExtra("user_code");
         String userRole = getIntent().getStringExtra("user_role");
+        String userEmail = getIntent().getStringExtra("user_email");
 
         if (userName != null && userCode != null) {
-            // Crear objeto User y pasarlo al ViewModel
-            User user = new User("1", userCode, userName, "", userRole, true);
+            // Crear objeto User usando constructor vacío y setters
+            User user = new User();
+            user.setUserCode(userCode);
+            user.setFirstName(userName); // Usar userName como firstName por simplicidad
+            user.setRole(userRole != null ? userRole : "asesor");
+            if (userEmail != null) {
+                user.setEmail(userEmail);
+            }
+            
             dashboardViewModel.setCurrentUser(user);
         }
     }

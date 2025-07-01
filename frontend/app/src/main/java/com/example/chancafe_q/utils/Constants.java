@@ -5,8 +5,8 @@ package com.example.chancafe_q.utils;
  */
 public class Constants {
     
-    // API Constants (para futuro uso)
-    public static final String BASE_URL = "https://api.chancafe.com/"; // TODO: Reemplazar con URL real
+    // API Constants
+    public static final String BASE_URL = "http://localhost:3000/api/"; // Configurado para desarrollo local
     public static final String API_VERSION = "v1";
     public static final int TIMEOUT_SECONDS = 30;
     

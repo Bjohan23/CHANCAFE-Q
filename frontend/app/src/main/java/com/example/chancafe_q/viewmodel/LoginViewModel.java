@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.chancafe_q.model.ApiResponse;
 import com.example.chancafe_q.model.LoginRequest;
+import com.example.chancafe_q.model.LoginResponse;
 import com.example.chancafe_q.model.User;
 import com.example.chancafe_q.repository.AuthRepository;
 
@@ -14,7 +15,7 @@ import com.example.chancafe_q.repository.AuthRepository;
  */
 public class LoginViewModel extends ViewModel {
     private AuthRepository authRepository;
-    private MutableLiveData<ApiResponse<User>> loginResult;
+    private MutableLiveData<ApiResponse<LoginResponse>> loginResult;
     private MutableLiveData<Boolean> isLoading;
     private MutableLiveData<String> userCodeError;
     private MutableLiveData<String> passwordError;
@@ -28,7 +29,7 @@ public class LoginViewModel extends ViewModel {
     }
 
     // Getters para observar desde la Vista
-    public LiveData<ApiResponse<User>> getLoginResult() {
+    public LiveData<ApiResponse<LoginResponse>> getLoginResult() {
         return loginResult;
     }
 
@@ -71,6 +72,48 @@ public class LoginViewModel extends ViewModel {
     }
 
     /**
+     * Obtiene el usuario desde el resultado del login
+     */
+    public User getCurrentUser() {
+        ApiResponse<LoginResponse> response = loginResult.getValue();
+        if (response != null && response.isSuccess() && response.getData() != null) {
+            return response.getData().getUser();
+        }
+        return null;
+    }
+
+    /**
+     * Obtiene el token desde el resultado del login
+     */
+    public String getCurrentToken() {
+        ApiResponse<LoginResponse> response = loginResult.getValue();
+        if (response != null && response.isSuccess() && response.getData() != null) {
+            return response.getData().getToken();
+        }
+        return null;
+    }
+
+    /**
+     * Verifica si el login fue exitoso
+     */
+    public boolean isLoginSuccessful() {
+        ApiResponse<LoginResponse> response = loginResult.getValue();
+        return response != null && response.isSuccess() && response.getData() != null
+                && response.getData().getUser() != null && response.getData().getToken() != null;
+    }
+
+    /**
+     * Obtiene el mensaje de error del login
+     */
+    public String getLoginErrorMessage() {
+        ApiResponse<LoginResponse> response = loginResult.getValue();
+        if (response != null && !response.isSuccess()) {
+            return response.getMessage();
+        }
+        return null;
+    }
+
+    /**
      * Valida los campos de entrada
      */
     private boolean validateInputs(String userCode, String password) {
@@ -110,5 +153,19 @@ public class LoginViewModel extends ViewModel {
     public void clearErrors() {
         userCodeError.setValue(null);
         passwordError.setValue(null);
+    }
+
+    /**
+     * Verifica si el usuario está autenticado
+     */
+    public boolean isAuthenticated() {
+        return authRepository.isAuthenticated();
+    }
+
+    /**
+     * Cierra la sesión del usuario
+     */
+    public LiveData<ApiResponse<Void>> logout() {
+        return authRepository.logout();
     }
 }

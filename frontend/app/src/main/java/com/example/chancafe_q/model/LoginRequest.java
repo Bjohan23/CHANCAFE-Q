@@ -1,10 +1,15 @@
 package com.example.chancafe_q.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Modelo para las credenciales de login
+ * Compatible con el backend que espera email y password
  */
 public class LoginRequest {
-    private String userCode;
+    @SerializedName("email")
+    private String email;
+    
     private String password;
 
     // Constructor vacío
@@ -12,18 +17,32 @@ public class LoginRequest {
     }
 
     // Constructor con parámetros
-    public LoginRequest(String userCode, String password) {
-        this.userCode = userCode;
+    public LoginRequest(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
+    // Constructor de compatibilidad (userCode se mapea a email)
+    public static LoginRequest fromUserCode(String userCode, String password) {
+        return new LoginRequest(userCode, password);
+    }
+
     // Getters y Setters
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    // Método de compatibilidad para getUserCode()
     public String getUserCode() {
-        return userCode;
+        return email;
     }
 
     public void setUserCode(String userCode) {
-        this.userCode = userCode;
+        this.email = userCode;
     }
 
     public String getPassword() {
@@ -37,7 +56,7 @@ public class LoginRequest {
     @Override
     public String toString() {
         return "LoginRequest{" +
-                "userCode='" + userCode + '\'' +
+                "email='" + email + '\'' +
                 ", password='[PROTECTED]'" +
                 '}';
     }

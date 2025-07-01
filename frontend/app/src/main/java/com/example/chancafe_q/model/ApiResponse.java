@@ -54,6 +54,11 @@ public class ApiResponse<T> {
         this.code = code;
     }
 
+    // Método de compatibilidad para getStatusCode()
+    public int getStatusCode() {
+        return code;
+    }
+
     @Override
     public String toString() {
         return "ApiResponse{" +
