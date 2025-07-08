@@ -222,9 +222,9 @@ public class ClientViewModel extends AndroidViewModel {
     }
     
     /**
-     * Busca clientes por texto
+     * Obtiene clientes activos
      */
-    public LiveData<ApiResponse<List<Client>>> searchClients(String query) {
+    public LiveData<ApiResponse<List<Client>>> getActiveClients() {
         if (!NetworkUtils.isNetworkAvailable(getApplication())) {
             MutableLiveData<ApiResponse<List<Client>>> result = new MutableLiveData<>();
             ApiResponse<List<Client>> errorResponse = new ApiResponse<>(
@@ -237,11 +237,181 @@ public class ClientViewModel extends AndroidViewModel {
             return result;
         }
         
-        if (query == null || query.trim().isEmpty()) {
+        isLoading.setValue(true);
+        
+        MutableLiveData<ApiResponse<List<Client>>> result = clientRepository.getActiveClients();
+        
+        result.observeForever(response -> {
+            isLoading.setValue(false);
+            if (response != null) {
+                if (response.isSuccess()) {
+                    successMessage.setValue(response.getMessage());
+                } else {
+                    errorMessage.setValue(response.getMessage());
+                }
+            }
+        });
+        
+        return result;
+    }
+
+    /**
+     * Obtiene clientes por tipo
+     */
+    public LiveData<ApiResponse<List<Client>>> getClientsByType(String type) {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
             MutableLiveData<ApiResponse<List<Client>>> result = new MutableLiveData<>();
             ApiResponse<List<Client>> errorResponse = new ApiResponse<>(
                 false, 
-                "Término de búsqueda requerido", 
+                "No hay conexión a internet", 
+                null, 
+                0
+            );
+            result.setValue(errorResponse);
+            return result;
+        }
+        
+        isLoading.setValue(true);
+        
+        MutableLiveData<ApiResponse<List<Client>>> result = clientRepository.getClientsByType(type);
+        
+        result.observeForever(response -> {
+            isLoading.setValue(false);
+            if (response != null) {
+                if (response.isSuccess()) {
+                    successMessage.setValue(response.getMessage());
+                } else {
+                    errorMessage.setValue(response.getMessage());
+                }
+            }
+        });
+        
+        return result;
+    }
+
+    /**
+     * Obtiene estadísticas de clientes
+     */
+    public LiveData<ApiResponse<Object>> getClientStats() {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            MutableLiveData<ApiResponse<Object>> result = new MutableLiveData<>();
+            ApiResponse<Object> errorResponse = new ApiResponse<>(
+                false, 
+                "No hay conexión a internet", 
+                null, 
+                0
+            );
+            result.setValue(errorResponse);
+            return result;
+        }
+        
+        isLoading.setValue(true);
+        
+        MutableLiveData<ApiResponse<Object>> result = clientRepository.getClientStats();
+        
+        result.observeForever(response -> {
+            isLoading.setValue(false);
+            if (response != null) {
+                if (response.isSuccess()) {
+                    successMessage.setValue(response.getMessage());
+                } else {
+                    errorMessage.setValue(response.getMessage());
+                }
+            }
+        });
+        
+        return result;
+    }
+
+    /**
+     * Cambia el status de un cliente
+     */
+    public LiveData<ApiResponse<Client>> changeClientStatus(int clientId, String status) {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
+            ApiResponse<Client> errorResponse = new ApiResponse<>(
+                false, 
+                "No hay conexión a internet", 
+                null, 
+                0
+            );
+            result.setValue(errorResponse);
+            return result;
+        }
+        
+        isLoading.setValue(true);
+        
+        MutableLiveData<ApiResponse<Client>> result = clientRepository.changeClientStatus(clientId, status);
+        
+        result.observeForever(response -> {
+            isLoading.setValue(false);
+            if (response != null) {
+                if (response.isSuccess()) {
+                    successMessage.setValue(response.getMessage());
+                } else {
+                    errorMessage.setValue(response.getMessage());
+                }
+            }
+        });
+        
+        return result;
+    }
+
+    /**
+     * Actualiza el límite de crédito de un cliente
+     */
+    public LiveData<ApiResponse<Client>> updateCreditLimit(int clientId, double creditLimit) {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
+            ApiResponse<Client> errorResponse = new ApiResponse<>(
+                false, 
+                "No hay conexión a internet", 
+                null, 
+                0
+            );
+            result.setValue(errorResponse);
+            return result;
+        }
+        
+        isLoading.setValue(true);
+        
+        MutableLiveData<ApiResponse<Client>> result = clientRepository.updateCreditLimit(clientId, creditLimit);
+        
+        result.observeForever(response -> {
+            isLoading.setValue(false);
+            if (response != null) {
+                if (response.isSuccess()) {
+                    successMessage.setValue(response.getMessage());
+                } else {
+                    errorMessage.setValue(response.getMessage());
+                }
+            }
+        });
+        
+        return result;
+    }
+
+    /**
+     * Busca cliente por documento
+     */
+    public LiveData<ApiResponse<Client>> getClientByDocument(String document) {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
+            ApiResponse<Client> errorResponse = new ApiResponse<>(
+                false, 
+                "No hay conexión a internet", 
+                null, 
+                0
+            );
+            result.setValue(errorResponse);
+            return result;
+        }
+        
+        if (document == null || document.trim().isEmpty()) {
+            MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
+            ApiResponse<Client> errorResponse = new ApiResponse<>(
+                false, 
+                "Número de documento requerido", 
                 null, 
                 400
             );
@@ -251,7 +421,7 @@ public class ClientViewModel extends AndroidViewModel {
         
         isLoading.setValue(true);
         
-        MutableLiveData<ApiResponse<List<Client>>> result = clientRepository.searchClients(query);
+        MutableLiveData<ApiResponse<Client>> result = clientRepository.getClientByDocument(document);
         
         result.observeForever(response -> {
             isLoading.setValue(false);

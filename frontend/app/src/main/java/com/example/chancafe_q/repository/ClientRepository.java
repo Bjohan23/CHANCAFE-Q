@@ -35,7 +35,7 @@ public class ClientRepository {
         MutableLiveData<ApiResponse<List<Client>>> result = new MutableLiveData<>();
 
         NetworkUtils.executeCall(
-            apiService.getClients(),
+            apiService.getAllClients(),
             new NetworkUtils.ApiCallback<List<Client>>() {
                 @Override
                 public void onSuccess(List<Client> data) {
@@ -71,7 +71,7 @@ public class ClientRepository {
         MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
 
         NetworkUtils.executeCall(
-            apiService.getClient(clientId),
+            apiService.getClientById(clientId),
             new NetworkUtils.ApiCallback<Client>() {
                 @Override
                 public void onSuccess(Client data) {
@@ -215,19 +215,19 @@ public class ClientRepository {
     }
 
     /**
-     * Busca clientes por texto
+     * Obtiene clientes activos
      */
-    public MutableLiveData<ApiResponse<List<Client>>> searchClients(String query) {
+    public MutableLiveData<ApiResponse<List<Client>>> getActiveClients() {
         MutableLiveData<ApiResponse<List<Client>>> result = new MutableLiveData<>();
 
         NetworkUtils.executeCall(
-            apiService.searchClients(query),
+            apiService.getActiveClients(),
             new NetworkUtils.ApiCallback<List<Client>>() {
                 @Override
                 public void onSuccess(List<Client> data) {
                     ApiResponse<List<Client>> response = new ApiResponse<>(
                         true, 
-                        "Búsqueda completada", 
+                        "Clientes activos obtenidos exitosamente", 
                         data, 
                         200
                     );
@@ -237,6 +237,158 @@ public class ClientRepository {
                 @Override
                 public void onError(String message, int errorCode) {
                     ApiResponse<List<Client>> errorResponse = new ApiResponse<>(
+                        false, 
+                        message, 
+                        null, 
+                        errorCode
+                    );
+                    result.postValue(errorResponse);
+                }
+            }
+        );
+
+        return result;
+    }
+
+    /**
+     * Obtiene clientes por tipo
+     */
+    public MutableLiveData<ApiResponse<List<Client>>> getClientsByType(String type) {
+        MutableLiveData<ApiResponse<List<Client>>> result = new MutableLiveData<>();
+
+        NetworkUtils.executeCall(
+            apiService.getClientsByType(type),
+            new NetworkUtils.ApiCallback<List<Client>>() {
+                @Override
+                public void onSuccess(List<Client> data) {
+                    ApiResponse<List<Client>> response = new ApiResponse<>(
+                        true, 
+                        "Clientes de tipo " + type + " obtenidos exitosamente", 
+                        data, 
+                        200
+                    );
+                    result.postValue(response);
+                }
+
+                @Override
+                public void onError(String message, int errorCode) {
+                    ApiResponse<List<Client>> errorResponse = new ApiResponse<>(
+                        false, 
+                        message, 
+                        null, 
+                        errorCode
+                    );
+                    result.postValue(errorResponse);
+                }
+            }
+        );
+
+        return result;
+    }
+
+    /**
+     * Obtiene estadísticas de clientes
+     */
+    public MutableLiveData<ApiResponse<Object>> getClientStats() {
+        MutableLiveData<ApiResponse<Object>> result = new MutableLiveData<>();
+
+        NetworkUtils.executeCall(
+            apiService.getClientStats(),
+            new NetworkUtils.ApiCallback<Object>() {
+                @Override
+                public void onSuccess(Object data) {
+                    ApiResponse<Object> response = new ApiResponse<>(
+                        true, 
+                        "Estadísticas obtenidas exitosamente", 
+                        data, 
+                        200
+                    );
+                    result.postValue(response);
+                }
+
+                @Override
+                public void onError(String message, int errorCode) {
+                    ApiResponse<Object> errorResponse = new ApiResponse<>(
+                        false, 
+                        message, 
+                        null, 
+                        errorCode
+                    );
+                    result.postValue(errorResponse);
+                }
+            }
+        );
+
+        return result;
+    }
+
+    /**
+     * Cambia el status de un cliente
+     */
+    public MutableLiveData<ApiResponse<Client>> changeClientStatus(int clientId, String status) {
+        MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
+
+        // Crear objeto con el nuevo status
+        java.util.Map<String, String> statusData = new java.util.HashMap<>();
+        statusData.put("status", status);
+
+        NetworkUtils.executeCall(
+            apiService.changeClientStatus(clientId, statusData),
+            new NetworkUtils.ApiCallback<Client>() {
+                @Override
+                public void onSuccess(Client data) {
+                    ApiResponse<Client> response = new ApiResponse<>(
+                        true, 
+                        "Status del cliente actualizado exitosamente", 
+                        data, 
+                        200
+                    );
+                    result.postValue(response);
+                }
+
+                @Override
+                public void onError(String message, int errorCode) {
+                    ApiResponse<Client> errorResponse = new ApiResponse<>(
+                        false, 
+                        message, 
+                        null, 
+                        errorCode
+                    );
+                    result.postValue(errorResponse);
+                }
+            }
+        );
+
+        return result;
+    }
+
+    /**
+     * Actualiza el límite de crédito de un cliente
+     */
+    public MutableLiveData<ApiResponse<Client>> updateCreditLimit(int clientId, double creditLimit) {
+        MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
+
+        // Crear objeto con el nuevo límite de crédito
+        java.util.Map<String, Double> creditData = new java.util.HashMap<>();
+        creditData.put("creditLimit", creditLimit);
+
+        NetworkUtils.executeCall(
+            apiService.updateCreditLimit(clientId, creditData),
+            new NetworkUtils.ApiCallback<Client>() {
+                @Override
+                public void onSuccess(Client data) {
+                    ApiResponse<Client> response = new ApiResponse<>(
+                        true, 
+                        "Límite de crédito actualizado exitosamente", 
+                        data, 
+                        200
+                    );
+                    result.postValue(response);
+                }
+
+                @Override
+                public void onError(String message, int errorCode) {
+                    ApiResponse<Client> errorResponse = new ApiResponse<>(
                         false, 
                         message, 
                         null, 

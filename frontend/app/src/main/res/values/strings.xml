@@ -20,6 +20,32 @@
     <string name="dashboard_products">Productos</string>
     <string name="dashboard_credit_requests">Solicitudes de Crédito</string>
     
+    <!-- Clients Screen -->
+    <string name="clients_title">Clientes</string>
+    <string name="clients_search_hint">Buscar cliente...</string>
+    <string name="clients_empty_title">No hay clientes registrados</string>
+    <string name="clients_empty_subtitle">Toca el botón + para agregar el primero</string>
+    <string name="clients_delete_title">Eliminar Cliente</string>
+    <string name="clients_delete_message">¿Estás seguro que deseas eliminar este cliente?</string>
+    
+    <!-- Products Screen -->
+    <string name="products_title">Productos</string>
+    
+    <!-- Quotes Screen -->
+    <string name="quotes_title">Mis Cotizaciones</string>
+    
+    <!-- Credit Requests Screen -->
+    <string name="credit_requests_title">Solicitudes de Crédito</string>
+    
+    <!-- Profile Screen -->
+    <string name="profile_title">Mi Perfil</string>
+    <string name="profile_logout">Cerrar Sesión</string>
+    <string name="profile_logout_title">Cerrar Sesión</string>
+    <string name="profile_logout_message">¿Estás seguro que deseas cerrar sesión?</string>
+    <string name="profile_change_password">Cambiar Contraseña</string>
+    <string name="profile_notifications">Notificaciones</string>
+    <string name="profile_settings">Configuración</string>
+    
     <!-- Navigation -->
     <string name="nav_home">Inicio</string>
     <string name="nav_agenda">Agenda</string>

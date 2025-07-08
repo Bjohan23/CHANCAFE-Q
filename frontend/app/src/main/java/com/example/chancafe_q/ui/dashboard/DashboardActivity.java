@@ -1,5 +1,6 @@
 package com.example.chancafe_q.ui.dashboard;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -136,35 +137,39 @@ public class DashboardActivity extends AppCompatActivity {
      * Maneja la selección de elementos del menú
      */
     private void handleMenuSelection(String menuItem) {
+        Intent intent = null;
         String message = "";
         
         switch (menuItem) {
             case "new_quote":
                 message = "Abriendo Nueva Cotización...";
+                // TODO: intent = new Intent(this, NewQuoteActivity.class);
                 break;
             case "my_quotes":
-                message = "Abriendo Mis Cotizaciones...";
+                intent = new Intent(this, com.example.chancafe_q.ui.quotes.QuotesActivity.class);
                 break;
             case "clients":
-                message = "Abriendo Clientes...";
+                intent = new Intent(this, com.example.chancafe_q.ui.clients.ClientsActivity.class);
                 break;
             case "products":
-                message = "Abriendo Productos...";
+                intent = new Intent(this, com.example.chancafe_q.ui.products.ProductsActivity.class);
                 break;
             case "credit_requests":
-                message = "Abriendo Solicitudes de Crédito...";
+                intent = new Intent(this, com.example.chancafe_q.ui.credit.CreditRequestsActivity.class);
                 break;
             case "agenda":
-                message = "Abriendo Agenda...";
+                intent = new Intent(this, com.example.chancafe_q.ui.agenda.AgendaActivity.class);
                 break;
             case "profile":
-                message = "Abriendo Perfil...";
+                intent = new Intent(this, com.example.chancafe_q.ui.profile.ProfileActivity.class);
                 break;
             default:
                 return; // No mostrar mensaje para "home"
         }
         
-        if (!message.isEmpty()) {
+        if (intent != null) {
+            startActivity(intent);
+        } else if (!message.isEmpty()) {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
     }

@@ -1,0 +1,19 @@
+Introducción 
+
+ 
+
+En la actualidad, la transformación digital constituye un pilar fundamental para mejorar la competitividad y eficiencia en el sector empresarial, especialmente en el ámbito del comercio minorista. Las herramientas tecnológicas móviles permiten agilizar procesos internos, optimizar la atención al cliente y mejorar la toma de decisiones comerciales. Sin embargo, muchas empresas aún enfrentan limitaciones en la implementación de soluciones digitales que respondan a sus necesidades operativas específicas. 
+
+CHANCAFE Q, es una empresa dedicada principalmente a la venta de al por menor de aparatos eléctricos de uso domésticos, muebles, equipos de iluminación y otros enseres (CIIU 4759), así como a actividades complementarias como al por mayor de enseres domésticos (CIIU 4649) y el mantenimiento y reparación de motocicletas (CIIU 4540) presenta deficiencias en su proceso de evaluación y calificación de clientes. Actualmente, este proceso depende exclusivamente del área de crédito, lo que genera retrasos significativos y afecta negativamente la eficiencia del área comercial, ya que no se cuenta con un sistema automatizado que permita realizar cotizaciones rápidas y preliminares.  
+
+Frente a esta problemática, se propone el desarrollo de una aplicación móvil cotizadora que permita a CHANCAFE Q evaluar de forma ágil y eficiente el perfil crediticio de los clientes, identificando, por ejemplo, si son bancarizados o cumplen con ciertos requisitos mínimos para acceder a un producto. Esta propuesta tecnológica busca disminuir los tiempos de espera, mejorar la experiencia del cliente y fortalecer la capacidad de respuesta del equipo comercial. A través de esta iniciativa, se pretende aportar al proceso de digitalización de la empresa, dotándola de una herramienta estratégica que le permita posicionarse de manera más competitiva en el mercado. 
+
+
+• Problema empresarial 
+
+
+CHANCAFE Q es una empresa peruana del sector retail que se dedica principalmente a la venta al por menor de aparatos eléctricos de uso doméstico, muebles, equipos de iluminación y otros enseres en comercio especializados. Además, complementa su actividad con la venta al por mayor de enseres domésticos y la venta, mantenimientos y reparación de motocicletas, piezas y accesorios. Según los datos oficiales de la Superintendencia Nacional de Administración Tributaria (SUNAT), CHANCAFE Q cuenta con más de 50 trabajadores, lo que la posiciona como una empresa de tamaño mediano dentro del mercado peruano. 
+
+A pesar de su crecimiento y diversificación en el mercado, CHANCAFE Q enfrenta una problemática significativamente en sus procesos comerciales. Actualmente, la empresa no dispone de una herramienta tecnológica móvil que permita realizar cotizaciones rápidas y evaluar preliminarmente la viabilidad crediticia de sus clientes. Este proceso depende exclusivamente del área de crédito, lo que genera demoras en la atención al cliente y retrasa la toma de decisiones comerciales. La falta de automatización en este aspecto no solo afecta la eficiencia operativa, sino que también puede resultar en la perdida de oportunidades de venta frente a competidores que ya han implementado soluciones digitales similares. 
+
+La ausencia de una aplicación móvil que facilite la cotización y evaluación crediticia limita la capacidad de respuesta del equipo de ventas, especialmente en un entorno donde la inmediatez y la eficiencia son factores clave para la satisfacción del cliente y la competitividad empresarial. Por lo tanto, es necesario que CHANCAFE Q adopte herramientas tecnológicas que optimicen sus procesos y mejoren la experiencia del cliente.

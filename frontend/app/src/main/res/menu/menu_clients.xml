@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Filtros -->
+    <item
+        android:id="@+id/action_filter"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Filtros"
+        app:showAsAction="always">
+        
+        <menu>
+            <!-- Por estado -->
+            <group android:id="@+id/group_status">
+                <item
+                    android:id="@+id/filter_all"
+                    android:title="Todos los clientes" />
+                <item
+                    android:id="@+id/filter_active"
+                    android:title="Solo activos" />
+                <item
+                    android:id="@+id/filter_inactive"
+                    android:title="Solo inactivos" />
+            </group>
+            
+            <!-- Por tipo -->
+            <group android:id="@+id/group_type">
+                <item
+                    android:id="@+id/filter_individual"
+                    android:title="Personas naturales" />
+                <item
+                    android:id="@+id/filter_business"
+                    android:title="Empresas" />
+            </group>
+        </menu>
+    </item>
+
+    <!-- Estadísticas -->
+    <item
+        android:id="@+id/action_stats"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="Estadísticas"
+        app:showAsAction="ifRoom" />
+
+    <!-- Actualizar -->
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:title="Actualizar"
+        app:showAsAction="ifRoom" />
+
+</menu>

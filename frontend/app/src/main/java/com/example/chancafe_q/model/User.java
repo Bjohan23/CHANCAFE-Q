@@ -18,15 +18,36 @@ public class User {
     @SerializedName("last_name")
     private String lastName;
     
+    @SerializedName("full_name")
+    private String fullName;
+    
     private String email;
     private String password;
     private String phone;
-    private String role; // "admin", "asesor", "supervisor"
+    private String role; // "admin", "asesor", "supervisor", "sales_rep"
     
     @SerializedName("branch_office")
     private String branchOffice;
     
     private String status; // "active", "inactive"
+    
+    @SerializedName("avatar_url")
+    private String avatarUrl;
+    
+    @SerializedName("hire_date")
+    private Date hireDate;
+    
+    @SerializedName("commission_rate")
+    private String commissionRate;
+    
+    @SerializedName("last_login")
+    private String lastLogin;
+    
+    @SerializedName("isActive")
+    private boolean isActiveFlag;
+    
+    @SerializedName("isAdmin")
+    private boolean isAdminFlag;
     
     @SerializedName("created_at")
     private Date createdAt;
@@ -105,6 +126,19 @@ public class User {
         this.lastName = lastName;
     }
 
+    public String getFullName() {
+        // Priorizar el full_name de la API si está disponible
+        if (fullName != null && !fullName.trim().isEmpty()) {
+            return fullName;
+        }
+        // Fallback a concatenar first_name + last_name
+        return (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -169,26 +203,68 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
+    // Getters y setters para nuevos campos
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public Date getHireDate() {
+        return hireDate;
+    }
+
+    public void setHireDate(Date hireDate) {
+        this.hireDate = hireDate;
+    }
+
+    public String getCommissionRate() {
+        return commissionRate;
+    }
+
+    public void setCommissionRate(String commissionRate) {
+        this.commissionRate = commissionRate;
+    }
+
+    public String getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public boolean getIsActiveFlag() {
+        return isActiveFlag;
+    }
+
+    public void setIsActiveFlag(boolean isActiveFlag) {
+        this.isActiveFlag = isActiveFlag;
+    }
+
+    public boolean getIsAdminFlag() {
+        return isAdminFlag;
+    }
+
+    public void setIsAdminFlag(boolean isAdminFlag) {
+        this.isAdminFlag = isAdminFlag;
+    }
+
     // Métodos de utilidad
-    public String getFullName() {
-        return (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
-    }
-
-    // Método de compatibilidad para getName()
-    public String getName() {
-        return getFullName().trim();
-    }
-
     public boolean isActive() {
-        return "active".equals(status);
+        // Priorizar el flag isActive de la API
+        return isActiveFlag || "active".equals(status);
     }
 
     public boolean isAdmin() {
-        return "admin".equals(role);
+        // Priorizar el flag isAdmin de la API
+        return isAdminFlag || "admin".equals(role);
     }
 
     public boolean isAsesor() {
-        return "asesor".equals(role);
+        return "asesor".equals(role) || "sales_rep".equals(role);
     }
 
     public boolean isSupervisor() {
@@ -196,12 +272,18 @@ public class User {
     }
 
     public String getRoleDisplayName() {
-        switch (role) {
+        switch (role != null ? role : "") {
             case "admin": return "Administrador";
             case "asesor": return "Asesor";
+            case "sales_rep": return "Asesor de Ventas";
             case "supervisor": return "Supervisor";
-            default: return role;
+            default: return role != null ? role : "Usuario";
         }
+    }
+
+    // Método de compatibilidad para getName()
+    public String getName() {
+        return getFullName().trim();
     }
 
     @Override

@@ -1,10 +1,19 @@
 const express = require('express');
 const quoteController = require('../controllers/quoteController');
 const authMiddleware = require('../../shared/middlewares/authMiddleware');
+const SentinelErrorHandler = require('../../external-apis/middleware/sentinelErrorHandler');
 
 const router = express.Router();
 
 router.post('/', authMiddleware, quoteController.createQuote);
+
+// 🆕 NUEVAS RUTAS PARA INTEGRACIÓN CON SENTINEL API
+router.post('/with-credit-check', 
+  authMiddleware, 
+  SentinelErrorHandler.logSentinelRequest,
+  SentinelErrorHandler.logSentinelResponse,
+  quoteController.createQuoteWithCreditCheck
+);
 
 router.get('/', authMiddleware, quoteController.getAllQuotes);
 
@@ -23,6 +32,21 @@ router.get('/:id', authMiddleware, quoteController.getQuoteById);
 router.get('/:id/items', authMiddleware, quoteController.getQuoteWithItems);
 
 router.get('/:id/relations', authMiddleware, quoteController.getQuoteWithRelations);
+
+router.get('/:id/credit-info', authMiddleware, quoteController.getQuoteWithCreditInfo);
+
+// 🆕 RUTAS PARA CONSULTA CREDITICIA MANUAL
+router.post('/client/:clientId/credit-check', 
+  authMiddleware,
+  SentinelErrorHandler.logSentinelRequest,
+  SentinelErrorHandler.logSentinelResponse,
+  quoteController.performClientCreditCheck
+);
+
+router.get('/client/:clientId/credit-assessment', 
+  authMiddleware, 
+  quoteController.getClientCreditAssessment
+);
 
 router.put('/:id', authMiddleware, quoteController.updateQuote);
 

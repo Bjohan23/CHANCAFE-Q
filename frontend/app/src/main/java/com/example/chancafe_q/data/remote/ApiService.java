@@ -14,6 +14,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -43,7 +44,7 @@ public interface ApiService {
     @POST("auth/refresh")
     Call<ApiResponse<String>> refreshToken();
     
-    @GET("auth/profile")
+    @GET("auth/users/profile")
     Call<ApiResponse<User>> getUserProfile();
     
     // ===============================
@@ -51,10 +52,31 @@ public interface ApiService {
     // ===============================
     
     @GET("clients")
-    Call<ApiResponse<List<Client>>> getClients();
+    Call<ApiResponse<List<Client>>> getAllClients();
+    
+    @GET("clients/active")
+    Call<ApiResponse<List<Client>>> getActiveClients();
+    
+    @GET("clients/stats")
+    Call<ApiResponse<Object>> getClientStats();
+    
+    @GET("clients/type/{type}")
+    Call<ApiResponse<List<Client>>> getClientsByType(@Path("type") String type);
+    
+    @GET("clients/assigned/{userId}")
+    Call<ApiResponse<List<Client>>> getClientsByAssignedUser(@Path("userId") int userId);
+    
+    @GET("clients/high-credit")
+    Call<ApiResponse<List<Client>>> getClientsWithHighCreditLimit();
+    
+    @GET("clients/document/{documentNumber}")
+    Call<ApiResponse<Client>> getClientByDocument(@Path("documentNumber") String documentNumber);
     
     @GET("clients/{id}")
-    Call<ApiResponse<Client>> getClient(@Path("id") int id);
+    Call<ApiResponse<Client>> getClientById(@Path("id") int id);
+    
+    @GET("clients/{id}/relations")
+    Call<ApiResponse<Client>> getClientWithRelations(@Path("id") int id);
     
     @POST("clients")
     Call<ApiResponse<Client>> createClient(@Body Client client);
@@ -62,17 +84,14 @@ public interface ApiService {
     @PUT("clients/{id}")
     Call<ApiResponse<Client>> updateClient(@Path("id") int id, @Body Client client);
     
+    @PATCH("clients/{id}/status")
+    Call<ApiResponse<Client>> changeClientStatus(@Path("id") int id, @Body Object statusData);
+    
+    @PATCH("clients/{id}/credit-limit")
+    Call<ApiResponse<Client>> updateCreditLimit(@Path("id") int id, @Body Object creditData);
+    
     @DELETE("clients/{id}")
     Call<ApiResponse<Void>> deleteClient(@Path("id") int id);
-    
-    @GET("clients/search")
-    Call<ApiResponse<List<Client>>> searchClients(@Query("q") String query);
-    
-    @GET("clients/document/{document}")
-    Call<ApiResponse<Client>> getClientByDocument(@Path("document") String document);
-    
-    @PUT("clients/{id}/status")
-    Call<ApiResponse<Client>> changeClientStatus(@Path("id") int id, @Query("status") String status);
     
     // ===============================
     // QUOTES ENDPOINTS

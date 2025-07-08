@@ -1,4 +1,5 @@
 const quoteService = require('../services/quoteService');
+const clientService = require('../../clients/services/clientService');
 const { sendSuccess, sendError } = require("../../shared/config/helpers/apiResponseHelper");
 
 const createQuote = async (req, res) => {
@@ -208,6 +209,165 @@ const getQuoteWithRelations = async (req, res) => {
   }
 };
 
+// 🆕 NUEVOS ENDPOINTS PARA INTEGRACIÓN CON SENTINEL API
+const createQuoteWithCreditCheck = async (req, res) => {
+  try {
+    console.log('🔍 [Quote Controller] Iniciando creación de cotización con consulta crediticia');
+    
+    const { clientId } = req.body;
+    if (!clientId) {
+      return sendError(res, 400, 'Client ID es requerido para consulta crediticia');
+    }
+
+    // Obtener información del cliente
+    const client = await clientService.getClientById(clientId);
+    if (!client) {
+      return sendError(res, 404, 'Cliente no encontrado');
+    }
+
+    let creditAssessment = null;
+    let creditCheckPerformed = false;
+
+    // Si el cliente tiene DNI y puede realizar consulta crediticia
+    if (client.documentType === 'DNI' && client.documentNumber && client.documentNumber.length === 8) {
+      try {
+        // Verificar si necesita consulta crediticia
+        if (!client.creditInfo || !client.creditInfo.lastCreditCheck || 
+            (Date.now() - new Date(client.creditInfo.lastCreditCheck).getTime()) > 30 * 24 * 60 * 60 * 1000) {
+          
+          console.log(`🔍 [Quote Controller] Realizando consulta crediticia para cliente ${client.id} - DNI: ${client.documentNumber}`);
+          
+          // Realizar consulta crediticia automática
+          const creditResult = await clientService.performCreditCheck(clientId);
+          creditAssessment = creditResult.creditAssessment;
+          creditCheckPerformed = true;
+          
+          console.log(`✅ [Quote Controller] Consulta crediticia completada: ${creditAssessment.recomendacion}`);
+        } else {
+          // Usar datos crediticios existentes
+          creditAssessment = {
+            recomendacion: client.creditInfo.automaticEvaluation,
+            limiteCredito: client.creditInfo.suggestedCreditLimit,
+            justificacion: client.creditInfo.evaluationJustification,
+            factores: {
+              scoreCredito: client.creditInfo.score,
+              clasificacionRiesgo: client.creditInfo.riskClassification,
+              totalDeudas: client.creditInfo.totalDebts,
+              cantidadDeudas: client.creditInfo.activeCredits
+            }
+          };
+          
+          console.log(`📋 [Quote Controller] Usando datos crediticios existentes: ${creditAssessment.recomendacion}`);
+        }
+      } catch (creditError) {
+        console.error(`❌ [Quote Controller] Error en consulta crediticia:`, creditError.message);
+        // Continuar con la creación de la cotización sin datos crediticios
+      }
+    }
+
+    // Crear la cotización normalmente
+    const result = await quoteService.createQuote(req.body);
+    
+    // Preparar respuesta con datos crediticios
+    const response = {
+      quote: result.quote,
+      creditAssessment,
+      creditCheckPerformed,
+      client: {
+        id: client.id,
+        fullName: client.fullName,
+        documentType: client.documentType,
+        documentNumber: client.documentNumber,
+        creditInfo: client.creditInfo
+      }
+    };
+
+    // Agregar alertas basadas en la evaluación crediticia
+    if (creditAssessment) {
+      response.alerts = [];
+      
+      if (creditAssessment.recomendacion === 'RECHAZAR') {
+        response.alerts.push({
+          type: 'danger',
+          message: `Evaluación crediticia: RECHAZAR - ${creditAssessment.justificacion}`
+        });
+      } else if (creditAssessment.recomendacion === 'REVISAR') {
+        response.alerts.push({
+          type: 'warning',
+          message: `Evaluación crediticia: REVISAR - ${creditAssessment.justificacion}`
+        });
+      } else if (creditAssessment.recomendacion === 'APROBAR') {
+        response.alerts.push({
+          type: 'success',
+          message: `Evaluación crediticia: APROBAR - Límite sugerido: S/ ${creditAssessment.limiteCredito.toLocaleString()}`
+        });
+      }
+    }
+
+    sendSuccess(res, response, 'Cotización creada con evaluación crediticia exitosa');
+  } catch (error) {
+    console.error('❌ [Quote Controller] Error en createQuoteWithCreditCheck:', error.message);
+    sendError(res, 400, error.message);
+  }
+};
+
+const performClientCreditCheck = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    
+    console.log(`🔍 [Quote Controller] Consulta crediticia manual para cliente ${clientId}`);
+    
+    const result = await clientService.performCreditCheck(clientId);
+    
+    sendSuccess(res, {
+      client: result.client,
+      creditAssessment: result.creditAssessment,
+      message: result.message
+    }, 'Consulta crediticia realizada exitosamente');
+  } catch (error) {
+    console.error('❌ [Quote Controller] Error en performClientCreditCheck:', error.message);
+    sendError(res, 400, error.message);
+  }
+};
+
+const getClientCreditAssessment = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    
+    const result = await clientService.getCreditAssessment(clientId);
+    
+    sendSuccess(res, result, 'Evaluación crediticia obtenida exitosamente');
+  } catch (error) {
+    console.error('❌ [Quote Controller] Error en getClientCreditAssessment:', error.message);
+    sendError(res, 404, error.message);
+  }
+};
+
+const getQuoteWithCreditInfo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const quote = await quoteService.getQuoteWithItems(id);
+    
+    // Obtener información crediticia del cliente si está disponible
+    if (quote.clientId) {
+      try {
+        const client = await clientService.getClientById(quote.clientId);
+        if (client.creditInfo) {
+          quote.clientCreditInfo = client.creditInfo;
+        }
+      } catch (error) {
+        console.warn('⚠️ [Quote Controller] No se pudo obtener información crediticia del cliente:', error.message);
+      }
+    }
+    
+    sendSuccess(res, { quote }, 'Cotización con información crediticia obtenida exitosamente');
+  } catch (error) {
+    console.error('❌ [Quote Controller] Error en getQuoteWithCreditInfo:', error.message);
+    sendError(res, 404, error.message);
+  }
+};
+
 module.exports = {
   createQuote,
   getQuoteById,
@@ -225,5 +385,10 @@ module.exports = {
   deleteQuoteItem,
   recalculateQuoteTotals,
   getQuoteStats,
-  getQuoteWithRelations
+  getQuoteWithRelations,
+  // 🆕 NUEVOS ENDPOINTS PARA INTEGRACIÓN CON SENTINEL API
+  createQuoteWithCreditCheck,
+  performClientCreditCheck,
+  getClientCreditAssessment,
+  getQuoteWithCreditInfo
 };

@@ -35,6 +35,55 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- Clientes -->
+        <activity
+            android:name=".ui.clients.ClientsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.dashboard.DashboardActivity" />
+
+        <!-- Agregar/Editar Cliente -->
+        <activity
+            android:name=".ui.clients.AddEditClientActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.clients.ClientsActivity" />
+
+        <!-- Productos -->
+        <activity
+            android:name=".ui.products.ProductsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.dashboard.DashboardActivity" />
+
+        <!-- Cotizaciones -->
+        <activity
+            android:name=".ui.quotes.QuotesActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.dashboard.DashboardActivity" />
+
+        <!-- Solicitudes de Crédito -->
+        <activity
+            android:name=".ui.credit.CreditRequestsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.dashboard.DashboardActivity" />
+
+        <!-- Agenda -->
+        <activity
+            android:name=".ui.agenda.AgendaActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.dashboard.DashboardActivity" />
+
+        <!-- Perfil -->
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.dashboard.DashboardActivity" />
+
         <!-- MainActivity original (temporal) -->
         <activity
             android:name=".MainActivity"

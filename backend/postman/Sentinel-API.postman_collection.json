@@ -1,0 +1,393 @@
+{
+  "info": {
+    "name": "Sentinel Credit Bureau API",
+    "description": "API REST que simula la funcionalidad del sistema crediticio peruano Sentinel, generando datos aleatorios realistas para cualquier DNI consultado.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "sentinel-api-collection",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Info de la API",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has API info\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('nombre');",
+              "    pm.expect(jsonData).to.have.property('version');",
+              "    pm.expect(jsonData).to.have.property('endpoints');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "{{content_type}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/info",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "info"
+          ]
+        },
+        "description": "Obtiene información general sobre la API y sus capacidades"
+      },
+      "response": []
+    },
+    {
+      "name": "Datos Básicos de Persona",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has person data\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('dni');",
+              "    pm.expect(jsonData).to.have.property('nombres');",
+              "    pm.expect(jsonData).to.have.property('apellidos');",
+              "    pm.expect(jsonData).to.have.property('scoreCredito');",
+              "    pm.expect(jsonData).to.have.property('clasificacionRiesgo');",
+              "});",
+              "",
+              "pm.test(\"Score crediticio is valid\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.scoreCredito).to.be.at.least(300);",
+              "    pm.expect(jsonData.scoreCredito).to.be.at.most(850);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "{{content_type}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/persona/{{dni}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "persona",
+            "{{dni}}"
+          ]
+        },
+        "description": "Obtiene datos básicos de una persona y su score crediticio"
+      },
+      "response": []
+    },
+    {
+      "name": "Historial Crediticio",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has credit history\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('dni');",
+              "    pm.expect(jsonData).to.have.property('historial');",
+              "    pm.expect(jsonData.historial).to.be.an('array');",
+              "});",
+              "",
+              "pm.test(\"Credit history items have required fields\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.historial.length > 0) {",
+              "        var firstItem = jsonData.historial[0];",
+              "        pm.expect(firstItem).to.have.property('entidad');",
+              "        pm.expect(firstItem).to.have.property('tipoCredito');",
+              "        pm.expect(firstItem).to.have.property('montoOriginal');",
+              "        pm.expect(firstItem).to.have.property('estado');",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "{{content_type}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/persona/{{dni}}/historial",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "persona",
+            "{{dni}}",
+            "historial"
+          ]
+        },
+        "description": "Obtiene el historial crediticio completo de una persona"
+      },
+      "response": []
+    },
+    {
+      "name": "Deudas Actuales",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has current debts\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('dni');",
+              "    pm.expect(jsonData).to.have.property('deudas');",
+              "    pm.expect(jsonData.deudas).to.be.an('array');",
+              "});",
+              "",
+              "pm.test(\"Current debts have positive balance\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.deudas.forEach(function(deuda) {",
+              "        pm.expect(deuda.saldoActual).to.be.above(0);",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "{{content_type}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/persona/{{dni}}/deudas",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "persona",
+            "{{dni}}",
+            "deudas"
+          ]
+        },
+        "description": "Obtiene únicamente las deudas vigentes de una persona"
+      },
+      "response": []
+    },
+    {
+      "name": "Reporte Completo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has complete report\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('dni');",
+              "    pm.expect(jsonData).to.have.property('nombres');",
+              "    pm.expect(jsonData).to.have.property('scoreCredito');",
+              "    pm.expect(jsonData).to.have.property('resumen');",
+              "    pm.expect(jsonData).to.have.property('historial');",
+              "    pm.expect(jsonData).to.have.property('alertas');",
+              "});",
+              "",
+              "pm.test(\"Summary has required fields\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.resumen).to.have.property('totalDeudas');",
+              "    pm.expect(jsonData.resumen).to.have.property('creditosActivos');",
+              "    pm.expect(jsonData.resumen).to.have.property('creditosVencidos');",
+              "    pm.expect(jsonData.resumen).to.have.property('entidadesReportantes');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "{{content_type}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/persona/{{dni}}/reporte",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "persona",
+            "{{dni}}",
+            "reporte"
+          ]
+        },
+        "description": "Obtiene el reporte crediticio completo con resumen ejecutivo"
+      },
+      "response": []
+    },
+    {
+      "name": "Alertas Recientes",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has alerts\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('dni');",
+              "    pm.expect(jsonData).to.have.property('alertas');",
+              "    pm.expect(jsonData.alertas).to.be.an('array');",
+              "});",
+              "",
+              "pm.test(\"Alerts have required fields\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.alertas.length > 0) {",
+              "        var firstAlert = jsonData.alertas[0];",
+              "        pm.expect(firstAlert).to.have.property('fecha');",
+              "        pm.expect(firstAlert).to.have.property('tipo');",
+              "        pm.expect(firstAlert).to.have.property('mensaje');",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "{{content_type}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/persona/{{dni}}/alertas",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "persona",
+            "{{dni}}",
+            "alertas"
+          ]
+        },
+        "description": "Obtiene las alertas y notificaciones recientes de una persona"
+      },
+      "response": []
+    },
+    {
+      "name": "Validación DNI Inválido",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Error response for invalid DNI\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error', true);",
+              "    pm.expect(jsonData).to.have.property('code', 'INVALID_DNI');",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "{{content_type}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/persona/123456789",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "persona",
+            "123456789"
+          ]
+        },
+        "description": "Prueba la validación de DNI con un DNI inválido (9 dígitos)"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "dni",
+      "value": "12345678"
+    }
+  ]
+}
