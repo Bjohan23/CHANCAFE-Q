@@ -21,4 +21,12 @@
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
     <color name="text_hint">#BDBDBD</color>
+    
+    <!-- Alias para compatibilidad -->
+    <color name="red_primary">@color/chancafe_red</color>
+    <color name="yellow_primary">@color/chancafe_yellow</color>
+    <color name="gray_text">@color/text_secondary</color>
+    
+    <!-- Overlay -->
+    <color name="overlay_background">#80000000</color>
 </resources>

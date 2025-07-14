@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.products.AddEditProductActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/red_primary"
+            app:title="Nuevo Producto"
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="@drawable/ic_home" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Información básica -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Información Básica"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/red_primary"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Nombre del producto -->
+                    <EditText
+                        android:id="@+id/et_product_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Nombre del producto *"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
+
+                    <!-- Descripción -->
+                    <EditText
+                        android:id="@+id/et_product_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Descripción del producto *"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:minLines="3"
+                        android:gravity="top" />
+
+                    <!-- Marca -->
+                    <EditText
+                        android:id="@+id/et_product_brand"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Marca *"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
+
+                    <!-- SKU -->
+                    <EditText
+                        android:id="@+id/et_product_sku"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="SKU *"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
+
+                    <!-- Código de barras -->
+                    <EditText
+                        android:id="@+id/et_product_barcode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Código de barras (opcional)"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Categoría y Proveedor -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Categorización"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/red_primary"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Categoría -->
+                    <Spinner
+                        android:id="@+id/spinner_category"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp" />
+
+                    <!-- Proveedor -->
+                    <Spinner
+                        android:id="@+id/spinner_supplier"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Precio e Inventario -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Precio e Inventario"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/red_primary"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Fila de precio y stock -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Precio -->
+                        <EditText
+                            android:id="@+id/et_product_price"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Precio (S/) *"
+                            android:background="@drawable/bg_edittext"
+                            android:padding="12dp"
+                            android:layout_marginEnd="8dp"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            android:inputType="numberDecimal" />
+
+                        <!-- Stock -->
+                        <EditText
+                            android:id="@+id/et_product_stock"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Stock *"
+                            android:background="@drawable/bg_edittext"
+                            android:padding="12dp"
+                            android:layout_marginStart="8dp"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            android:inputType="number" />
+
+                    </LinearLayout>
+
+                    <!-- Fila de stock mínimo y máximo -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Stock mínimo -->
+                        <EditText
+                            android:id="@+id/et_product_min_stock"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Stock mínimo"
+                            android:background="@drawable/bg_edittext"
+                            android:padding="12dp"
+                            android:layout_marginEnd="8dp"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            android:inputType="number" />
+
+                        <!-- Stock máximo -->
+                        <EditText
+                            android:id="@+id/et_product_max_stock"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Stock máximo"
+                            android:background="@drawable/bg_edittext"
+                            android:padding="12dp"
+                            android:layout_marginStart="8dp"
+                            android:textColor="@color/black"
+                            android:textSize="14sp"
+                            android:inputType="number" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Estado y Opciones -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Estado y Opciones"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/red_primary"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Estado -->
+                    <Spinner
+                        android:id="@+id/spinner_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp" />
+
+                    <!-- Producto destacado -->
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switch_featured"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Producto destacado"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Notas adicionales -->
+                    <EditText
+                        android:id="@+id/et_product_notes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Notas adicionales (opcional)"
+                        android:background="@drawable/bg_edittext"
+                        android:padding="12dp"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:minLines="2"
+                        android:gravity="top" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Botones de acción -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
+
+                <Button
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Cancelar"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_button_secondary"
+                    android:textColor="@color/red_primary"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/btn_save"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Guardar"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_button_primary"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Loading overlay -->
+    <FrameLayout
+        android:id="@+id/loading_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/overlay_background"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="@color/red_primary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Guardando..."
+                android:textColor="@color/black"
+                android:layout_marginTop="16dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

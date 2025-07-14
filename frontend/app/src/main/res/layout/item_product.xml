@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Imagen del producto -->
+        <ImageView
+            android:id="@+id/iv_product_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="16dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_products"
+            android:background="@drawable/bg_circle_client"
+            android:padding="16dp" />
+
+        <!-- Contenido principal -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Fila superior: Nombre y indicador de estado -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tv_product_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="Producto de Ejemplo" />
+
+                <View
+                    android:id="@+id/status_indicator"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_circle_client"
+                    android:backgroundTint="@android:color/holo_green_dark" />
+
+            </LinearLayout>
+
+            <!-- Descripción -->
+            <TextView
+                android:id="@+id/tv_product_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="14sp"
+                android:textColor="@color/gray_text"
+                android:ellipsize="end"
+                android:maxLines="2"
+                tools:text="Descripción detallada del producto" />
+
+            <!-- Fila de información: Precio y Stock -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_product_price"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/red_primary"
+                    tools:text="S/ 150.00" />
+
+                <TextView
+                    android:id="@+id/tv_product_stock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_text"
+                    tools:text="Stock: 25" />
+
+            </LinearLayout>
+
+            <!-- Fila de información: Marca y SKU -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_product_brand"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_text"
+                    tools:text="Marca XYZ" />
+
+                <TextView
+                    android:id="@+id/tv_product_sku"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_text"
+                    tools:text="SKU: ABC123" />
+
+            </LinearLayout>
+
+            <!-- Fila inferior: Estado y acciones -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tv_product_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/holo_green_dark"
+                    tools:text="Activo" />
+
+                <!-- Botones de acción -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iv_stock_product"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_products"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:padding="4dp"
+                        android:tint="@color/gray_text" />
+
+                    <ImageView
+                        android:id="@+id/iv_status_product"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_person"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:padding="4dp"
+                        android:tint="@color/gray_text" />
+
+                    <ImageView
+                        android:id="@+id/iv_edit_product"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:padding="4dp"
+                        android:tint="@color/yellow_primary" />
+
+                    <ImageView
+                        android:id="@+id/iv_delete_product"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_menu_delete"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:padding="4dp"
+                        android:tint="@color/red_primary" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
