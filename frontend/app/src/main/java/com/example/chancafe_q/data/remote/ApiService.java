@@ -6,6 +6,8 @@ import com.example.chancafe_q.model.LoginResponse;
 import com.example.chancafe_q.model.User;
 import com.example.chancafe_q.model.Client;
 import com.example.chancafe_q.model.Quote;
+import com.example.chancafe_q.model.QuotesResponse;
+import com.example.chancafe_q.model.ClientsResponse;
 import com.example.chancafe_q.model.CreditRequest;
 import com.example.chancafe_q.model.Product;
 import com.example.chancafe_q.model.Category;
@@ -52,22 +54,22 @@ public interface ApiService {
     // ===============================
     
     @GET("clients")
-    Call<ApiResponse<List<Client>>> getAllClients();
+    Call<ApiResponse<ClientsResponse>> getAllClients();
     
     @GET("clients/active")
-    Call<ApiResponse<List<Client>>> getActiveClients();
+    Call<ApiResponse<ClientsResponse>> getActiveClients();
     
     @GET("clients/stats")
     Call<ApiResponse<Object>> getClientStats();
     
     @GET("clients/type/{type}")
-    Call<ApiResponse<List<Client>>> getClientsByType(@Path("type") String type);
+    Call<ApiResponse<ClientsResponse>> getClientsByType(@Path("type") String type);
     
     @GET("clients/assigned/{userId}")
-    Call<ApiResponse<List<Client>>> getClientsByAssignedUser(@Path("userId") int userId);
+    Call<ApiResponse<ClientsResponse>> getClientsByAssignedUser(@Path("userId") int userId);
     
     @GET("clients/high-credit")
-    Call<ApiResponse<List<Client>>> getClientsWithHighCreditLimit();
+    Call<ApiResponse<ClientsResponse>> getClientsWithHighCreditLimit();
     
     @GET("clients/document/{documentNumber}")
     Call<ApiResponse<Client>> getClientByDocument(@Path("documentNumber") String documentNumber);
@@ -98,20 +100,20 @@ public interface ApiService {
     // ===============================
     
     @GET("quotes")
-    Call<ApiResponse<List<Quote>>> getAllQuotes(
+    Call<ApiResponse<QuotesResponse>> getAllQuotes(
         @Query("status") String status,
         @Query("client_id") Integer clientId,
         @Query("user_id") Integer userId,
+        @Query("currency") String currency,
         @Query("date_from") String dateFrom,
         @Query("date_to") String dateTo,
         @Query("search") String search,
-        @Query("quote_number") String quoteNumber,
         @Query("page") Integer page,
         @Query("limit") Integer limit
     );
     
     @GET("quotes")
-    Call<ApiResponse<List<Quote>>> getQuotes();
+    Call<ApiResponse<QuotesResponse>> getQuotes();
     
     @GET("quotes/{id}")
     Call<ApiResponse<Quote>> getQuoteById(@Path("id") int id);
@@ -120,13 +122,13 @@ public interface ApiService {
     Call<ApiResponse<Quote>> getQuote(@Path("id") int id);
     
     @GET("quotes/client/{clientId}")
-    Call<ApiResponse<List<Quote>>> getQuotesByClient(@Path("clientId") int clientId);
+    Call<ApiResponse<QuotesResponse>> getQuotesByClient(@Path("clientId") int clientId);
     
     @GET("quotes/user/{userId}")
-    Call<ApiResponse<List<Quote>>> getQuotesByUser(@Path("userId") int userId);
+    Call<ApiResponse<QuotesResponse>> getQuotesByUser(@Path("userId") int userId);
     
     @GET("quotes/status/{status}")
-    Call<ApiResponse<List<Quote>>> getQuotesByStatus(@Path("status") String status);
+    Call<ApiResponse<QuotesResponse>> getQuotesByStatus(@Path("status") String status);
     
     @GET("quotes/number/{quoteNumber}")
     Call<ApiResponse<Quote>> getQuoteByNumber(@Path("quoteNumber") String quoteNumber);

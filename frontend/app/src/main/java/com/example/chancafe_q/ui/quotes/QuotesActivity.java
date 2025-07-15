@@ -242,7 +242,17 @@ public class QuotesActivity extends AppCompatActivity implements QuotesAdapter.O
     }
 
     private void showError(String message) {
-        Toast.makeText(this, "Error: " + message, Toast.LENGTH_LONG).show();
+        // Si el mensaje indica sesión expirada, redirigir al login
+        if (message != null && message.contains("Sesión expirada")) {
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            // Redirigir al login
+            Intent intent = new Intent(this, com.example.chancafe_q.ui.login.LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        } else {
+            Toast.makeText(this, "Error: " + message, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void showSuccess(String message) {

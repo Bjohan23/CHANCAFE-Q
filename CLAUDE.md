@@ -51,6 +51,12 @@ cd frontend
 
 # Run instrumented tests
 ./gradlew connectedAndroidTest
+
+# Build release APK
+./gradlew assembleRelease
+
+# Check for lint issues
+./gradlew lint
 ```
 
 ## Project Architecture
@@ -152,10 +158,21 @@ SENTINEL_CACHE_TTL=3600
 
 ### Frontend Environment Configuration
 
-Environment switching is handled via `Configuration.java`:
-- Development: `http://10.0.2.2:3000/api/` (localhost for emulator)
+Environment switching is handled via `Configuration.java` in `frontend/app/src/main/java/com/example/chancafe_q/utils/`:
+- Development: Currently using Cloudflare tunnel (configurable)
 - Staging: `https://staging.chancafe.com/api/`
 - Production: `https://api.chancafe.com/api/`
+
+To switch environments, modify the `CURRENT_ENVIRONMENT` constant in `Configuration.java`:
+```java
+private static final Environment CURRENT_ENVIRONMENT = Environment.DEVELOPMENT;
+```
+
+Available development URLs (uncomment as needed):
+- `http://10.0.2.2:3000/api/` - For Android emulator (localhost)
+- `http://192.168.0.112/api/` - For physical device on local network
+- `http://172.21.208.1:3000/api/` - For WSL environment
+- Cloudflare tunnel URL - For remote development
 
 ## Database Configuration
 

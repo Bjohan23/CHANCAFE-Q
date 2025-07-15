@@ -85,7 +85,12 @@ public class ClientSelectorActivity extends AppCompatActivity implements ClientS
         // Observar errores
         clientViewModel.getError().observe(this, error -> {
             if (error != null && !error.isEmpty()) {
-                showError(error);
+                // Si es error de sesión expirada, redirigir al login
+                if (error.contains("Sesión expirada")) {
+                    handleSessionExpired();
+                } else {
+                    showError(error);
+                }
                 clientViewModel.clearMessages();
             }
         });
@@ -126,6 +131,16 @@ public class ClientSelectorActivity extends AppCompatActivity implements ClientS
 
     private void showError(String message) {
         Toast.makeText(this, "Error: " + message, Toast.LENGTH_LONG).show();
+    }
+
+    private void handleSessionExpired() {
+        Toast.makeText(this, "Sesión expirada. Por favor, inicia sesión nuevamente.", Toast.LENGTH_LONG).show();
+        
+        // Redirigir al login
+        Intent loginIntent = new Intent(this, com.example.chancafe_q.ui.login.LoginActivity.class);
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(loginIntent);
+        finish();
     }
 
     // Implementación de OnClientSelectListener

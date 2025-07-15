@@ -25,7 +25,7 @@ public class ProfileViewModel extends AndroidViewModel {
 
     public ProfileViewModel(@NonNull Application application) {
         super(application);
-        authRepository = AuthRepository.getInstance();
+        authRepository = AuthRepository.getInstance(application);
     }
 
     // Getters para LiveData

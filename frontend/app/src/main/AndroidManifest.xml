@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".ChancafeApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -49,12 +50,26 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.clients.ClientsActivity" />
 
+        <!-- Selector de Cliente -->
+        <activity
+            android:name=".ui.clients.ClientSelectorActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.quotes.AddEditQuoteActivity" />
+
         <!-- Productos -->
         <activity
             android:name=".ui.products.ProductsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.dashboard.DashboardActivity" />
+
+        <!-- Agregar/Editar Producto -->
+        <activity
+            android:name=".ui.products.AddEditProductActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.products.ProductsActivity" />
 
         <!-- Cotizaciones -->
         <activity
@@ -63,12 +78,47 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.dashboard.DashboardActivity" />
 
+        <!-- Agregar/Editar Cotización -->
+        <activity
+            android:name=".ui.quotes.AddEditQuoteActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.quotes.QuotesActivity" />
+
+        <!-- Detalle de Cotización -->
+        <activity
+            android:name=".ui.quotes.QuoteDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.quotes.QuotesActivity" />
+
+        <!-- Agregar/Editar Ítem de Cotización -->
+        <activity
+            android:name=".ui.quotes.AddEditQuoteItemActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.quotes.AddEditQuoteActivity" />
+
         <!-- Solicitudes de Crédito -->
         <activity
             android:name=".ui.credit.CreditRequestsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.dashboard.DashboardActivity" />
+
+        <!-- Agregar/Editar Solicitud de Crédito -->
+        <activity
+            android:name=".ui.credit.AddEditCreditRequestActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.credit.CreditRequestsActivity" />
+
+        <!-- Detalle de Solicitud de Crédito -->
+        <activity
+            android:name=".ui.credit.CreditRequestDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.credit.CreditRequestsActivity" />
 
         <!-- Agenda -->
         <activity

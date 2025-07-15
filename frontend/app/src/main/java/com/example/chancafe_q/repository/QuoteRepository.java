@@ -7,6 +7,7 @@ import com.example.chancafe_q.data.remote.ApiService;
 import com.example.chancafe_q.model.ApiResponse;
 import com.example.chancafe_q.model.Quote;
 import com.example.chancafe_q.model.QuoteItem;
+import com.example.chancafe_q.model.QuotesResponse;
 import java.util.List;
 import java.util.Map;
 import retrofit2.Call;
@@ -61,27 +62,38 @@ public class QuoteRepository {
                             String dateFrom, String dateTo, String search, Integer page, Integer limit) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<Quote>>> call = apiService.getAllQuotes(
+        Call<ApiResponse<QuotesResponse>> call = apiService.getAllQuotes(
             status, clientId, userId, currency, dateFrom, dateTo, search, page, limit
         );
         
-        call.enqueue(new Callback<ApiResponse<List<Quote>>>() {
+        call.enqueue(new Callback<ApiResponse<QuotesResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Quote>>> call, Response<ApiResponse<List<Quote>>> response) {
+            public void onResponse(Call<ApiResponse<QuotesResponse>> call, Response<ApiResponse<QuotesResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        quotesLiveData.postValue(response.body().getData());
+                        QuotesResponse quotesResponse = response.body().getData();
+                        if (quotesResponse != null && quotesResponse.getQuotes() != null) {
+                            quotesLiveData.postValue(quotesResponse.getQuotes());
+                        } else {
+                            quotesLiveData.postValue(null);
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
                 } else {
-                    errorLiveData.postValue("Error al cargar cotizaciones");
+                    // Si es 401, limpiar el token y notificar sesión expirada
+                    if (response.code() == 401) {
+                        ApiClient.clearAuthToken();
+                        errorLiveData.postValue("Sesión expirada. Por favor, inicia sesión nuevamente.");
+                    } else {
+                        errorLiveData.postValue("Error al cargar cotizaciones");
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Quote>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<QuotesResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }
@@ -121,15 +133,20 @@ public class QuoteRepository {
     public void getQuotesByClient(int clientId) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<Quote>>> call = apiService.getQuotesByClient(clientId);
+        Call<ApiResponse<QuotesResponse>> call = apiService.getQuotesByClient(clientId);
         
-        call.enqueue(new Callback<ApiResponse<List<Quote>>>() {
+        call.enqueue(new Callback<ApiResponse<QuotesResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Quote>>> call, Response<ApiResponse<List<Quote>>> response) {
+            public void onResponse(Call<ApiResponse<QuotesResponse>> call, Response<ApiResponse<QuotesResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        quotesLiveData.postValue(response.body().getData());
+                        QuotesResponse quotesResponse = response.body().getData();
+                        if (quotesResponse != null && quotesResponse.getQuotes() != null) {
+                            quotesLiveData.postValue(quotesResponse.getQuotes());
+                        } else {
+                            quotesLiveData.postValue(null);
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -139,7 +156,7 @@ public class QuoteRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Quote>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<QuotesResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }
@@ -150,15 +167,20 @@ public class QuoteRepository {
     public void getQuotesByUser(int userId) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<Quote>>> call = apiService.getQuotesByUser(userId);
+        Call<ApiResponse<QuotesResponse>> call = apiService.getQuotesByUser(userId);
         
-        call.enqueue(new Callback<ApiResponse<List<Quote>>>() {
+        call.enqueue(new Callback<ApiResponse<QuotesResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Quote>>> call, Response<ApiResponse<List<Quote>>> response) {
+            public void onResponse(Call<ApiResponse<QuotesResponse>> call, Response<ApiResponse<QuotesResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        quotesLiveData.postValue(response.body().getData());
+                        QuotesResponse quotesResponse = response.body().getData();
+                        if (quotesResponse != null && quotesResponse.getQuotes() != null) {
+                            quotesLiveData.postValue(quotesResponse.getQuotes());
+                        } else {
+                            quotesLiveData.postValue(null);
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -168,7 +190,7 @@ public class QuoteRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Quote>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<QuotesResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }
@@ -179,15 +201,20 @@ public class QuoteRepository {
     public void getQuotesByStatus(String status) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<Quote>>> call = apiService.getQuotesByStatus(status);
+        Call<ApiResponse<QuotesResponse>> call = apiService.getQuotesByStatus(status);
         
-        call.enqueue(new Callback<ApiResponse<List<Quote>>>() {
+        call.enqueue(new Callback<ApiResponse<QuotesResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Quote>>> call, Response<ApiResponse<List<Quote>>> response) {
+            public void onResponse(Call<ApiResponse<QuotesResponse>> call, Response<ApiResponse<QuotesResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        quotesLiveData.postValue(response.body().getData());
+                        QuotesResponse quotesResponse = response.body().getData();
+                        if (quotesResponse != null && quotesResponse.getQuotes() != null) {
+                            quotesLiveData.postValue(quotesResponse.getQuotes());
+                        } else {
+                            quotesLiveData.postValue(null);
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -197,7 +224,7 @@ public class QuoteRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Quote>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<QuotesResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }

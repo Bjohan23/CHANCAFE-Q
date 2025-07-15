@@ -1,5 +1,7 @@
 package com.example.chancafe_q.viewmodel;
 
+import android.app.Application;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -13,15 +15,16 @@ import com.example.chancafe_q.repository.AuthRepository;
  * ViewModel para la pantalla de Login
  * Maneja la lógica de presentación y comunica con el Repository
  */
-public class LoginViewModel extends ViewModel {
+public class LoginViewModel extends AndroidViewModel {
     private AuthRepository authRepository;
     private MutableLiveData<ApiResponse<LoginResponse>> loginResult;
     private MutableLiveData<Boolean> isLoading;
     private MutableLiveData<String> userCodeError;
     private MutableLiveData<String> passwordError;
 
-    public LoginViewModel() {
-        authRepository = AuthRepository.getInstance();
+    public LoginViewModel(Application application) {
+        super(application);
+        authRepository = AuthRepository.getInstance(application);
         loginResult = new MutableLiveData<>();
         isLoading = new MutableLiveData<>(false);
         userCodeError = new MutableLiveData<>();

@@ -7,6 +7,8 @@ import com.example.chancafe_q.model.ApiResponse;
 import com.example.chancafe_q.model.LoginRequest;
 import com.example.chancafe_q.model.LoginResponse;
 import com.example.chancafe_q.model.User;
+import com.example.chancafe_q.utils.TokenManager;
+import android.content.Context;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -17,14 +19,16 @@ import retrofit2.Response;
 public class AuthRepository {
     private static AuthRepository instance;
     private ApiService apiService;
+    private Context context;
 
-    private AuthRepository() {
+    private AuthRepository(Context context) {
+        this.context = context.getApplicationContext();
         apiService = ApiClient.getApiService();
     }
 
-    public static synchronized AuthRepository getInstance() {
+    public static synchronized AuthRepository getInstance(Context context) {
         if (instance == null) {
-            instance = new AuthRepository();
+            instance = new AuthRepository(context);
         }
         return instance;
     }
@@ -45,7 +49,18 @@ public class AuthRepository {
                     
                     // Guardar token si el login fue exitoso
                     if (apiResponse.isSuccess() && apiResponse.getData() != null && apiResponse.getData().getToken() != null) {
-                        ApiClient.setAuthToken(apiResponse.getData().getToken());
+                        LoginResponse loginResponse = apiResponse.getData();
+                        ApiClient.setAuthToken(loginResponse.getToken());
+                        
+                        // Guardar información del usuario en SharedPreferences
+                        if (loginResponse.getUser() != null) {
+                            User user = loginResponse.getUser();
+                            TokenManager.getInstance(context).saveUserInfo(
+                                user.getId(), 
+                                user.getUserCode(), 
+                                user.getRole()
+                            );
+                        }
                     }
                     
                     result.postValue(apiResponse);
@@ -233,13 +248,28 @@ public class AuthRepository {
      * Verifica si hay una sesión activa
      */
     public boolean isAuthenticated() {
-        return ApiClient.isAuthenticated();
+        return TokenManager.getInstance(context).isAuthenticated();
     }
 
     /**
      * Obtiene el token actual
      */
     public String getCurrentToken() {
-        return ApiClient.getAuthToken();
+        return TokenManager.getInstance(context).getToken();
+    }
+    
+    /**
+     * Obtiene información del usuario actual
+     */
+    public User getCurrentUser() {
+        TokenManager tokenManager = TokenManager.getInstance(context);
+        if (tokenManager.isAuthenticated()) {
+            User user = new User();
+            user.setId(tokenManager.getUserId());
+            user.setUsername(tokenManager.getUsername());
+            user.setRole(tokenManager.getUserRole());
+            return user;
+        }
+        return null;
     }
 }

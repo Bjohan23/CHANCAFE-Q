@@ -5,6 +5,7 @@ import com.example.chancafe_q.data.remote.ApiClient;
 import com.example.chancafe_q.data.remote.ApiService;
 import com.example.chancafe_q.model.ApiResponse;
 import com.example.chancafe_q.model.Client;
+import com.example.chancafe_q.model.ClientsResponse;
 import com.example.chancafe_q.utils.NetworkUtils;
 
 import java.util.List;
@@ -36,13 +37,14 @@ public class ClientRepository {
 
         NetworkUtils.executeCall(
             apiService.getAllClients(),
-            new NetworkUtils.ApiCallback<List<Client>>() {
+            new NetworkUtils.ApiCallback<ClientsResponse>() {
                 @Override
-                public void onSuccess(List<Client> data) {
+                public void onSuccess(ClientsResponse data) {
+                    List<Client> clients = data != null ? data.getClients() : null;
                     ApiResponse<List<Client>> response = new ApiResponse<>(
                         true, 
                         "Clientes obtenidos exitosamente", 
-                        data, 
+                        clients, 
                         200
                     );
                     result.postValue(response);
@@ -50,6 +52,11 @@ public class ClientRepository {
 
                 @Override
                 public void onError(String message, int errorCode) {
+                    // Si es 401, limpiar el token y notificar sesión expirada
+                    if (errorCode == 401) {
+                        ApiClient.clearAuthToken();
+                        message = "Sesión expirada. Por favor, inicia sesión nuevamente.";
+                    }
                     ApiResponse<List<Client>> errorResponse = new ApiResponse<>(
                         false, 
                         message, 
@@ -222,13 +229,14 @@ public class ClientRepository {
 
         NetworkUtils.executeCall(
             apiService.getActiveClients(),
-            new NetworkUtils.ApiCallback<List<Client>>() {
+            new NetworkUtils.ApiCallback<ClientsResponse>() {
                 @Override
-                public void onSuccess(List<Client> data) {
+                public void onSuccess(ClientsResponse data) {
+                    List<Client> clients = data != null ? data.getClients() : null;
                     ApiResponse<List<Client>> response = new ApiResponse<>(
                         true, 
                         "Clientes activos obtenidos exitosamente", 
-                        data, 
+                        clients, 
                         200
                     );
                     result.postValue(response);
@@ -236,6 +244,11 @@ public class ClientRepository {
 
                 @Override
                 public void onError(String message, int errorCode) {
+                    // Si es 401, limpiar el token y notificar sesión expirada
+                    if (errorCode == 401) {
+                        ApiClient.clearAuthToken();
+                        message = "Sesión expirada. Por favor, inicia sesión nuevamente.";
+                    }
                     ApiResponse<List<Client>> errorResponse = new ApiResponse<>(
                         false, 
                         message, 
@@ -257,35 +270,46 @@ public class ClientRepository {
         MutableLiveData<ApiResponse<List<Client>>> result = new MutableLiveData<>();
 
         NetworkUtils.executeCall(
-            apiService.getClientsByType(type),
-            new NetworkUtils.ApiCallback<List<Client>>() {
-                @Override
-                public void onSuccess(List<Client> data) {
-                    ApiResponse<List<Client>> response = new ApiResponse<>(
-                        true, 
-                        "Clientes de tipo " + type + " obtenidos exitosamente", 
-                        data, 
-                        200
-                    );
-                    result.postValue(response);
-                }
+                apiService.getClientsByType(type),
+                // CAMBIO 1: El callback ahora espera un 'ClientsResponse', que es lo que la API devuelve.
+                new NetworkUtils.ApiCallback<ClientsResponse>() {
+                    @Override
+                    // CAMBIO 2: El parámetro 'data' ahora es de tipo 'ClientsResponse'.
+                    public void onSuccess(ClientsResponse data) {
+                        // CAMBIO 3: Extraemos la lista de clientes del objeto 'data'.
+                        // Asumo que tu clase ClientsResponse tiene un método como .getClients() o un campo público.
+                        List<Client> clientList = data.getClients();
 
-                @Override
-                public void onError(String message, int errorCode) {
-                    ApiResponse<List<Client>> errorResponse = new ApiResponse<>(
-                        false, 
-                        message, 
-                        null, 
-                        errorCode
-                    );
-                    result.postValue(errorResponse);
+                        ApiResponse<List<Client>> response = new ApiResponse<>(
+                                true,
+                                "Clientes de tipo " + type + " obtenidos exitosamente",
+                                // Pasamos la lista extraída a la respuesta final.
+                                clientList,
+                                200
+                        );
+                        result.postValue(response);
+                    }
+
+                    @Override
+                    public void onError(String message, int errorCode) {
+                        if (errorCode == 401) {
+                            ApiClient.clearAuthToken();
+                            message = "Sesión expirada. Por favor, inicia sesión nuevamente.";
+                        }
+                        // Aquí no hay cambios, el tipo de dato en caso de error es irrelevante (null).
+                        ApiResponse<List<Client>> errorResponse = new ApiResponse<>(
+                                false,
+                                message,
+                                null,
+                                errorCode
+                        );
+                        result.postValue(errorResponse);
+                    }
                 }
-            }
         );
 
         return result;
     }
-
     /**
      * Obtiene estadísticas de clientes
      */

@@ -286,6 +286,15 @@ public class User {
         return getFullName().trim();
     }
 
+    // Métodos de compatibilidad para getUsername()
+    public String getUsername() {
+        return getUserCode();
+    }
+
+    public void setUsername(String username) {
+        setUserCode(username);
+    }
+
     @Override
     public String toString() {
         return "User{" +

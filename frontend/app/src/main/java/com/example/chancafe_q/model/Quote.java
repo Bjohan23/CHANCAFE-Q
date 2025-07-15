@@ -72,6 +72,15 @@ public class Quote {
     @SerializedName("updated_at")
     private Date updatedAt;
     
+    @SerializedName("isDraft")
+    private Boolean isDraft;
+    
+    @SerializedName("isApproved")
+    private Boolean isApproved;
+    
+    @SerializedName("isExpired")
+    private Boolean isExpired;
+    
     // Relaciones
     private Client client;
     private User user;
@@ -326,9 +335,33 @@ public class Quote {
         this.projectName = projectName;
     }
 
+    public Boolean getIsDraft() {
+        return isDraft;
+    }
+
+    public void setIsDraft(Boolean isDraft) {
+        this.isDraft = isDraft;
+    }
+
+    public Boolean getIsApproved() {
+        return isApproved;
+    }
+
+    public void setIsApproved(Boolean isApproved) {
+        this.isApproved = isApproved;
+    }
+
+    public Boolean getIsExpired() {
+        return isExpired;
+    }
+
+    public void setIsExpired(Boolean isExpired) {
+        this.isExpired = isExpired;
+    }
+
     // Métodos de utilidad
     public boolean isDraft() {
-        return "draft".equals(status);
+        return Boolean.TRUE.equals(isDraft) || "draft".equals(status);
     }
 
     public boolean isSent() {
@@ -336,11 +369,11 @@ public class Quote {
     }
 
     public boolean isApproved() {
-        return "approved".equals(status);
+        return Boolean.TRUE.equals(isApproved) || "approved".equals(status);
     }
 
     public boolean isExpired() {
-        return "expired".equals(status) || (validUntil != null && validUntil.before(new Date()));
+        return Boolean.TRUE.equals(isExpired) || "expired".equals(status) || (validUntil != null && validUntil.before(new Date()));
     }
 
     public String getStatusDisplayName() {

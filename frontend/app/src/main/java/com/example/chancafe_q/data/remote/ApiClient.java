@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import com.example.chancafe_q.utils.Configuration;
+import com.example.chancafe_q.utils.TokenManager;
+import android.content.Context;
 
 /**
  * Cliente API para configurar Retrofit
@@ -24,6 +26,7 @@ public class ApiClient {
     // BASE_URL se obtiene dinámicamente de Configuration
     private static Retrofit retrofit = null;
     private static String authToken = null;
+    private static Context appContext = null;
     
     public static Retrofit getClient() {
         if (retrofit == null) {
@@ -48,14 +51,25 @@ public class ApiClient {
                 public Response intercept(Chain chain) throws IOException {
                     Request originalRequest = chain.request();
                     
+                    // Obtener token del TokenManager si está disponible
+                    String token = null;
+                    if (appContext != null) {
+                        token = TokenManager.getInstance(appContext).getToken();
+                    }
+                    
+                    // Si no hay token en TokenManager, usar el token en memoria
+                    if (token == null || token.isEmpty()) {
+                        token = authToken;
+                    }
+                    
                     // Si no hay token, enviar request normal
-                    if (authToken == null || authToken.isEmpty()) {
+                    if (token == null || token.isEmpty()) {
                         return chain.proceed(originalRequest);
                     }
                     
                     // Agregar token Bearer a todas las requests
                     Request newRequest = originalRequest.newBuilder()
-                            .header("Authorization", "Bearer " + authToken)
+                            .header("Authorization", "Bearer " + token)
                             .build();
                     
                     return chain.proceed(newRequest);
@@ -90,16 +104,37 @@ public class ApiClient {
     }
     
     /**
+     * Inicializa el contexto de la aplicación
+     */
+    public static void init(Context context) {
+        appContext = context.getApplicationContext();
+        // Cargar token desde SharedPreferences si existe
+        if (appContext != null) {
+            authToken = TokenManager.getInstance(appContext).getToken();
+        }
+    }
+    
+    /**
      * Guarda el token JWT para las futuras requests
      */
     public static void setAuthToken(String token) {
         authToken = token;
+        // Guardar también en SharedPreferences
+        if (appContext != null) {
+            TokenManager.getInstance(appContext).saveToken(token);
+        }
     }
     
     /**
      * Obtiene el token JWT actual
      */
     public static String getAuthToken() {
+        if (appContext != null) {
+            String persistedToken = TokenManager.getInstance(appContext).getToken();
+            if (persistedToken != null && !persistedToken.isEmpty()) {
+                return persistedToken;
+            }
+        }
         return authToken;
     }
     
@@ -108,12 +143,19 @@ public class ApiClient {
      */
     public static void clearAuthToken() {
         authToken = null;
+        // Limpiar también de SharedPreferences
+        if (appContext != null) {
+            TokenManager.getInstance(appContext).clearSession();
+        }
     }
     
     /**
      * Verifica si hay un token JWT válido
      */
     public static boolean isAuthenticated() {
+        if (appContext != null) {
+            return TokenManager.getInstance(appContext).isAuthenticated();
+        }
         return authToken != null && !authToken.isEmpty();
     }
     
