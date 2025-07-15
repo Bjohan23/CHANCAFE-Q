@@ -3,15 +3,15 @@ package com.example.chancafe_q.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import com.example.chancafe_q.model.Quote;
-import com.example.chancafe_q.model.QuoteItem;
-import com.example.chancafe_q.repository.QuoteRepository;
+import com.example.chancafe_q.model.CreditRequest;
+import com.example.chancafe_q.repository.CreditRequestRepository;
 import java.util.List;
 import java.util.Map;
 
-public class QuoteViewModel extends ViewModel {
-    private final QuoteRepository quoteRepository;
+public class CreditRequestViewModel extends ViewModel {
+    private final CreditRequestRepository creditRequestRepository;
     private final MutableLiveData<String> filterStatusLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> filterPriorityLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> searchQueryLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> selectedClientLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> selectedUserLiveData = new MutableLiveData<>();
@@ -19,12 +19,12 @@ public class QuoteViewModel extends ViewModel {
     private final MutableLiveData<String> dateFromLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> dateToLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> sortOrderLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> creditCheckEnabledLiveData = new MutableLiveData<>();
 
-    public QuoteViewModel() {
-        quoteRepository = new QuoteRepository();
+    public CreditRequestViewModel() {
+        creditRequestRepository = new CreditRequestRepository();
         // Inicializar valores por defecto
         filterStatusLiveData.setValue("all");
+        filterPriorityLiveData.setValue("all");
         searchQueryLiveData.setValue("");
         selectedClientLiveData.setValue(null);
         selectedUserLiveData.setValue(null);
@@ -32,41 +32,40 @@ public class QuoteViewModel extends ViewModel {
         dateFromLiveData.setValue(null);
         dateToLiveData.setValue(null);
         sortOrderLiveData.setValue("created_desc");
-        creditCheckEnabledLiveData.setValue(true);
     }
 
     // Getters para LiveData del repository
-    public LiveData<List<Quote>> getQuotes() {
-        return quoteRepository.getQuotesLiveData();
+    public LiveData<List<CreditRequest>> getCreditRequests() {
+        return creditRequestRepository.getCreditRequestsLiveData();
     }
 
-    public LiveData<Quote> getQuote() {
-        return quoteRepository.getQuoteLiveData();
+    public LiveData<CreditRequest> getCreditRequest() {
+        return creditRequestRepository.getCreditRequestLiveData();
     }
 
-    public LiveData<List<QuoteItem>> getQuoteItems() {
-        return quoteRepository.getQuoteItemsLiveData();
-    }
-
-    public LiveData<Map<String, Object>> getCreditAssessment() {
-        return quoteRepository.getCreditAssessmentLiveData();
+    public LiveData<Map<String, Object>> getStatistics() {
+        return creditRequestRepository.getStatisticsLiveData();
     }
 
     public LiveData<Boolean> getLoading() {
-        return quoteRepository.getLoadingLiveData();
+        return creditRequestRepository.getLoadingLiveData();
     }
 
     public LiveData<String> getError() {
-        return quoteRepository.getErrorLiveData();
+        return creditRequestRepository.getErrorLiveData();
     }
 
     public LiveData<String> getSuccess() {
-        return quoteRepository.getSuccessLiveData();
+        return creditRequestRepository.getSuccessLiveData();
     }
 
     // Getters para filtros
     public LiveData<String> getFilterStatus() {
         return filterStatusLiveData;
+    }
+
+    public LiveData<String> getFilterPriority() {
+        return filterPriorityLiveData;
     }
 
     public LiveData<String> getSearchQuery() {
@@ -97,68 +96,70 @@ public class QuoteViewModel extends ViewModel {
         return sortOrderLiveData;
     }
 
-    public LiveData<Boolean> getCreditCheckEnabled() {
-        return creditCheckEnabledLiveData;
-    }
-
     // Métodos para actualizar filtros
     public void setFilterStatus(String status) {
         filterStatusLiveData.setValue(status);
-        loadQuotes();
+        loadCreditRequests();
+    }
+
+    public void setFilterPriority(String priority) {
+        filterPriorityLiveData.setValue(priority);
+        loadCreditRequests();
     }
 
     public void setSearchQuery(String query) {
         searchQueryLiveData.setValue(query);
-        loadQuotes();
+        loadCreditRequests();
     }
 
     public void setSelectedClient(Integer clientId) {
         selectedClientLiveData.setValue(clientId);
         if (clientId != null) {
-            loadQuotesByClient(clientId);
+            loadCreditRequestsByClient(clientId);
         } else {
-            loadQuotes();
+            loadCreditRequests();
         }
     }
 
     public void setSelectedUser(Integer userId) {
         selectedUserLiveData.setValue(userId);
         if (userId != null) {
-            loadQuotesByUser(userId);
+            loadCreditRequestsByUser(userId);
         } else {
-            loadQuotes();
+            loadCreditRequests();
         }
     }
 
     public void setSelectedCurrency(String currency) {
         selectedCurrencyLiveData.setValue(currency);
-        loadQuotes();
+        loadCreditRequests();
     }
 
     public void setDateFrom(String dateFrom) {
         dateFromLiveData.setValue(dateFrom);
-        loadQuotes();
+        loadCreditRequests();
     }
 
     public void setDateTo(String dateTo) {
         dateToLiveData.setValue(dateTo);
-        loadQuotes();
+        loadCreditRequests();
     }
 
     public void setSortOrder(String sortOrder) {
         sortOrderLiveData.setValue(sortOrder);
-        loadQuotes();
+        loadCreditRequests();
     }
 
-    public void setCreditCheckEnabled(boolean enabled) {
-        creditCheckEnabledLiveData.setValue(enabled);
-    }
-
-    // Métodos principales para cargar cotizaciones
-    public void loadQuotes() {
+    // Métodos principales para cargar solicitudes
+    public void loadCreditRequests() {
         String status = filterStatusLiveData.getValue();
         if ("all".equals(status)) {
             status = null;
+        }
+
+        String priority = filterPriorityLiveData.getValue();
+        if ("all".equals(priority)) {
+            priority = null;
         }
         
         Integer clientId = selectedClientLiveData.getValue();
@@ -172,152 +173,101 @@ public class QuoteViewModel extends ViewModel {
             search = null;
         }
 
-        quoteRepository.getAllQuotes(
-            status, clientId, userId, currency, dateFrom, dateTo, search, null, null
+        creditRequestRepository.getAllCreditRequests(
+            status, clientId, userId, priority, currency, dateFrom, dateTo, search, null, null
         );
     }
 
-    public void loadQuotesByClient(int clientId) {
-        quoteRepository.getQuotesByClient(clientId);
+    public void loadCreditRequestsByClient(int clientId) {
+        creditRequestRepository.getCreditRequestsByClient(clientId);
     }
 
-    public void loadQuotesByUser(int userId) {
-        quoteRepository.getQuotesByUser(userId);
+    public void loadCreditRequestsByUser(int userId) {
+        creditRequestRepository.getCreditRequestsByUser(userId);
     }
 
-    public void loadQuotesByStatus(String status) {
-        quoteRepository.getQuotesByStatus(status);
+    public void loadCreditRequestsByStatus(String status) {
+        creditRequestRepository.getCreditRequestsByStatus(status);
     }
 
-    public void loadQuoteById(int id) {
-        quoteRepository.getQuoteById(id);
+    public void loadCreditRequestsByPriority(String priority) {
+        creditRequestRepository.getCreditRequestsByPriority(priority);
     }
 
-    public void loadQuoteByNumber(String quoteNumber) {
-        quoteRepository.getQuoteByNumber(quoteNumber);
+    public void loadCreditRequestById(int id) {
+        creditRequestRepository.getCreditRequestById(id);
     }
 
-    // Métodos CRUD para cotizaciones
-    public void createQuote(Quote quote) {
-        if (validateQuote(quote)) {
-            if (creditCheckEnabledLiveData.getValue() && quote.getClientId() != null) {
-                quoteRepository.createQuoteWithCreditCheck(quote);
-            } else {
-                quoteRepository.createQuote(quote);
-            }
+    public void loadStatistics() {
+        creditRequestRepository.getCreditRequestStatistics();
+    }
+
+    // Métodos CRUD para solicitudes de crédito
+    public void createCreditRequest(CreditRequest creditRequest) {
+        if (validateCreditRequest(creditRequest)) {
+            creditRequestRepository.createCreditRequest(creditRequest);
         }
     }
 
-    public void createQuoteWithCreditCheck(Quote quote) {
-        if (validateQuote(quote)) {
-            quoteRepository.createQuoteWithCreditCheck(quote);
+    public void updateCreditRequest(int id, CreditRequest creditRequest) {
+        if (validateCreditRequest(creditRequest)) {
+            creditRequestRepository.updateCreditRequest(id, creditRequest);
         }
     }
 
-    public void updateQuote(int id, Quote quote) {
-        if (validateQuote(quote)) {
-            quoteRepository.updateQuote(id, quote);
-        }
+    public void deleteCreditRequest(int id) {
+        creditRequestRepository.deleteCreditRequest(id);
     }
 
-    public void deleteQuote(int id) {
-        quoteRepository.deleteQuote(id);
+    public void changeCreditRequestStatus(int id, String status) {
+        creditRequestRepository.changeCreditRequestStatus(id, status);
     }
 
-    public void changeQuoteStatus(int id, String status) {
-        quoteRepository.changeQuoteStatus(id, status);
+    // Métodos para workflow de aprobación
+    public void approveCreditRequest(int id, Double approvedAmount, String approvedTerms, String conditions) {
+        creditRequestRepository.approveCreditRequest(id, approvedAmount, approvedTerms, conditions);
     }
 
-    public void recalculateQuote(int id) {
-        quoteRepository.recalculateQuote(id);
+    public void rejectCreditRequest(int id, String rejectionReason) {
+        creditRequestRepository.rejectCreditRequest(id, rejectionReason);
     }
 
-    // Métodos para ítems de cotización
-    public void loadQuoteItems(int quoteId) {
-        quoteRepository.getQuoteItems(quoteId);
+    public void updateRiskAssessment(int id, String riskAssessment) {
+        creditRequestRepository.updateRiskAssessment(id, riskAssessment);
     }
 
-    public void addQuoteItem(int quoteId, QuoteItem quoteItem) {
-        if (validateQuoteItem(quoteItem)) {
-            quoteRepository.addQuoteItem(quoteId, quoteItem);
-        }
+    public void markExpiredCreditRequests() {
+        creditRequestRepository.markExpiredCreditRequests();
     }
 
-    public void updateQuoteItem(int itemId, QuoteItem quoteItem) {
-        if (validateQuoteItem(quoteItem)) {
-            quoteRepository.updateQuoteItem(itemId, quoteItem);
-        }
-    }
-
-    public void deleteQuoteItem(int itemId) {
-        quoteRepository.deleteQuoteItem(itemId);
-    }
-
-    // Métodos para evaluación crediticia
-    public void performCreditCheck(int clientId) {
-        quoteRepository.performCreditCheck(clientId);
-    }
-
-    public void getCreditAssessment(int clientId) {
-        quoteRepository.getCreditAssessment(clientId);
-    }
-
-    public void getQuoteWithCreditInfo(int quoteId) {
-        quoteRepository.getQuoteWithCreditInfo(quoteId);
-    }
-
-    // Validación de cotizaciones
-    private boolean validateQuote(Quote quote) {
-        if (quote == null) {
+    // Validación de solicitudes de crédito
+    private boolean validateCreditRequest(CreditRequest creditRequest) {
+        if (creditRequest == null) {
+            // Crear una validación local y usar el repositorio para crear una solicitud vacía que genere error
             return false;
         }
 
-        if (quote.getTitle() == null || quote.getTitle().trim().isEmpty()) {
+        if (creditRequest.getClientId() <= 0) {
             return false;
         }
 
-        if (quote.getClientId() == null || quote.getClientId() <= 0) {
+        if (creditRequest.getUserId() <= 0) {
             return false;
         }
 
-        if (quote.getUserId() == null || quote.getUserId() <= 0) {
+        if (creditRequest.getRequestedAmount() == null || creditRequest.getRequestedAmount() <= 0) {
             return false;
         }
 
-        if (quote.getCurrency() == null || quote.getCurrency().trim().isEmpty()) {
+        if (creditRequest.getPurpose() == null || creditRequest.getPurpose().trim().isEmpty()) {
             return false;
         }
 
-        if (quote.getSubtotal() < 0) {
+        if (creditRequest.getPaymentTerms() == null || creditRequest.getPaymentTerms().trim().isEmpty()) {
             return false;
         }
 
-        if (quote.getTaxPercentage() == null || quote.getTaxPercentage() < 0 || quote.getTaxPercentage() > 100) {
-            return false;
-        }
-
-        return true;
-    }
-
-    // Validación de ítems de cotización
-    private boolean validateQuoteItem(QuoteItem quoteItem) {
-        if (quoteItem == null) {
-            return false;
-        }
-
-        if (quoteItem.getProductId() == null || quoteItem.getProductId() <= 0) {
-            return false;
-        }
-
-        if (quoteItem.getQuantity() <= 0) {
-            return false;
-        }
-
-        if (quoteItem.getUnitPrice() <= 0) {
-            return false;
-        }
-
-        if (quoteItem.getDiscount() != null && (quoteItem.getDiscount() < 0 || quoteItem.getDiscount() > 100)) {
+        if (creditRequest.getCurrency() == null || creditRequest.getCurrency().trim().isEmpty()) {
             return false;
         }
 
@@ -327,26 +277,31 @@ public class QuoteViewModel extends ViewModel {
     // Métodos de utilidad
     public void clearFilters() {
         filterStatusLiveData.setValue("all");
+        filterPriorityLiveData.setValue("all");
         searchQueryLiveData.setValue("");
         selectedClientLiveData.setValue(null);
         selectedUserLiveData.setValue(null);
         selectedCurrencyLiveData.setValue("PEN");
         dateFromLiveData.setValue(null);
         dateToLiveData.setValue(null);
-        loadQuotes();
+        loadCreditRequests();
     }
 
     public void clearMessages() {
-        quoteRepository.clearMessages();
+        creditRequestRepository.clearMessages();
     }
 
     public void refresh() {
-        loadQuotes();
+        loadCreditRequests();
     }
 
     // Métodos para manejo de estados
     public String getFilterStatusValue() {
         return filterStatusLiveData.getValue();
+    }
+
+    public String getFilterPriorityValue() {
+        return filterPriorityLiveData.getValue();
     }
 
     public String getSearchQueryValue() {
@@ -377,10 +332,6 @@ public class QuoteViewModel extends ViewModel {
         return sortOrderLiveData.getValue();
     }
 
-    public boolean getCreditCheckEnabledValue() {
-        return creditCheckEnabledLiveData.getValue() != null ? creditCheckEnabledLiveData.getValue() : true;
-    }
-
     // Métodos para filtros rápidos
     public void applyQuickFilter(String filterType) {
         clearFilters();
@@ -400,32 +351,39 @@ public class QuoteViewModel extends ViewModel {
             case "expired":
                 setFilterStatus("expired");
                 break;
+            case "high_priority":
+                setFilterPriority("high");
+                break;
+            case "urgent":
+                setFilterPriority("urgent");
+                break;
             case "today":
-                // Filtrar cotizaciones de hoy
+                // Filtrar solicitudes de hoy
                 String today = java.time.LocalDate.now().toString();
                 setDateFrom(today);
                 setDateTo(today);
                 break;
             case "this_week":
-                // Filtrar cotizaciones de esta semana
+                // Filtrar solicitudes de esta semana
                 String startOfWeek = java.time.LocalDate.now().minusDays(7).toString();
                 setDateFrom(startOfWeek);
                 setDateTo(java.time.LocalDate.now().toString());
                 break;
             case "this_month":
-                // Filtrar cotizaciones de este mes
+                // Filtrar solicitudes de este mes
                 String startOfMonth = java.time.LocalDate.now().withDayOfMonth(1).toString();
                 setDateFrom(startOfMonth);
                 setDateTo(java.time.LocalDate.now().toString());
                 break;
             default:
-                loadQuotes();
+                loadCreditRequests();
                 break;
         }
     }
 
     public boolean hasActiveFilters() {
         String status = filterStatusLiveData.getValue();
+        String priority = filterPriorityLiveData.getValue();
         String search = searchQueryLiveData.getValue();
         Integer clientId = selectedClientLiveData.getValue();
         Integer userId = selectedUserLiveData.getValue();
@@ -434,6 +392,7 @@ public class QuoteViewModel extends ViewModel {
         String dateTo = dateToLiveData.getValue();
 
         return (status != null && !status.equals("all")) ||
+               (priority != null && !priority.equals("all")) ||
                (search != null && !search.trim().isEmpty()) ||
                (clientId != null && clientId > 0) ||
                (userId != null && userId > 0) ||
@@ -442,29 +401,34 @@ public class QuoteViewModel extends ViewModel {
                (dateTo != null && !dateTo.trim().isEmpty());
     }
 
-    // Métodos para cálculos
-    public double calculateSubtotal(List<QuoteItem> items) {
-        if (items == null || items.isEmpty()) {
-            return 0.0;
-        }
-
-        double subtotal = 0.0;
-        for (QuoteItem item : items) {
-            double itemTotal = item.getQuantity() * item.getUnitPrice();
-            if (item.getDiscount() != null && item.getDiscount() > 0) {
-                itemTotal = itemTotal * (1 - item.getDiscount() / 100);
-            }
-            subtotal += itemTotal;
-        }
-        return subtotal;
+    // Métodos para cálculos y utilidades
+    public double calculateDebtToIncomeRatio(double monthlyIncome, double currentDebts) {
+        if (monthlyIncome <= 0) return 0;
+        return (currentDebts / monthlyIncome) * 100;
     }
 
-    public double calculateTax(double subtotal, double taxPercentage) {
-        return subtotal * (taxPercentage / 100);
+    public double calculateMonthlyPayment(double amount, int termsInMonths, double interestRate) {
+        if (termsInMonths <= 0) return 0;
+        
+        if (interestRate <= 0) {
+            // Cálculo simple sin intereses
+            return amount / termsInMonths;
+        } else {
+            // Cálculo con intereses usando fórmula de cuota fija
+            double monthlyRate = interestRate / 100 / 12;
+            return amount * (monthlyRate * Math.pow(1 + monthlyRate, termsInMonths)) / 
+                   (Math.pow(1 + monthlyRate, termsInMonths) - 1);
+        }
     }
 
-    public double calculateTotal(double subtotal, double taxPercentage) {
-        return subtotal + calculateTax(subtotal, taxPercentage);
+    public String determineRiskLevel(double debtToIncomeRatio, int creditScore) {
+        if (creditScore >= 750 && debtToIncomeRatio <= 30) {
+            return "low";
+        } else if (creditScore >= 650 && debtToIncomeRatio <= 40) {
+            return "medium";
+        } else {
+            return "high";
+        }
     }
 
     @Override

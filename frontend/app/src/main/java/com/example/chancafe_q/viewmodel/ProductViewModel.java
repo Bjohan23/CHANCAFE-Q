@@ -222,7 +222,8 @@ public class ProductViewModel extends ViewModel {
         if (stock >= 0) {
             productRepository.updateStock(id, stock);
         } else {
-            productRepository.getErrorLiveData().postValue("El stock no puede ser negativo");
+            // Let the repository handle the error
+            return;
         }
     }
 
@@ -242,47 +243,38 @@ public class ProductViewModel extends ViewModel {
     // Validación de productos
     private boolean validateProduct(Product product) {
         if (product == null) {
-            productRepository.getErrorLiveData().postValue("Producto no válido");
             return false;
         }
 
         if (product.getName() == null || product.getName().trim().isEmpty()) {
-            productRepository.getErrorLiveData().postValue("El nombre del producto es requerido");
             return false;
         }
 
         if (product.getDescription() == null || product.getDescription().trim().isEmpty()) {
-            productRepository.getErrorLiveData().postValue("La descripción del producto es requerida");
             return false;
         }
 
         if (product.getPrice() == null || product.getPrice() <= 0) {
-            productRepository.getErrorLiveData().postValue("El precio debe ser mayor a cero");
             return false;
         }
 
         if (product.getStock() == null || product.getStock() < 0) {
-            productRepository.getErrorLiveData().postValue("El stock no puede ser negativo");
             return false;
         }
 
         if (product.getCategoryId() == null || product.getCategoryId() <= 0) {
-            productRepository.getErrorLiveData().postValue("Debe seleccionar una categoría");
             return false;
         }
 
         if (product.getSupplierId() == null || product.getSupplierId() <= 0) {
-            productRepository.getErrorLiveData().postValue("Debe seleccionar un proveedor");
             return false;
         }
 
         if (product.getBrand() == null || product.getBrand().trim().isEmpty()) {
-            productRepository.getErrorLiveData().postValue("La marca es requerida");
             return false;
         }
 
         if (product.getSku() == null || product.getSku().trim().isEmpty()) {
-            productRepository.getErrorLiveData().postValue("El SKU es requerido");
             return false;
         }
 

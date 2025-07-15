@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#D32F2F"
+        android:elevation="4dp"
+        app:title="Solicitudes de Crédito"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="?attr/homeAsUpIndicator" />
+
+    <!-- Header con búsqueda y filtros -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:elevation="2dp">
+
+        <!-- Primera fila: Búsqueda y botón agregar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <!-- Campo de búsqueda -->
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="12dp"
+                android:background="#F5F5F5"
+                android:hint="Buscar solicitud..."
+                android:paddingHorizontal="16dp"
+                android:drawableStart="@android:drawable/ic_menu_search"
+                android:drawablePadding="12dp"
+                android:textSize="14sp" />
+
+            <!-- Botón filtros -->
+            <ImageButton
+                android:id="@+id/btn_filters"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_preferences"
+                android:contentDescription="Filtros" />
+
+            <!-- Botón estadísticas -->
+            <ImageButton
+                android:id="@+id/btn_statistics"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:contentDescription="Estadísticas" />
+
+            <!-- Botón agregar solicitud -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_credit_request"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_input_add"
+                app:backgroundTint="#D32F2F"
+                app:tint="@android:color/white"
+                app:fabSize="mini" />
+
+        </LinearLayout>
+
+        <!-- Segunda fila: Filtros rápidos por estado -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="8dp">
+
+                <!-- Chip: Todas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Todas"
+                    android:checkable="true"
+                    android:checked="true"
+                    app:chipBackgroundColor="#E3F2FD"
+                    app:chipStrokeColor="#2196F3" />
+
+                <!-- Chip: Pendientes -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_pending"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Pendientes"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#FFF3E0"
+                    app:chipStrokeColor="#FF9800" />
+
+                <!-- Chip: Aprobadas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_approved"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Aprobadas"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#E8F5E8"
+                    app:chipStrokeColor="#4CAF50" />
+
+                <!-- Chip: Rechazadas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_rejected"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Rechazadas"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#FFEBEE"
+                    app:chipStrokeColor="#F44336" />
+
+                <!-- Chip: Expiradas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_expired"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Expiradas"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#F3E5F5"
+                    app:chipStrokeColor="#9C27B0" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <!-- Tercera fila: Filtros rápidos por prioridad -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="16dp">
+
+                <!-- Chip: Urgente -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_urgent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="🔥 Urgente"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#FFEBEE"
+                    app:chipStrokeColor="#F44336" />
+
+                <!-- Chip: Alta prioridad -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_high_priority"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="⚡ Alta"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#FFF3E0"
+                    app:chipStrokeColor="#FF9800" />
+
+                <!-- Chip: Hoy -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="📅 Hoy"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#E8F5E8"
+                    app:chipStrokeColor="#4CAF50" />
+
+                <!-- Chip: Esta semana -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_this_week"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="📆 Esta semana"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#E3F2FD"
+                    app:chipStrokeColor="#2196F3" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+    <!-- Lista de solicitudes de crédito -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_credit_requests"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_credit_request" />
+
+    <!-- Loading indicator -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <!-- Empty state -->
+    <LinearLayout
+        android:id="@+id/layout_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <!-- Icono -->
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/ic_credit"
+            android:alpha="0.3" />
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hay solicitudes de crédito"
+            android:textSize="18sp"
+            android:textColor="#666666"
+            android:textStyle="bold" />
+
+        <!-- Descripción -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Toca el botón + para crear la primera solicitud"
+            android:textSize="14sp"
+            android:textColor="#999999"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <!-- Statistics Quick View (collapsible) -->
+    <LinearLayout
+        android:id="@+id/layout_statistics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:padding="16dp"
+        android:elevation="4dp"
+        android:visibility="gone">
+
+        <!-- Pendientes -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_pending_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FF9800" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pendientes"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+
+        </LinearLayout>
+
+        <!-- Aprobadas -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_approved_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#4CAF50" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aprobadas"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+
+        </LinearLayout>
+
+        <!-- Rechazadas -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_rejected_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#F44336" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rechazadas"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+
+        </LinearLayout>
+
+        <!-- Total Amount -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_total_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="S/ 125K"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#2196F3" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Monto total"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

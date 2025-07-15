@@ -14,22 +14,33 @@ public class Product {
     private String sku;
     
     @SerializedName("category_id")
-    private int categoryId;
+    private Integer categoryId;
     
     @SerializedName("supplier_id")
-    private int supplierId;
+    private Integer supplierId;
     
-    private double price;
+    private Double price;
     
     @SerializedName("cost_price")
-    private double costPrice;
+    private Double costPrice;
     
-    private int stock;
+    private Integer stock;
     
     @SerializedName("min_stock")
-    private int minStock;
+    private Integer minStock;
+    
+    @SerializedName("max_stock")
+    private Integer maxStock;
     
     private String unit; // "unidad", "kg", "litro", etc.
+    
+    private String brand; // Marca del producto
+    
+    private String barcode; // Código de barras del producto
+    
+    private String notes; // Notas adicionales del producto
+    
+    private Boolean featured; // Producto destacado
     
     @SerializedName("image_url")
     private String imageUrl;
@@ -99,52 +110,60 @@ public class Product {
         this.sku = sku;
     }
 
-    public int getCategoryId() {
+    public Integer getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
     }
 
-    public int getSupplierId() {
+    public Integer getSupplierId() {
         return supplierId;
     }
 
-    public void setSupplierId(int supplierId) {
+    public void setSupplierId(Integer supplierId) {
         this.supplierId = supplierId;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public double getCostPrice() {
+    public Double getCostPrice() {
         return costPrice;
     }
 
-    public void setCostPrice(double costPrice) {
+    public void setCostPrice(Double costPrice) {
         this.costPrice = costPrice;
     }
 
-    public int getStock() {
+    public Integer getStock() {
         return stock;
     }
 
-    public void setStock(int stock) {
+    public void setStock(Integer stock) {
         this.stock = stock;
     }
 
-    public int getMinStock() {
+    public Integer getMinStock() {
         return minStock;
     }
 
-    public void setMinStock(int minStock) {
+    public void setMinStock(Integer minStock) {
         this.minStock = minStock;
+    }
+
+    public Integer getMaxStock() {
+        return maxStock;
+    }
+
+    public void setMaxStock(Integer maxStock) {
+        this.maxStock = maxStock;
     }
 
     public String getUnit() {
@@ -153,6 +172,38 @@ public class Product {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public Boolean isFeatured() {
+        return featured;
+    }
+
+    public void setFeatured(Boolean featured) {
+        this.featured = featured;
     }
 
     public String getImageUrl() {

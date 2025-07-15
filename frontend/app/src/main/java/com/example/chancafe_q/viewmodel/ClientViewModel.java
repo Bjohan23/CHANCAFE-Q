@@ -26,6 +26,9 @@ public class ClientViewModel extends AndroidViewModel {
     private MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private MutableLiveData<String> successMessage = new MutableLiveData<>();
     
+    // LiveData para listas de clientes
+    private MutableLiveData<List<Client>> clientsList = new MutableLiveData<>();
+    
     public ClientViewModel(@NonNull Application application) {
         super(application);
         clientRepository = ClientRepository.getInstance();
@@ -33,13 +36,18 @@ public class ClientViewModel extends AndroidViewModel {
     
     // Getters para LiveData
     public LiveData<Boolean> getIsLoading() { return isLoading; }
+    public LiveData<Boolean> getLoading() { return isLoading; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<String> getError() { return errorMessage; }
     public LiveData<String> getSuccessMessage() { return successMessage; }
     
+    // Getter para lista de clientes (usado por ClientSelectorActivity)
+    public LiveData<List<Client>> getClients() { return clientsList; }
+    
     /**
-     * Obtiene todos los clientes
+     * Obtiene todos los clientes (retorna ApiResponse)
      */
-    public LiveData<ApiResponse<List<Client>>> getClients() {
+    public LiveData<ApiResponse<List<Client>>> getAllClients() {
         // Verificar conexión antes de hacer la llamada
         if (!NetworkUtils.isNetworkAvailable(getApplication())) {
             MutableLiveData<ApiResponse<List<Client>>> result = new MutableLiveData<>();
@@ -435,6 +443,79 @@ public class ClientViewModel extends AndroidViewModel {
         });
         
         return result;
+    }
+    
+    /**
+     * Carga clientes activos (usado por ClientSelectorActivity)
+     */
+    public void loadActiveClients() {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            errorMessage.setValue("No hay conexión a internet");
+            return;
+        }
+        
+        isLoading.setValue(true);
+        
+        MutableLiveData<ApiResponse<List<Client>>> result = clientRepository.getActiveClients();
+        
+        result.observeForever(response -> {
+            isLoading.setValue(false);
+            if (response != null) {
+                if (response.isSuccess()) {
+                    clientsList.setValue(response.getData());
+                    successMessage.setValue(response.getMessage());
+                } else {
+                    errorMessage.setValue(response.getMessage());
+                }
+            }
+        });
+    }
+    
+    /**
+     * Busca clientes por texto
+     */
+    public void searchClients(String query) {
+        if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            errorMessage.setValue("No hay conexión a internet");
+            return;
+        }
+        
+        if (query == null || query.trim().isEmpty()) {
+            // Si no hay búsqueda, cargar todos los clientes activos
+            loadActiveClients();
+            return;
+        }
+        
+        isLoading.setValue(true);
+        
+        // Aquí deberías implementar la búsqueda real cuando esté disponible en el repositorio
+        // Por ahora, simulamos filtrando clientes activos
+        MutableLiveData<ApiResponse<List<Client>>> result = clientRepository.getActiveClients();
+        
+        result.observeForever(response -> {
+            isLoading.setValue(false);
+            if (response != null) {
+                if (response.isSuccess()) {
+                    List<Client> allClients = response.getData();
+                    if (allClients != null) {
+                        // Filtrar clientes por nombre, documento o empresa
+                        List<Client> filteredClients = allClients.stream()
+                            .filter(client -> 
+                                (client.getFirstName() != null && client.getFirstName().toLowerCase().contains(query.toLowerCase())) ||
+                                (client.getLastName() != null && client.getLastName().toLowerCase().contains(query.toLowerCase())) ||
+                                (client.getDocumentNumber() != null && client.getDocumentNumber().contains(query)) ||
+                                (client.getBusinessName() != null && client.getBusinessName().toLowerCase().contains(query.toLowerCase()))
+                            )
+                            .collect(java.util.stream.Collectors.toList());
+                        
+                        clientsList.setValue(filteredClients);
+                    }
+                    successMessage.setValue(response.getMessage());
+                } else {
+                    errorMessage.setValue(response.getMessage());
+                }
+            }
+        });
     }
     
     /**

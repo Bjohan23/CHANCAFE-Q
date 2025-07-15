@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="3dp"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Request Number -->
+            <TextView
+                android:id="@+id/tv_request_number"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="CR-2024-001"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#212121" />
+
+            <!-- Priority Badge -->
+            <TextView
+                android:id="@+id/tv_priority"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alta"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="#FF9800"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Status Badge -->
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pendiente"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="#FF9800"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp" />
+
+        </LinearLayout>
+
+        <!-- Client Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:tint="#757575"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tv_client_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Juan Pérez García"
+                android:textSize="14sp"
+                android:textColor="#424242" />
+
+            <!-- Credit Score (if available) -->
+            <LinearLayout
+                android:id="@+id/layout_credit_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="#E8F5E8"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:layout_marginStart="8dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:src="@android:drawable/ic_dialog_info"
+                    android:tint="#4CAF50"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_credit_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="750"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#2E7D32" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Purpose -->
+        <TextView
+            android:id="@+id/tv_purpose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Ampliación de negocio - compra de equipos"
+            android:textSize="13sp"
+            android:textColor="#757575"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="#E0E0E0" />
+
+        <!-- Amount and Terms Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Requested Amount -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Monto solicitado"
+                    android:textSize="11sp"
+                    android:textColor="#757575" />
+
+                <TextView
+                    android:id="@+id/tv_requested_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S/ 25,000"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#D32F2F" />
+
+            </LinearLayout>
+
+            <!-- Payment Terms -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Términos"
+                    android:textSize="11sp"
+                    android:textColor="#757575" />
+
+                <TextView
+                    android:id="@+id/tv_payment_terms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="24 meses"
+                    android:textSize="13sp"
+                    android:textColor="#424242" />
+
+            </LinearLayout>
+
+            <!-- Menu Options -->
+            <ImageButton
+                android:id="@+id/btn_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_more"
+                android:contentDescription="Más opciones" />
+
+        </LinearLayout>
+
+        <!-- Approved Amount (only visible if approved) -->
+        <LinearLayout
+            android:id="@+id/layout_approved_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:background="#E8F5E8"
+            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:tint="#4CAF50"
+                android:layout_marginEnd="8dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Monto aprobado"
+                    android:textSize="11sp"
+                    android:textColor="#2E7D32" />
+
+                <TextView
+                    android:id="@+id/tv_approved_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S/ 20,000"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#2E7D32" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_approved_terms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="18 meses"
+                android:textSize="12sp"
+                android:textColor="#2E7D32" />
+
+        </LinearLayout>
+
+        <!-- Rejection Reason (only visible if rejected) -->
+        <LinearLayout
+            android:id="@+id/layout_rejection_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:background="#FFEBEE"
+            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_delete"
+                android:tint="#F44336"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tv_rejection_reason"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ingresos insuficientes para el monto solicitado"
+                android:textSize="12sp"
+                android:textColor="#D32F2F"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Risk Assessment (only visible for pending/review) -->
+        <LinearLayout
+            android:id="@+id/layout_risk_assessment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:background="#FFF3E0"
+            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_dialog_alert"
+                android:tint="#FF9800"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Evaluación de riesgo:"
+                android:textSize="12sp"
+                android:textColor="#E65100"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:id="@+id/tv_risk_level"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Medio - Requiere garantías adicionales"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#E65100" />
+
+        </LinearLayout>
+
+        <!-- Footer with dates -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <!-- Created date -->
+            <TextView
+                android:id="@+id/tv_created_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Creada: 15/12/2024"
+                android:textSize="11sp"
+                android:textColor="#999999" />
+
+            <!-- Expires date (if applicable) -->
+            <TextView
+                android:id="@+id/tv_expires_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Expira: 31/12/2024"
+                android:textSize="11sp"
+                android:textColor="#F44336"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -11,31 +11,54 @@ public class Quote {
     private int id;
     
     @SerializedName("client_id")
-    private int clientId;
+    private Integer clientId;
     
     @SerializedName("user_id")
-    private int userId;
+    private Integer userId;
     
     @SerializedName("quote_number")
     private String quoteNumber;
     
+    private String title;
     private String description;
     
     @SerializedName("subtotal")
-    private double subtotal;
+    private Double subtotal;
+    
+    @SerializedName("discount_percentage")
+    private Double discountPercentage;
+    
+    @SerializedName("discount_amount")
+    private Double discountAmount;
+    
+    @SerializedName("tax_percentage")
+    private Double taxPercentage;
     
     @SerializedName("tax_amount")
-    private double taxAmount;
+    private Double taxAmount;
     
     @SerializedName("total_amount")
-    private double totalAmount;
+    private Double totalAmount;
+    
+    private String currency;
+    
+    @SerializedName("exchange_rate")
+    private Double exchangeRate;
     
     private String status; // "draft", "sent", "approved", "rejected", "expired"
     
     @SerializedName("valid_until")
     private Date validUntil;
     
+    private String notes;
+    
+    @SerializedName("internal_notes")
+    private String internalNotes;
+    
     private int revision;
+    
+    @SerializedName("project_name")
+    private String projectName;
     
     @SerializedName("pdf_generated")
     private boolean pdfGenerated;
@@ -61,16 +84,22 @@ public class Quote {
         this.status = "draft";
         this.revision = 1;
         this.subtotal = 0.0;
+        this.discountPercentage = 0.0;
+        this.discountAmount = 0.0;
+        this.taxPercentage = 18.0; // IGV por defecto
         this.taxAmount = 0.0;
         this.totalAmount = 0.0;
+        this.currency = "PEN";
+        this.exchangeRate = 1.0;
         this.pdfGenerated = false;
     }
 
     // Constructor con parámetros básicos
-    public Quote(int clientId, int userId, String description) {
+    public Quote(int clientId, int userId, String title, String description) {
         this();
         this.clientId = clientId;
         this.userId = userId;
+        this.title = title;
         this.description = description;
     }
 
@@ -83,19 +112,19 @@ public class Quote {
         this.id = id;
     }
 
-    public int getClientId() {
+    public Integer getClientId() {
         return clientId;
     }
 
-    public void setClientId(int clientId) {
+    public void setClientId(Integer clientId) {
         this.clientId = clientId;
     }
 
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -131,12 +160,17 @@ public class Quote {
         this.taxAmount = taxAmount;
     }
 
-    public double getTotalAmount() {
+    public Double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    // Alias method for compatibility
+    public Double getTotal() {
+        return totalAmount;
     }
 
     public String getStatus() {
@@ -217,6 +251,79 @@ public class Quote {
 
     public void setQuoteItems(List<QuoteItem> quoteItems) {
         this.quoteItems = quoteItems;
+    }
+
+    // Getters y setters para nuevos campos
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Double getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(Double discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
+
+    public Double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(Double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    public Double getTaxPercentage() {
+        return taxPercentage;
+    }
+
+    public void setTaxPercentage(Double taxPercentage) {
+        this.taxPercentage = taxPercentage;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public Double getExchangeRate() {
+        return exchangeRate;
+    }
+
+    public void setExchangeRate(Double exchangeRate) {
+        this.exchangeRate = exchangeRate;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getInternalNotes() {
+        return internalNotes;
+    }
+
+    public void setInternalNotes(String internalNotes) {
+        this.internalNotes = internalNotes;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     // Métodos de utilidad

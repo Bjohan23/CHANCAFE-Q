@@ -23,6 +23,15 @@ public class QuoteItem {
     @SerializedName("total_price")
     private double totalPrice;
     
+    private Double discount;
+    
+    @SerializedName("discount_percentage")
+    private Double discountPercentage;
+    
+    @SerializedName("discount_amount")
+    private Double discountAmount;
+    
+    private String currency;
     private String notes;
     
     // Relación
@@ -120,9 +129,52 @@ public class QuoteItem {
         this.product = product;
     }
 
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+    
+    public Double getDiscountPercentage() {
+        return discountPercentage;
+    }
+    
+    public void setDiscountPercentage(Double discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
+    
+    public Double getDiscountAmount() {
+        return discountAmount;
+    }
+    
+    public void setDiscountAmount(Double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+    
+    public String getCurrency() {
+        return currency;
+    }
+    
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+    
+    public String getProductName() {
+        if (product != null && product.getName() != null) {
+            return product.getName();
+        }
+        return description;
+    }
+
     // Métodos de utilidad
     public void calculateTotal() {
-        this.totalPrice = this.quantity * this.unitPrice;
+        double total = this.quantity * this.unitPrice;
+        if (discount != null && discount > 0) {
+            total = total * (1 - discount / 100);
+        }
+        this.totalPrice = total;
     }
 
     public String getDisplayDescription() {

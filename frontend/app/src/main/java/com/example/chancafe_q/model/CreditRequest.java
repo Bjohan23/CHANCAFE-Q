@@ -16,22 +16,31 @@ public class CreditRequest {
     private int userId;
     
     @SerializedName("requested_amount")
-    private double requestedAmount;
+    private Double requestedAmount;
     
-    @SerializedName("requested_terms")
-    private int requestedTerms; // en meses
+    @SerializedName("request_number")
+    private String requestNumber;
     
-    @SerializedName("monthly_income")
-    private double monthlyIncome;
+    private String currency;
     
-    @SerializedName("current_debts")
-    private double currentDebts;
+    @SerializedName("exchange_rate")
+    private Double exchangeRate;
     
-    @SerializedName("purpose")
+    @SerializedName("payment_terms")
+    private String paymentTerms;
+    
     private String purpose;
+    private String description;
     
-    @SerializedName("risk_level")
-    private String riskLevel; // "low", "medium", "high"
+    private String priority; // "low", "medium", "high", "urgent"
+    
+    @SerializedName("risk_assessment")
+    private String riskAssessment;
+    
+    private String documents;
+    
+    @SerializedName("approval_conditions")
+    private String approvalConditions;
     
     private String status; // "pending", "approved", "rejected", "expired"
     
@@ -39,7 +48,13 @@ public class CreditRequest {
     private Double approvedAmount;
     
     @SerializedName("approved_terms")
-    private Integer approvedTerms;
+    private String approvedTerms;
+    
+    @SerializedName("approved_by")
+    private Integer approvedBy;
+    
+    @SerializedName("approved_at")
+    private Date approvedAt;
     
     @SerializedName("rejection_reason")
     private String rejectionReason;
@@ -49,11 +64,27 @@ public class CreditRequest {
     
     private String notes;
     
+    @SerializedName("internal_notes")
+    private String internalNotes;
+    
     @SerializedName("created_at")
     private Date createdAt;
     
     @SerializedName("updated_at")
     private Date updatedAt;
+    
+    // Campos adicionales para cálculos de crédito
+    @SerializedName("requested_terms")
+    private int requestedTerms;
+    
+    @SerializedName("monthly_income")
+    private double monthlyIncome;
+    
+    @SerializedName("current_debts")
+    private double currentDebts;
+    
+    @SerializedName("risk_level")
+    private String riskLevel;
     
     // Relaciones
     private Client client;
@@ -62,20 +93,19 @@ public class CreditRequest {
     // Constructor vacío
     public CreditRequest() {
         this.status = "pending";
-        this.riskLevel = "medium";
+        this.priority = "medium";
         this.requestedAmount = 0.0;
-        this.monthlyIncome = 0.0;
-        this.currentDebts = 0.0;
-        this.requestedTerms = 12;
+        this.currency = "PEN";
+        this.exchangeRate = 1.0;
     }
 
     // Constructor con parámetros básicos
-    public CreditRequest(int clientId, int userId, double requestedAmount, int requestedTerms, String purpose) {
+    public CreditRequest(int clientId, int userId, Double requestedAmount, String paymentTerms, String purpose) {
         this();
         this.clientId = clientId;
         this.userId = userId;
         this.requestedAmount = requestedAmount;
-        this.requestedTerms = requestedTerms;
+        this.paymentTerms = paymentTerms;
         this.purpose = purpose;
     }
 
@@ -104,11 +134,11 @@ public class CreditRequest {
         this.userId = userId;
     }
 
-    public double getRequestedAmount() {
+    public Double getRequestedAmount() {
         return requestedAmount;
     }
 
-    public void setRequestedAmount(double requestedAmount) {
+    public void setRequestedAmount(Double requestedAmount) {
         this.requestedAmount = requestedAmount;
     }
 
@@ -168,11 +198,11 @@ public class CreditRequest {
         this.approvedAmount = approvedAmount;
     }
 
-    public Integer getApprovedTerms() {
+    public String getApprovedTerms() {
         return approvedTerms;
     }
 
-    public void setApprovedTerms(Integer approvedTerms) {
+    public void setApprovedTerms(String approvedTerms) {
         this.approvedTerms = approvedTerms;
     }
 
@@ -232,6 +262,103 @@ public class CreditRequest {
         this.user = user;
     }
 
+    // Getters y setters faltantes
+    public String getRequestNumber() {
+        return requestNumber;
+    }
+
+    public void setRequestNumber(String requestNumber) {
+        this.requestNumber = requestNumber;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public Double getExchangeRate() {
+        return exchangeRate;
+    }
+
+    public void setExchangeRate(Double exchangeRate) {
+        this.exchangeRate = exchangeRate;
+    }
+
+    public String getPaymentTerms() {
+        return paymentTerms;
+    }
+
+    public void setPaymentTerms(String paymentTerms) {
+        this.paymentTerms = paymentTerms;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public String getRiskAssessment() {
+        return riskAssessment;
+    }
+
+    public void setRiskAssessment(String riskAssessment) {
+        this.riskAssessment = riskAssessment;
+    }
+
+    public String getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(String documents) {
+        this.documents = documents;
+    }
+
+    public String getApprovalConditions() {
+        return approvalConditions;
+    }
+
+    public void setApprovalConditions(String approvalConditions) {
+        this.approvalConditions = approvalConditions;
+    }
+
+    public Integer getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(Integer approvedBy) {
+        this.approvedBy = approvedBy;
+    }
+
+    public Date getApprovedAt() {
+        return approvedAt;
+    }
+
+    public void setApprovedAt(Date approvedAt) {
+        this.approvedAt = approvedAt;
+    }
+
+    public String getInternalNotes() {
+        return internalNotes;
+    }
+
+    public void setInternalNotes(String internalNotes) {
+        this.internalNotes = internalNotes;
+    }
+
     // Métodos de utilidad
     public boolean isPending() {
         return "pending".equals(status);
@@ -275,7 +402,17 @@ public class CreditRequest {
 
     public double calculateMonthlyPayment() {
         double amount = approvedAmount != null ? approvedAmount : requestedAmount;
-        int terms = approvedTerms != null ? approvedTerms : requestedTerms;
+        int terms = requestedTerms;
+        
+        // Si hay términos aprobados, intenta convertir de String a int
+        if (approvedTerms != null && !approvedTerms.isEmpty()) {
+            try {
+                terms = Integer.parseInt(approvedTerms);
+            } catch (NumberFormatException e) {
+                // Si no se puede convertir, usa requestedTerms
+                terms = requestedTerms;
+            }
+        }
         
         if (terms <= 0) return 0;
         

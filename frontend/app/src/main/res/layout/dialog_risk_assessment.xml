@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_dialog_alert"
+            android:tint="#FF9800"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Evaluación de Riesgo"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#212121" />
+
+    </LinearLayout>
+
+    <!-- Credit Request Info -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFF3E0"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tv_request_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CR-2024-001 - Juan Pérez García\nMonto solicitado: S/ 25,000"
+            android:textSize="14sp"
+            android:textColor="#E65100" />
+
+    </LinearLayout>
+
+    <!-- Current Risk Level -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nivel de riesgo actual:"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/tv_current_risk"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Medio"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#FF9800" />
+
+    </LinearLayout>
+
+    <!-- Risk Level Selection -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar nuevo nivel:"
+        android:textSize="14sp"
+        android:textColor="#424242"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/rg_risk_level"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/rb_low_risk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bajo - Cliente confiable, historial crediticio excelente"
+            android:textSize="13sp"
+            android:textColor="#2E7D32" />
+
+        <RadioButton
+            android:id="@+id/rb_medium_risk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Medio - Cliente aceptable, requiere seguimiento"
+            android:textSize="13sp"
+            android:textColor="#FF9800" />
+
+        <RadioButton
+            android:id="@+id/rb_high_risk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alto - Cliente riesgoso, requiere garantías adicionales"
+            android:textSize="13sp"
+            android:textColor="#F44336" />
+
+    </RadioGroup>
+
+    <!-- Risk Assessment Notes -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Observaciones de la evaluación">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_risk_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:maxLines="5" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Credit Score Info (if available) -->
+    <LinearLayout
+        android:id="@+id/layout_credit_score_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#E3F2FD"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Información crediticia:"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#1976D2"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tv_credit_score_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Score: 750 - Excelente\nDeudas actuales: S/ 5,000\nRatio deuda-ingreso: 25%"
+            android:textSize="12sp"
+            android:textColor="#1976D2" />
+
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Cancelar"
+            android:backgroundTint="#757575" />
+
+        <Button
+            android:id="@+id/btn_update_risk"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Actualizar"
+            android:backgroundTint="#FF9800" />
+
+    </LinearLayout>
+
+</LinearLayout>

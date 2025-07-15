@@ -63,10 +63,32 @@ public class Client implements java.io.Serializable {
     private String taxId;
     
     @SerializedName("credit_limit")
-    private double creditLimit;
+    private Double creditLimit;
     
     @SerializedName("assigned_user_id")
     private Integer assignedUserId;
+    
+    // Campos de evaluación crediticia (Sentinel API)
+    @SerializedName("credit_score")
+    private Integer creditScore;
+    
+    @SerializedName("risk_classification")
+    private String riskClassification;
+    
+    @SerializedName("total_debts")
+    private Double totalDebts;
+    
+    @SerializedName("automatic_evaluation")
+    private String automaticEvaluation;
+    
+    @SerializedName("suggested_credit_limit")
+    private Double suggestedCreditLimit;
+    
+    @SerializedName("is_banked")
+    private Boolean isBanked;
+    
+    @SerializedName("last_credit_check")
+    private Date lastCreditCheck;
     
     private String status; // "active", "inactive", "blocked"
     
@@ -279,11 +301,11 @@ public class Client implements java.io.Serializable {
         this.taxId = taxId;
     }
 
-    public double getCreditLimit() {
+    public Double getCreditLimit() {
         return creditLimit;
     }
 
-    public void setCreditLimit(double creditLimit) {
+    public void setCreditLimit(Double creditLimit) {
         this.creditLimit = creditLimit;
     }
 
@@ -317,6 +339,63 @@ public class Client implements java.io.Serializable {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    // Getters y setters para campos de evaluación crediticia
+    public Integer getCreditScore() {
+        return creditScore;
+    }
+
+    public void setCreditScore(Integer creditScore) {
+        this.creditScore = creditScore;
+    }
+
+    public String getRiskClassification() {
+        return riskClassification;
+    }
+
+    public void setRiskClassification(String riskClassification) {
+        this.riskClassification = riskClassification;
+    }
+
+    public Double getTotalDebts() {
+        return totalDebts;
+    }
+
+    public void setTotalDebts(Double totalDebts) {
+        this.totalDebts = totalDebts;
+    }
+
+    public String getAutomaticEvaluation() {
+        return automaticEvaluation;
+    }
+
+    public void setAutomaticEvaluation(String automaticEvaluation) {
+        this.automaticEvaluation = automaticEvaluation;
+    }
+
+    public Double getSuggestedCreditLimit() {
+        return suggestedCreditLimit;
+    }
+
+    public void setSuggestedCreditLimit(Double suggestedCreditLimit) {
+        this.suggestedCreditLimit = suggestedCreditLimit;
+    }
+
+    public Boolean getIsBanked() {
+        return isBanked;
+    }
+
+    public void setIsBanked(Boolean isBanked) {
+        this.isBanked = isBanked;
+    }
+
+    public Date getLastCreditCheck() {
+        return lastCreditCheck;
+    }
+
+    public void setLastCreditCheck(Date lastCreditCheck) {
+        this.lastCreditCheck = lastCreditCheck;
     }
 
     // Métodos de utilidad
@@ -359,7 +438,7 @@ public class Client implements java.io.Serializable {
     }
 
     public boolean canRequestCredit() {
-        return isActive() && creditLimit > 0;
+        return isActive() && creditLimit != null && creditLimit > 0;
     }
 
     // Método de compatibilidad para getDocument()

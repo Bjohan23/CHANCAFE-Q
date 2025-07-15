@@ -98,25 +98,77 @@ public interface ApiService {
     // ===============================
     
     @GET("quotes")
+    Call<ApiResponse<List<Quote>>> getAllQuotes(
+        @Query("status") String status,
+        @Query("client_id") Integer clientId,
+        @Query("user_id") Integer userId,
+        @Query("date_from") String dateFrom,
+        @Query("date_to") String dateTo,
+        @Query("search") String search,
+        @Query("quote_number") String quoteNumber,
+        @Query("page") Integer page,
+        @Query("limit") Integer limit
+    );
+    
+    @GET("quotes")
     Call<ApiResponse<List<Quote>>> getQuotes();
+    
+    @GET("quotes/{id}")
+    Call<ApiResponse<Quote>> getQuoteById(@Path("id") int id);
     
     @GET("quotes/{id}")
     Call<ApiResponse<Quote>> getQuote(@Path("id") int id);
     
+    @GET("quotes/client/{clientId}")
+    Call<ApiResponse<List<Quote>>> getQuotesByClient(@Path("clientId") int clientId);
+    
+    @GET("quotes/user/{userId}")
+    Call<ApiResponse<List<Quote>>> getQuotesByUser(@Path("userId") int userId);
+    
+    @GET("quotes/status/{status}")
+    Call<ApiResponse<List<Quote>>> getQuotesByStatus(@Path("status") String status);
+    
+    @GET("quotes/number/{quoteNumber}")
+    Call<ApiResponse<Quote>> getQuoteByNumber(@Path("quoteNumber") String quoteNumber);
+    
     @POST("quotes")
     Call<ApiResponse<Quote>> createQuote(@Body Quote quote);
+    
+    @POST("quotes/with-credit-check")
+    Call<ApiResponse<java.util.Map<String, Object>>> createQuoteWithCreditCheck(@Body Quote quote);
     
     @PUT("quotes/{id}")
     Call<ApiResponse<Quote>> updateQuote(@Path("id") int id, @Body Quote quote);
     
     @DELETE("quotes/{id}")
-    Call<ApiResponse<Void>> deleteQuote(@Path("id") int id);
-    
-    @GET("quotes/client/{clientId}")
-    Call<ApiResponse<List<Quote>>> getQuotesByClient(@Path("clientId") int clientId);
+    Call<ApiResponse<String>> deleteQuote(@Path("id") int id);
     
     @PUT("quotes/{id}/status")
     Call<ApiResponse<Quote>> changeQuoteStatus(@Path("id") int id, @Query("status") String status);
+    
+    @POST("quotes/{id}/recalculate")
+    Call<ApiResponse<Quote>> recalculateQuote(@Path("id") int id);
+    
+    @GET("quotes/{quoteId}/items")
+    Call<ApiResponse<List<com.example.chancafe_q.model.QuoteItem>>> getQuoteItems(@Path("quoteId") int quoteId);
+    
+    @POST("quotes/{quoteId}/items")
+    Call<ApiResponse<com.example.chancafe_q.model.QuoteItem>> addQuoteItem(@Path("quoteId") int quoteId, @Body com.example.chancafe_q.model.QuoteItem quoteItem);
+    
+    @PUT("quotes/items/{itemId}")
+    Call<ApiResponse<com.example.chancafe_q.model.QuoteItem>> updateQuoteItem(@Path("itemId") int itemId, @Body com.example.chancafe_q.model.QuoteItem quoteItem);
+    
+    @DELETE("quotes/items/{itemId}")
+    Call<ApiResponse<String>> deleteQuoteItem(@Path("itemId") int itemId);
+    
+    @POST("quotes/client/{clientId}/credit-check")
+    Call<ApiResponse<java.util.Map<String, Object>>> performCreditCheck(@Path("clientId") int clientId);
+    
+    @GET("quotes/client/{clientId}/credit-assessment")
+    Call<ApiResponse<java.util.Map<String, Object>>> getCreditAssessment(@Path("clientId") int clientId);
+    
+    @GET("quotes/{quoteId}/credit-info")
+    Call<ApiResponse<java.util.Map<String, Object>>> getQuoteWithCreditInfo(@Path("quoteId") int quoteId);
     
     @POST("quotes/{id}/generate-pdf")
     Call<ApiResponse<String>> generateQuotePdf(@Path("id") int id);
@@ -126,10 +178,42 @@ public interface ApiService {
     // ===============================
     
     @GET("credit-requests")
+    Call<ApiResponse<List<CreditRequest>>> getAllCreditRequests(
+        @Query("status") String status,
+        @Query("client_id") Integer clientId,
+        @Query("user_id") Integer userId,
+        @Query("priority") String priority,
+        @Query("currency") String currency,
+        @Query("date_from") String dateFrom,
+        @Query("date_to") String dateTo,
+        @Query("search") String search,
+        @Query("page") Integer page,
+        @Query("limit") Integer limit
+    );
+    
+    @GET("credit-requests")
     Call<ApiResponse<List<CreditRequest>>> getCreditRequests();
     
     @GET("credit-requests/{id}")
+    Call<ApiResponse<CreditRequest>> getCreditRequestById(@Path("id") int id);
+    
+    @GET("credit-requests/{id}")
     Call<ApiResponse<CreditRequest>> getCreditRequest(@Path("id") int id);
+    
+    @GET("credit-requests/status/{status}")
+    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByStatus(@Path("status") String status);
+    
+    @GET("credit-requests/client/{clientId}")
+    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByClient(@Path("clientId") int clientId);
+    
+    @GET("credit-requests/user/{userId}")
+    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByUser(@Path("userId") int userId);
+    
+    @GET("credit-requests/priority/{priority}")
+    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByPriority(@Path("priority") String priority);
+    
+    @GET("credit-requests/statistics")
+    Call<ApiResponse<java.util.Map<String, Object>>> getCreditRequestStatistics();
     
     @POST("credit-requests")
     Call<ApiResponse<CreditRequest>> createCreditRequest(@Body CreditRequest creditRequest);
@@ -138,23 +222,64 @@ public interface ApiService {
     Call<ApiResponse<CreditRequest>> updateCreditRequest(@Path("id") int id, @Body CreditRequest creditRequest);
     
     @DELETE("credit-requests/{id}")
-    Call<ApiResponse<Void>> deleteCreditRequest(@Path("id") int id);
+    Call<ApiResponse<String>> deleteCreditRequest(@Path("id") int id);
+    
+    @PATCH("credit-requests/{id}/status")
+    Call<ApiResponse<CreditRequest>> changeCreditRequestStatus(@Path("id") int id, @Query("status") String status);
     
     @PUT("credit-requests/{id}/approve")
-    Call<ApiResponse<CreditRequest>> approveCreditRequest(@Path("id") int id, @Query("approved_amount") double approvedAmount, @Query("approved_terms") int approvedTerms);
+    Call<ApiResponse<CreditRequest>> approveCreditRequest(
+        @Path("id") int id, 
+        @Query("approved_amount") Double approvedAmount, 
+        @Query("approved_terms") String approvedTerms,
+        @Query("conditions") String conditions
+    );
     
     @PUT("credit-requests/{id}/reject")
-    Call<ApiResponse<CreditRequest>> rejectCreditRequest(@Path("id") int id, @Query("rejection_reason") String reason);
+    Call<ApiResponse<CreditRequest>> rejectCreditRequest(@Path("id") int id, @Query("rejection_reason") String rejectionReason);
     
-    @GET("credit-requests/client/{clientId}")
-    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByClient(@Path("clientId") int clientId);
+    @PATCH("credit-requests/{id}/risk-assessment")
+    Call<ApiResponse<CreditRequest>> updateCreditRequestRiskAssessment(@Path("id") int id, @Query("risk_assessment") String riskAssessment);
+    
+    @POST("credit-requests/mark-expired")
+    Call<ApiResponse<String>> markExpiredCreditRequests();
     
     // ===============================
     // PRODUCTS ENDPOINTS
     // ===============================
     
     @GET("products")
+    Call<ApiResponse<List<Product>>> getAllProducts(
+        @Query("status") String status,
+        @Query("category_id") Integer categoryId,
+        @Query("supplier_id") Integer supplierId,
+        @Query("brand") String brand,
+        @Query("search") String search,
+        @Query("price_min") Double priceMin,
+        @Query("price_max") Double priceMax,
+        @Query("stock_min") Integer stockMin,
+        @Query("stock_max") Integer stockMax,
+        @Query("page") Integer page,
+        @Query("limit") Integer limit
+    );
+    
+    @GET("products")
     Call<ApiResponse<List<Product>>> getProducts();
+    
+    @GET("products/active")
+    Call<ApiResponse<List<Product>>> getActiveProducts();
+    
+    @GET("products/featured")
+    Call<ApiResponse<List<Product>>> getFeaturedProducts();
+    
+    @GET("products/low-stock")
+    Call<ApiResponse<List<Product>>> getLowStockProducts();
+    
+    @GET("products/out-of-stock")
+    Call<ApiResponse<List<Product>>> getOutOfStockProducts();
+    
+    @GET("products/{id}")
+    Call<ApiResponse<Product>> getProductById(@Path("id") int id);
     
     @GET("products/{id}")
     Call<ApiResponse<Product>> getProduct(@Path("id") int id);
@@ -166,7 +291,21 @@ public interface ApiService {
     Call<ApiResponse<Product>> updateProduct(@Path("id") int id, @Body Product product);
     
     @DELETE("products/{id}")
-    Call<ApiResponse<Void>> deleteProduct(@Path("id") int id);
+    Call<ApiResponse<String>> deleteProduct(@Path("id") int id);
+    
+    @PATCH("products/{id}/status")
+    Call<ApiResponse<Product>> changeProductStatus(@Path("id") int id, @Query("status") String status);
+    
+    @PATCH("products/{id}/stock")
+    Call<ApiResponse<Product>> updateProductStock(@Path("id") int id, @Query("stock") Integer stock);
+    
+    @GET("products/search")
+    Call<ApiResponse<List<Product>>> searchProducts(
+        @Query("q") String query,
+        @Query("category_id") Integer categoryId,
+        @Query("supplier_id") Integer supplierId,
+        @Query("status") String status
+    );
     
     @GET("products/search")
     Call<ApiResponse<List<Product>>> searchProducts(@Query("q") String query);
@@ -174,12 +313,24 @@ public interface ApiService {
     @GET("products/category/{categoryId}")
     Call<ApiResponse<List<Product>>> getProductsByCategory(@Path("categoryId") int categoryId);
     
+    @GET("products/supplier/{supplierId}")
+    Call<ApiResponse<List<Product>>> getProductsBySupplier(@Path("supplierId") int supplierId);
+    
+    @GET("products/brand/{brand}")
+    Call<ApiResponse<List<Product>>> getProductsByBrand(@Path("brand") String brand);
+    
+    @GET("products/brands")
+    Call<ApiResponse<List<String>>> getAvailableBrands();
+    
     // ===============================
     // CATEGORIES ENDPOINTS
     // ===============================
     
     @GET("categories")
     Call<ApiResponse<List<Category>>> getCategories();
+    
+    @GET("categories/active")
+    Call<ApiResponse<List<Category>>> getActiveCategories();
     
     @GET("categories/{id}")
     Call<ApiResponse<Category>> getCategory(@Path("id") int id);
@@ -199,6 +350,9 @@ public interface ApiService {
     
     @GET("suppliers")
     Call<ApiResponse<List<Supplier>>> getSuppliers();
+    
+    @GET("suppliers/active")
+    Call<ApiResponse<List<Supplier>>> getActiveSuppliers();
     
     @GET("suppliers/{id}")
     Call<ApiResponse<Supplier>> getSupplier(@Path("id") int id);

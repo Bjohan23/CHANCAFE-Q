@@ -142,7 +142,7 @@ public class ClientsActivity extends AppCompatActivity implements ClientsAdapter
     }
 
     private void loadClients() {
-        clientViewModel.getClients().observe(this, response -> {
+        clientViewModel.getAllClients().observe(this, response -> {
             if (response != null) {
                 if (response.isSuccess() && response.getData() != null) {
                     clientsAdapter.updateClients(response.getData());
@@ -409,7 +409,7 @@ public class ClientsActivity extends AppCompatActivity implements ClientsAdapter
 
     private void loadClientsByStatus(String status) {
         // Filtrar clientes por estado usando la API general y luego filtrar localmente
-        clientViewModel.getClients().observe(this, response -> {
+        clientViewModel.getAllClients().observe(this, response -> {
             if (response != null && response.isSuccess() && response.getData() != null) {
                 java.util.List<Client> filteredClients = new java.util.ArrayList<>();
                 for (Client client : response.getData()) {

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#D32F2F"
+        android:elevation="4dp"
+        app:title="Cotizaciones"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="?attr/homeAsUpIndicator" />
+
+    <!-- Header con búsqueda y filtros -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:elevation="2dp">
+
+        <!-- Primera fila: Búsqueda y botón agregar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <!-- Campo de búsqueda -->
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="12dp"
+                android:background="#F5F5F5"
+                android:hint="Buscar cotización..."
+                android:paddingHorizontal="16dp"
+                android:drawableStart="@android:drawable/ic_menu_search"
+                android:drawablePadding="12dp"
+                android:textSize="14sp" />
+
+            <!-- Botón filtros -->
+            <ImageButton
+                android:id="@+id/btn_filters"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_preferences"
+                android:contentDescription="Filtros" />
+
+            <!-- Botón agregar cotización -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_quote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_input_add"
+                app:backgroundTint="#D32F2F"
+                app:tint="@android:color/white"
+                app:fabSize="mini" />
+
+        </LinearLayout>
+
+        <!-- Segunda fila: Filtros rápidos -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="16dp">
+
+                <!-- Chip: Todas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Todas"
+                    android:checkable="true"
+                    android:checked="true"
+                    app:chipBackgroundColor="#E3F2FD"
+                    app:chipStrokeColor="#2196F3" />
+
+                <!-- Chip: Borrador -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_draft"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Borrador"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#FFF3E0"
+                    app:chipStrokeColor="#FF9800" />
+
+                <!-- Chip: Enviadas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_sent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Enviadas"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#E8F5E8"
+                    app:chipStrokeColor="#4CAF50" />
+
+                <!-- Chip: Aprobadas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_approved"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Aprobadas"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#E8F5E8"
+                    app:chipStrokeColor="#4CAF50" />
+
+                <!-- Chip: Rechazadas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_rejected"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Rechazadas"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#FFEBEE"
+                    app:chipStrokeColor="#F44336" />
+
+                <!-- Chip: Expiradas -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_expired"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Expiradas"
+                    android:checkable="true"
+                    app:chipBackgroundColor="#F3E5F5"
+                    app:chipStrokeColor="#9C27B0" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+    <!-- Lista de cotizaciones -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_quotes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_quote" />
+
+    <!-- Loading indicator -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <!-- Empty state -->
+    <LinearLayout
+        android:id="@+id/layout_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <!-- Icono -->
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/ic_quote"
+            android:alpha="0.3" />
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hay cotizaciones"
+            android:textSize="18sp"
+            android:textColor="#666666"
+            android:textStyle="bold" />
+
+        <!-- Descripción -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Toca el botón + para crear tu primera cotización"
+            android:textSize="14sp"
+            android:textColor="#999999"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <!-- Credit Assessment Alert (will be shown when credit check is performed) -->
+    <LinearLayout
+        android:id="@+id/layout_credit_alert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#E8F5E8"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <!-- Credit Icon -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:src="@android:drawable/ic_dialog_info"
+            android:tint="#4CAF50" />
+
+        <!-- Credit Message -->
+        <TextView
+            android:id="@+id/tv_credit_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Evaluación crediticia disponible"
+            android:textSize="14sp"
+            android:textColor="#2E7D32" />
+
+        <!-- Close Button -->
+        <ImageButton
+            android:id="@+id/btn_close_credit_alert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:contentDescription="Cerrar" />
+
+    </LinearLayout>
+
+</LinearLayout>

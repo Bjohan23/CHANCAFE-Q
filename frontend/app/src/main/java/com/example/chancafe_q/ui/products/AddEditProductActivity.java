@@ -2,11 +2,13 @@ package com.example.chancafe_q.ui.products;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -110,8 +112,17 @@ public class AddEditProductActivity extends AppCompatActivity {
         // Adapter para categorías
         categoryAdapter = new ArrayAdapter<Category>(this, android.R.layout.simple_spinner_item, categories) {
             @Override
-            public String getItem(int position) {
-                return categories.get(position).getName();
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                textView.setText(categories.get(position).getName());
+                return textView;
+            }
+            
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getDropDownView(position, convertView, parent);
+                textView.setText(categories.get(position).getName());
+                return textView;
             }
         };
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -120,8 +131,17 @@ public class AddEditProductActivity extends AppCompatActivity {
         // Adapter para proveedores
         supplierAdapter = new ArrayAdapter<Supplier>(this, android.R.layout.simple_spinner_item, suppliers) {
             @Override
-            public String getItem(int position) {
-                return suppliers.get(position).getName();
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                textView.setText(suppliers.get(position).getName());
+                return textView;
+            }
+            
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getDropDownView(position, convertView, parent);
+                textView.setText(suppliers.get(position).getName());
+                return textView;
             }
         };
         supplierAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

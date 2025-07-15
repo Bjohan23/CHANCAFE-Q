@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#D32F2F"
+            android:elevation="4dp"
+            app:title="Nueva Cotización"
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="?attr/homeAsUpIndicator" />
+
+        <!-- Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Basic Information Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="3dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Información Básica"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Client Selection -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cliente *"
+                        android:textSize="14sp"
+                        android:textColor="#424242"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:id="@+id/tv_selected_client"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:background="#F5F5F5"
+                            android:padding="12dp"
+                            android:text="Seleccionar cliente..."
+                            android:textColor="#757575"
+                            android:gravity="center_vertical"
+                            android:drawableEnd="@android:drawable/arrow_down_float"
+                            android:drawablePadding="12dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <ImageButton
+                            android:id="@+id/btn_new_client"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@android:drawable/ic_input_add"
+                            android:contentDescription="Agregar cliente"
+                            android:tint="#D32F2F" />
+
+                    </LinearLayout>
+
+                    <!-- Credit Info (will be shown when client has credit assessment) -->
+                    <LinearLayout
+                        android:id="@+id/layout_credit_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="#E3F2FD"
+                        android:padding="12dp"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center_vertical"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/ic_dialog_info"
+                            android:tint="#1976D2"
+                            android:layout_marginEnd="8dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_credit_status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Score: 750 - Evaluación: APROBAR"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#1976D2" />
+
+                            <TextView
+                                android:id="@+id/tv_credit_limit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Límite sugerido: S/ 25,000"
+                                android:textSize="11sp"
+                                android:textColor="#1976D2" />
+
+                        </LinearLayout>
+
+                        <ImageButton
+                            android:id="@+id/btn_refresh_credit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@android:drawable/ic_popup_sync"
+                            android:contentDescription="Actualizar evaluación"
+                            android:tint="#1976D2" />
+
+                    </LinearLayout>
+
+                    <!-- Quote Title -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Título de la cotización *"
+                        android:textSize="14sp"
+                        android:textColor="#424242"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/et_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="#F5F5F5"
+                        android:hint="Ej: Cotización de electrodomésticos"
+                        android:padding="12dp"
+                        android:textSize="14sp" />
+
+                    <!-- Description -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Descripción"
+                        android:textSize="14sp"
+                        android:textColor="#424242"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/et_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="#F5F5F5"
+                        android:hint="Descripción detallada de la cotización..."
+                        android:padding="12dp"
+                        android:textSize="14sp"
+                        android:gravity="top|start"
+                        android:inputType="textMultiLine"
+                        android:maxLines="4" />
+
+                    <!-- Project Name -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nombre del proyecto"
+                        android:textSize="14sp"
+                        android:textColor="#424242"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/et_project_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="#F5F5F5"
+                        android:hint="Opcional"
+                        android:padding="12dp"
+                        android:textSize="14sp" />
+
+                    <!-- Valid Until -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Válida hasta *"
+                        android:textSize="14sp"
+                        android:textColor="#424242"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_valid_until"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="#F5F5F5"
+                        android:padding="12dp"
+                        android:text="Seleccionar fecha..."
+                        android:textColor="#757575"
+                        android:gravity="center_vertical"
+                        android:drawableEnd="@android:drawable/ic_menu_today"
+                        android:drawablePadding="12dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <!-- Currency and Exchange Rate -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <!-- Currency -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Moneda *"
+                                android:textSize="14sp"
+                                android:textColor="#424242"
+                                android:textStyle="bold" />
+
+                            <Spinner
+                                android:id="@+id/spinner_currency"
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginTop="8dp"
+                                android:background="#F5F5F5" />
+
+                        </LinearLayout>
+
+                        <!-- Exchange Rate -->
+                        <LinearLayout
+                            android:id="@+id/layout_exchange_rate"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tipo de cambio"
+                                android:textSize="14sp"
+                                android:textColor="#424242"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/et_exchange_rate"
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginTop="8dp"
+                                android:background="#F5F5F5"
+                                android:hint="3.75"
+                                android:padding="12dp"
+                                android:textSize="14sp"
+                                android:inputType="numberDecimal" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Items Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="3dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Items de la cotización"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#212121" />
+
+                        <Button
+                            android:id="@+id/btn_add_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="16dp"
+                            android:background="#D32F2F"
+                            android:text="Agregar"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp"
+                            android:drawableStart="@android:drawable/ic_input_add"
+                            android:drawablePadding="8dp"
+                            android:paddingHorizontal="16dp" />
+
+                    </LinearLayout>
+
+                    <!-- Items List -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_quote_items"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:nestedScrollingEnabled="false" />
+
+                    <!-- Empty Items State -->
+                    <LinearLayout
+                        android:id="@+id/layout_empty_items"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="32dp"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginBottom="16dp"
+                            android:src="@android:drawable/ic_menu_add"
+                            android:alpha="0.3" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sin items agregados"
+                            android:textSize="14sp"
+                            android:textColor="#757575" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Toca 'Agregar' para añadir productos"
+                            android:textSize="12sp"
+                            android:textColor="#999999" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Totals Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="3dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Totales"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Subtotal -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Subtotal:"
+                            android:textSize="14sp"
+                            android:textColor="#424242" />
+
+                        <TextView
+                            android:id="@+id/tv_subtotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="S/ 0.00"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#424242" />
+
+                    </LinearLayout>
+
+                    <!-- Discount -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Descuento:"
+                            android:textSize="14sp"
+                            android:textColor="#424242" />
+
+                        <TextView
+                            android:id="@+id/tv_discount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="S/ 0.00"
+                            android:textSize="14sp"
+                            android:textColor="#F44336" />
+
+                    </LinearLayout>
+
+                    <!-- Tax -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="IGV (18%):"
+                            android:textSize="14sp"
+                            android:textColor="#424242" />
+
+                        <TextView
+                            android:id="@+id/tv_tax"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="S/ 0.00"
+                            android:textSize="14sp"
+                            android:textColor="#424242" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="8dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- Total -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="TOTAL:"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#212121" />
+
+                        <TextView
+                            android:id="@+id/tv_total"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="S/ 0.00"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#D32F2F" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Notes Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="3dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Notas"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Notes -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Notas para el cliente"
+                        android:textSize="14sp"
+                        android:textColor="#424242"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/et_notes"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="#F5F5F5"
+                        android:hint="Notas visibles para el cliente..."
+                        android:padding="12dp"
+                        android:textSize="14sp"
+                        android:gravity="top|start"
+                        android:inputType="textMultiLine"
+                        android:maxLines="3" />
+
+                    <!-- Internal Notes -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Notas internas"
+                        android:textSize="14sp"
+                        android:textColor="#424242"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/et_internal_notes"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="8dp"
+                        android:background="#F5F5F5"
+                        android:hint="Notas internas (no visibles para el cliente)..."
+                        android:padding="12dp"
+                        android:textSize="14sp"
+                        android:gravity="top|start"
+                        android:inputType="textMultiLine"
+                        android:maxLines="3" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp">
+
+                <!-- Save as Draft -->
+                <Button
+                    android:id="@+id/btn_save_draft"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:background="#757575"
+                    android:text="Guardar borrador"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+                <!-- Save and Send -->
+                <Button
+                    android:id="@+id/btn_save_and_send"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:background="#D32F2F"
+                    android:text="Guardar y enviar"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
