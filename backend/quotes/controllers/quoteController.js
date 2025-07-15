@@ -214,13 +214,15 @@ const createQuoteWithCreditCheck = async (req, res) => {
   try {
     console.log('🔍 [Quote Controller] Iniciando creación de cotización con consulta crediticia');
     
-    const { clientId } = req.body;
-    if (!clientId) {
+    const { clientId, client_id } = req.body;
+    const finalClientId = clientId || client_id;
+    
+    if (!finalClientId) {
       return sendError(res, 400, 'Client ID es requerido para consulta crediticia');
     }
 
     // Obtener información del cliente
-    const client = await clientService.getClientById(clientId);
+    const client = await clientService.getClientById(finalClientId);
     if (!client) {
       return sendError(res, 404, 'Cliente no encontrado');
     }
@@ -238,7 +240,7 @@ const createQuoteWithCreditCheck = async (req, res) => {
           console.log(`🔍 [Quote Controller] Realizando consulta crediticia para cliente ${client.id} - DNI: ${client.documentNumber}`);
           
           // Realizar consulta crediticia automática
-          const creditResult = await clientService.performCreditCheck(clientId);
+          const creditResult = await clientService.performCreditCheck(finalClientId);
           creditAssessment = creditResult.creditAssessment;
           creditCheckPerformed = true;
           

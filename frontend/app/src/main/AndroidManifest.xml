@@ -71,6 +71,13 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.products.ProductsActivity" />
 
+        <!-- Selector de Producto -->
+        <activity
+            android:name=".ui.products.ProductSelectorActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.quotes.AddEditQuoteItemActivity" />
+
         <!-- Cotizaciones -->
         <activity
             android:name=".ui.quotes.QuotesActivity"

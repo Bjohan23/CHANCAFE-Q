@@ -1,11 +1,12 @@
 package com.example.chancafe_q.model;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 
 /**
  * Modelo de datos para el Item de Cotización
  */
-public class QuoteItem {
+public class QuoteItem implements Serializable {
     private int id;
     
     @SerializedName("quote_id")

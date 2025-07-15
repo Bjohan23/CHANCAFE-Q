@@ -7,22 +7,43 @@ class QuoteService {
     try {
       const {
         clientId,
+        client_id,
         userId,
+        user_id,
         title,
         description,
         items = [],
+        quote_items = [],
         discountPercentage = 0,
+        discount_percentage = 0,
         discountAmount = 0,
+        discount_amount = 0,
         taxPercentage = 18,
+        tax_percentage = 18,
         currency = 'PEN',
         exchangeRate = 1,
+        exchange_rate = 1,
         validUntil,
+        valid_until,
         notes,
         internalNotes,
-        projectName
+        internal_notes,
+        projectName,
+        project_name
       } = quoteData;
 
-      if (!clientId || !userId) {
+      const finalClientId = clientId || client_id;
+      const finalUserId = userId || user_id;
+      const finalItems = items.length > 0 ? items : quote_items;
+      const finalDiscountPercentage = discountPercentage || discount_percentage;
+      const finalDiscountAmount = discountAmount || discount_amount;
+      const finalTaxPercentage = taxPercentage || tax_percentage;
+      const finalExchangeRate = exchangeRate || exchange_rate;
+      const finalValidUntil = validUntil || valid_until;
+      const finalInternalNotes = internalNotes || internal_notes;
+      const finalProjectName = projectName || project_name;
+
+      if (!finalClientId || !finalUserId) {
         throw new Error("Cliente y usuario son obligatorios");
       }
 
@@ -30,56 +51,58 @@ class QuoteService {
         throw new Error("El título de la cotización es obligatorio");
       }
 
-      if (items.length === 0) {
+      if (finalItems.length === 0) {
         throw new Error("La cotización debe tener al menos un item");
       }
 
       const quoteNumber = await quoteRepository.generateQuoteNumber();
 
       let subtotal = 0;
-      for (const item of items) {
+      for (const item of finalItems) {
         if (!item.quantity || item.quantity <= 0) {
           throw new Error("La cantidad debe ser mayor a 0");
         }
-        if (!item.unitPrice || item.unitPrice <= 0) {
-          throw new Error("El precio unitario debe ser mayor a 0");
+        if (!item.unitPrice && !item.unit_price) {
+          throw new Error("El precio unitario es obligatorio");
         }
         
-        const itemDiscountAmount = item.discountAmount || (item.unitPrice * item.quantity * (item.discountPercentage || 0) / 100);
-        const itemSubtotal = (item.unitPrice * item.quantity) - itemDiscountAmount;
+        const unitPrice = item.unitPrice || item.unit_price;
+        const discountPercentage = item.discountPercentage || item.discount || 0;
+        const itemDiscountAmount = item.discountAmount || (unitPrice * item.quantity * discountPercentage / 100);
+        const itemSubtotal = (unitPrice * item.quantity) - itemDiscountAmount;
         subtotal += itemSubtotal;
       }
 
-      const finalDiscountAmount = discountAmount || (subtotal * discountPercentage / 100);
-      const subtotalAfterDiscount = subtotal - finalDiscountAmount;
-      const taxAmount = subtotalAfterDiscount * taxPercentage / 100;
+      const calculatedDiscountAmount = finalDiscountAmount || (subtotal * finalDiscountPercentage / 100);
+      const subtotalAfterDiscount = subtotal - calculatedDiscountAmount;
+      const taxAmount = subtotalAfterDiscount * finalTaxPercentage / 100;
       const totalAmount = subtotalAfterDiscount + taxAmount;
 
       const quoteDto = new QuoteDTO({
-        clientId,
-        userId,
+        clientId: finalClientId,
+        userId: finalUserId,
         quoteNumber,
         title,
         description,
         subtotal,
-        discountPercentage,
-        discountAmount: finalDiscountAmount,
-        taxPercentage,
+        discountPercentage: finalDiscountPercentage,
+        discountAmount: calculatedDiscountAmount,
+        taxPercentage: finalTaxPercentage,
         taxAmount,
         totalAmount,
         currency,
-        exchangeRate,
-        validUntil,
+        exchangeRate: finalExchangeRate,
+        validUntil: finalValidUntil,
         status: 'draft',
         notes,
-        internalNotes,
+        internalNotes: finalInternalNotes,
         revision: 1,
-        projectName,
+        projectName: finalProjectName,
         pdfGenerated: false
       });
 
       const newQuote = await quoteRepository.create({
-        client_id: quoteDto.clientId,
+        client_id: finalClientId,
         user_id: quoteDto.userId,
         quote_number: quoteDto.quoteNumber,
         title: quoteDto.title,
@@ -101,19 +124,21 @@ class QuoteService {
         pdf_generated: quoteDto.pdfGenerated
       });
 
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const itemDiscountAmount = item.discountAmount || (item.unitPrice * item.quantity * (item.discountPercentage || 0) / 100);
-        const itemSubtotal = (item.unitPrice * item.quantity) - itemDiscountAmount;
+      for (let i = 0; i < finalItems.length; i++) {
+        const item = finalItems[i];
+        const unitPrice = item.unitPrice || item.unit_price;
+        const discountPercentage = item.discountPercentage || item.discount || 0;
+        const itemDiscountAmount = item.discountAmount || (unitPrice * item.quantity * discountPercentage / 100);
+        const itemSubtotal = (unitPrice * item.quantity) - itemDiscountAmount;
 
         const itemDto = new QuoteItemDTO({
           quoteId: newQuote.id,
-          productId: item.productId,
-          productName: item.productName,
-          productDescription: item.productDescription,
+          productId: item.productId || item.product_id,
+          productName: item.productName || item.product_name,
+          productDescription: item.productDescription || item.description,
           quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          discountPercentage: item.discountPercentage || 0,
+          unitPrice: unitPrice,
+          discountPercentage: discountPercentage,
           discountAmount: itemDiscountAmount,
           subtotal: itemSubtotal,
           notes: item.notes,

@@ -7,6 +7,7 @@ class CreditRequestService {
     try {
       const {
         clientId,
+        client_id,
         userId,
         requestedAmount,
         currency = 'PEN',
@@ -21,7 +22,9 @@ class CreditRequestService {
         internalNotes
       } = creditRequestData;
 
-      if (!clientId || !userId) {
+      const finalClientId = clientId || client_id;
+
+      if (!finalClientId || !userId) {
         throw new Error("Cliente y usuario son obligatorios");
       }
 
@@ -40,7 +43,7 @@ class CreditRequestService {
       const requestNumber = await creditRequestRepository.generateRequestNumber();
 
       const creditRequestDto = new CreditRequestDTO({
-        clientId,
+        clientId: finalClientId,
         userId,
         requestNumber,
         requestedAmount,
@@ -58,7 +61,7 @@ class CreditRequestService {
       });
 
       const newCreditRequest = await creditRequestRepository.create({
-        client_id: creditRequestDto.clientId,
+        client_id: finalClientId,
         user_id: creditRequestDto.userId,
         request_number: creditRequestDto.requestNumber,
         requested_amount: creditRequestDto.requestedAmount,

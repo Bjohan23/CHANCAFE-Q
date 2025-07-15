@@ -393,7 +393,7 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
         Intent intent = new Intent(this, AddEditQuoteItemActivity.class);
         intent.putExtra("is_editing", true);
         intent.putExtra("item_position", position);
-        // TODO: Pasar el item como Serializable o Parcelable
+        intent.putExtra("quote_item", item);
         startActivityForResult(intent, REQUEST_EDIT_ITEM);
     }
 
@@ -628,29 +628,52 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
                 case REQUEST_SELECT_CLIENT:
                     if (data != null && data.hasExtra("selected_client_id")) {
                         int clientId = data.getIntExtra("selected_client_id", -1);
-                        // TODO: Cargar cliente por ID
-                        // Por ahora, simular cliente seleccionado
-                        // selectedClient = new Client();
+                        String clientName = data.getStringExtra("selected_client_name");
+                        
+                        // Crear cliente temporal con los datos recibidos
+                        selectedClient = new Client();
+                        selectedClient.setId(clientId);
+                        if (clientName != null) {
+                            if (clientName.contains(" ")) {
+                                String[] parts = clientName.split(" ", 2);
+                                selectedClient.setFirstName(parts[0]);
+                                selectedClient.setLastName(parts[1]);
+                            } else {
+                                selectedClient.setBusinessName(clientName);
+                            }
+                        }
+                        
                         updateClientInfo();
+                        
+                        // Cargar evaluación crediticia si el cliente tiene DNI
+                        if (selectedClient.getDocumentType() != null && "DNI".equals(selectedClient.getDocumentType())) {
+                            quoteViewModel.getCreditAssessment(selectedClient.getId());
+                        }
                     }
                     break;
                     
                 case REQUEST_ADD_ITEM:
-                    if (data != null) {
-                        // TODO: Obtener QuoteItem de la actividad
-                        // QuoteItem newItem = (QuoteItem) data.getSerializableExtra("quote_item");
-                        // quoteItems.add(newItem);
-                        updateItemsList();
-                        updateTotals();
+                    if (data != null && data.hasExtra("quote_item")) {
+                        QuoteItem newItem = (QuoteItem) data.getSerializableExtra("quote_item");
+                        if (newItem != null) {
+                            quoteItems.add(newItem);
+                            updateItemsList();
+                            updateTotals();
+                            Toast.makeText(this, "Item agregado exitosamente", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
                     
                 case REQUEST_EDIT_ITEM:
-                    if (data != null && data.hasExtra("item_position")) {
+                    if (data != null && data.hasExtra("item_position") && data.hasExtra("quote_item")) {
                         int position = data.getIntExtra("item_position", -1);
-                        // TODO: Actualizar item editado
-                        updateItemsList();
-                        updateTotals();
+                        QuoteItem editedItem = (QuoteItem) data.getSerializableExtra("quote_item");
+                        if (position >= 0 && position < quoteItems.size() && editedItem != null) {
+                            quoteItems.set(position, editedItem);
+                            updateItemsList();
+                            updateTotals();
+                            Toast.makeText(this, "Item actualizado exitosamente", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
             }
