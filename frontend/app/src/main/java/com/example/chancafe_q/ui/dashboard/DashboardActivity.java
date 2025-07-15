@@ -142,8 +142,7 @@ public class DashboardActivity extends AppCompatActivity {
         
         switch (menuItem) {
             case "new_quote":
-                message = "Abriendo Nueva Cotización...";
-                // TODO: intent = new Intent(this, NewQuoteActivity.class);
+                intent = new Intent(this, com.example.chancafe_q.ui.quotes.AddEditQuoteActivity.class);
                 break;
             case "my_quotes":
                 intent = new Intent(this, com.example.chancafe_q.ui.quotes.QuotesActivity.class);

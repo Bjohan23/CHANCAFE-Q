@@ -278,9 +278,17 @@ public class AddEditClientActivity extends AppCompatActivity {
     }
 
     private boolean validateFields() {
-        // Validaciones básicas
-        if (etDocumentNumber.getText().toString().trim().isEmpty()) {
-            etDocumentNumber.setError("Número de documento requerido");
+        // Validaciones obligatorias: documentType y documentNumber
+        String documentType = getSpinnerValue(spinnerDocumentType, new String[]{"DNI", "RUC", "passport", "CE"});
+        if (documentType == null || documentType.trim().isEmpty()) {
+            Toast.makeText(this, "Tipo de documento es obligatorio", Toast.LENGTH_LONG).show();
+            spinnerDocumentType.requestFocus();
+            return false;
+        }
+
+        String documentNumber = etDocumentNumber.getText().toString().trim();
+        if (documentNumber.isEmpty()) {
+            etDocumentNumber.setError("Número de documento es obligatorio");
             etDocumentNumber.requestFocus();
             return false;
         }

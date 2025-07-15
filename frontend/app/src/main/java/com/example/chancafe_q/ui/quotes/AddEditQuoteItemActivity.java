@@ -138,14 +138,13 @@ public class AddEditQuoteItemActivity extends AppCompatActivity {
     private void loadItemData() {
         if (currentItem != null) {
             // Cargar producto si existe
-            if (currentItem.getProduct() != null) {
-                selectedProduct = currentItem.getProduct();
-                updateProductSelection();
-            } else if (currentItem.getProductId() != null) {
-                // Crear producto temporal con ID
+            if (currentItem.getProductId() != null) {
+                // Crear producto temporal con ID para mostrar información
                 selectedProduct = new Product();
                 selectedProduct.setId(currentItem.getProductId());
                 selectedProduct.setName("Producto ID: " + currentItem.getProductId());
+                selectedProduct.setPrice(currentItem.getUnitPrice());
+                selectedProduct.setDescription(currentItem.getDescription());
                 updateProductSelection();
             }
             
@@ -189,7 +188,8 @@ public class AddEditQuoteItemActivity extends AppCompatActivity {
             // Establecer producto seleccionado
             if (selectedProduct != null) {
                 currentItem.setProductId(selectedProduct.getId());
-                currentItem.setProduct(selectedProduct);
+                // No establecer el objeto Product completo para evitar problemas de serialización
+                // currentItem.setProduct(selectedProduct);
             }
             
             currentItem.setDescription(etDescription.getText().toString().trim());

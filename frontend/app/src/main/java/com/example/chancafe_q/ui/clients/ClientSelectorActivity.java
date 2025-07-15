@@ -149,9 +149,28 @@ public class ClientSelectorActivity extends AppCompatActivity implements ClientS
     public void onClientSelected(Client client) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("selected_client_id", client.getId());
-        resultIntent.putExtra("selected_client_name", 
-            client.getBusinessName() != null ? client.getBusinessName() : 
-            (client.getFirstName() + " " + client.getLastName()).trim());
+        
+        // Determinar el nombre del cliente con prioridad: businessName > fullName > firstName + lastName
+        String clientName;
+        if (client.getBusinessName() != null && !client.getBusinessName().isEmpty()) {
+            clientName = client.getBusinessName();
+        } else if (client.getFullName() != null && !client.getFullName().isEmpty()) {
+            clientName = client.getFullName();
+        } else {
+            String firstName = client.getFirstName() != null ? client.getFirstName() : "";
+            String lastName = client.getLastName() != null ? client.getLastName() : "";
+            clientName = (firstName + " " + lastName).trim();
+            
+            if (clientName.isEmpty()) {
+                clientName = "Cliente ID: " + client.getId();
+            }
+        }
+        
+        resultIntent.putExtra("selected_client_name", clientName);
+        resultIntent.putExtra("selected_client_document_type", client.getDocumentType());
+        resultIntent.putExtra("selected_client_document_number", client.getDocumentNumber());
+        resultIntent.putExtra("selected_client_type", client.getClientType());
+        
         setResult(RESULT_OK, resultIntent);
         finish();
     }

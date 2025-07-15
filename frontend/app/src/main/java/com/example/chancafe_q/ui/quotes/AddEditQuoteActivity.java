@@ -427,9 +427,23 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
 
     private void updateClientInfo() {
         if (selectedClient != null) {
-            String clientName = selectedClient.getBusinessName() != null 
-                ? selectedClient.getBusinessName()
-                : (selectedClient.getFirstName() + " " + selectedClient.getLastName()).trim();
+            String clientName = null;
+            
+            // Prioridad: businessName > fullName > firstName + lastName
+            if (selectedClient.getBusinessName() != null && !selectedClient.getBusinessName().isEmpty()) {
+                clientName = selectedClient.getBusinessName();
+            } else if (selectedClient.getFullName() != null && !selectedClient.getFullName().isEmpty()) {
+                clientName = selectedClient.getFullName();
+            } else {
+                String firstName = selectedClient.getFirstName() != null ? selectedClient.getFirstName() : "";
+                String lastName = selectedClient.getLastName() != null ? selectedClient.getLastName() : "";
+                clientName = (firstName + " " + lastName).trim();
+                
+                if (clientName.isEmpty()) {
+                    clientName = "Cliente ID: " + selectedClient.getId();
+                }
+            }
+            
             tvSelectedClient.setText(clientName);
             tvSelectedClient.setTextColor(getResources().getColor(android.R.color.black));
         } else {
@@ -441,11 +455,64 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
 
     private void onCreditAssessmentReceived(Map<String, Object> creditAssessment) {
         if (creditAssessment != null && selectedClient != null) {
-            // TODO: Parsear la respuesta de evaluación crediticia
-            // Por ahora, mostrar información básica
             layoutCreditInfo.setVisibility(View.VISIBLE);
-            tvCreditStatus.setText("Evaluación crediticia disponible");
-            tvCreditLimit.setText("Revisar información en detalle");
+            
+            try {
+                // Extraer información del cliente
+                Map<String, Object> clientData = (Map<String, Object>) creditAssessment.get("client");
+                Map<String, Object> creditInfo = null;
+                
+                if (clientData != null) {
+                    creditInfo = (Map<String, Object>) clientData.get("creditInfo");
+                }
+                
+                if (creditInfo != null) {
+                    // Mostrar score y clasificación
+                    Object score = creditInfo.get("score");
+                    String scoreLabel = (String) creditInfo.get("scoreLabel");
+                    String riskClassification = (String) creditInfo.get("riskClassification");
+                    String automaticEvaluation = (String) creditInfo.get("automaticEvaluation");
+                    String suggestedCreditLimit = (String) creditInfo.get("suggestedCreditLimit");
+                    
+                    StringBuilder statusText = new StringBuilder();
+                    if (score != null) {
+                        statusText.append("Score: ").append(score);
+                        if (scoreLabel != null) {
+                            statusText.append(" (").append(scoreLabel).append(")");
+                        }
+                    }
+                    
+                    if (riskClassification != null) {
+                        if (statusText.length() > 0) statusText.append("\n");
+                        statusText.append("Riesgo: ").append(riskClassification);
+                    }
+                    
+                    if (automaticEvaluation != null) {
+                        if (statusText.length() > 0) statusText.append("\n");
+                        statusText.append("Evaluación: ").append(automaticEvaluation);
+                    }
+                    
+                    tvCreditStatus.setText(statusText.toString());
+                    
+                    // Mostrar límite sugerido
+                    if (suggestedCreditLimit != null) {
+                        try {
+                            double limit = Double.parseDouble(suggestedCreditLimit);
+                            tvCreditLimit.setText(String.format(Locale.getDefault(), "Límite sugerido: S/ %.2f", limit));
+                        } catch (NumberFormatException e) {
+                            tvCreditLimit.setText("Límite sugerido: " + suggestedCreditLimit);
+                        }
+                    } else {
+                        tvCreditLimit.setText("Sin límite de crédito");
+                    }
+                } else {
+                    tvCreditStatus.setText("Información crediticia no disponible");
+                    tvCreditLimit.setText("Consulte con el área de créditos");
+                }
+            } catch (Exception e) {
+                tvCreditStatus.setText("Error al procesar información crediticia");
+                tvCreditLimit.setText("Consulte manualmente el historial crediticio");
+            }
         }
     }
 
@@ -629,24 +696,41 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
                     if (data != null && data.hasExtra("selected_client_id")) {
                         int clientId = data.getIntExtra("selected_client_id", -1);
                         String clientName = data.getStringExtra("selected_client_name");
+                        String documentType = data.getStringExtra("selected_client_document_type");
+                        String documentNumber = data.getStringExtra("selected_client_document_number");
+                        String clientType = data.getStringExtra("selected_client_type");
                         
                         // Crear cliente temporal con los datos recibidos
                         selectedClient = new Client();
                         selectedClient.setId(clientId);
-                        if (clientName != null) {
+                        selectedClient.setDocumentType(documentType);
+                        selectedClient.setDocumentNumber(documentNumber);
+                        selectedClient.setClientType(clientType);
+                        
+                        // Establecer el nombre completo recibido
+                        if (clientName != null && !clientName.isEmpty()) {
+                            selectedClient.setFullName(clientName);
+                            
+                            // También intentar separar en firstName y lastName para compatibilidad
                             if (clientName.contains(" ")) {
                                 String[] parts = clientName.split(" ", 2);
                                 selectedClient.setFirstName(parts[0]);
-                                selectedClient.setLastName(parts[1]);
+                                if (parts.length > 1) {
+                                    selectedClient.setLastName(parts[1]);
+                                }
                             } else {
-                                selectedClient.setBusinessName(clientName);
+                                if ("business".equals(clientType)) {
+                                    selectedClient.setBusinessName(clientName);
+                                } else {
+                                    selectedClient.setFirstName(clientName);
+                                }
                             }
                         }
                         
                         updateClientInfo();
                         
                         // Cargar evaluación crediticia si el cliente tiene DNI
-                        if (selectedClient.getDocumentType() != null && "DNI".equals(selectedClient.getDocumentType())) {
+                        if ("DNI".equals(documentType)) {
                             quoteViewModel.getCreditAssessment(selectedClient.getId());
                         }
                     }

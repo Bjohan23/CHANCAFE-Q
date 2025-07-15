@@ -102,12 +102,18 @@ public class ClientSelectorAdapter extends RecyclerView.Adapter<ClientSelectorAd
             String clientName;
             if (client.getBusinessName() != null && !client.getBusinessName().isEmpty()) {
                 clientName = client.getBusinessName();
-                
-                // Mostrar información de empresa
                 layoutBusinessInfo.setVisibility(View.VISIBLE);
                 tvBusinessName.setText(client.getBusinessName());
+            } else if (client.getFullName() != null && !client.getFullName().isEmpty()) {
+                clientName = client.getFullName();
+                layoutBusinessInfo.setVisibility(View.GONE);
             } else {
-                clientName = (client.getFirstName() + " " + client.getLastName()).trim();
+                String firstName = client.getFirstName() != null ? client.getFirstName() : "";
+                String lastName = client.getLastName() != null ? client.getLastName() : "";
+                clientName = (firstName + " " + lastName).trim();
+                if (clientName.isEmpty()) {
+                    clientName = "Cliente sin nombre";
+                }
                 layoutBusinessInfo.setVisibility(View.GONE);
             }
             tvClientName.setText(clientName);
@@ -118,23 +124,38 @@ public class ClientSelectorAdapter extends RecyclerView.Adapter<ClientSelectorAd
             tvDocument.setText(documentType + ": " + documentNumber);
 
             // Email
-            tvEmail.setText(client.getEmail() != null ? client.getEmail() : "Sin email");
+            tvEmail.setText(client.getEmail() != null && !client.getEmail().isEmpty() ? client.getEmail() : "Sin email");
 
             // Teléfono
-            tvPhone.setText(client.getPhone() != null ? client.getPhone() : "Sin teléfono");
+            tvPhone.setText(client.getPhone() != null && !client.getPhone().isEmpty() ? client.getPhone() : "Sin teléfono");
 
-            // Score crediticio
-            if (client.getCreditScore() != null && client.getCreditScore() > 0) {
+            // Score crediticio - usar nueva información crediticia
+            if (client.getCreditInfo() != null && client.getCreditInfo().getScore() != null) {
                 layoutCreditScore.setVisibility(View.VISIBLE);
-                tvCreditScore.setText(String.valueOf(client.getCreditScore()));
+                int score = client.getCreditInfo().getScore();
+                String scoreLabel = client.getCreditInfo().getScoreLabel() != null ? 
+                    client.getCreditInfo().getScoreLabel() : "";
+                tvCreditScore.setText(score + " (" + scoreLabel + ")");
                 
                 // Cambiar color según el score
-                if (client.getCreditScore() >= 650) {
+                if (score >= 650) {
                     tvCreditScore.setTextColor(Color.parseColor("#2E7D32")); // Verde
-                } else if (client.getCreditScore() >= 550) {
+                } else if (score >= 550) {
                     tvCreditScore.setTextColor(Color.parseColor("#F57F17")); // Amarillo
                 } else {
                     tvCreditScore.setTextColor(Color.parseColor("#D32F2F")); // Rojo
+                }
+            } else if (client.getCreditScore() != null && client.getCreditScore() > 0) {
+                // Fallback a la información crediticia antigua
+                layoutCreditScore.setVisibility(View.VISIBLE);
+                tvCreditScore.setText(String.valueOf(client.getCreditScore()));
+                
+                if (client.getCreditScore() >= 650) {
+                    tvCreditScore.setTextColor(Color.parseColor("#2E7D32"));
+                } else if (client.getCreditScore() >= 550) {
+                    tvCreditScore.setTextColor(Color.parseColor("#F57F17"));
+                } else {
+                    tvCreditScore.setTextColor(Color.parseColor("#D32F2F"));
                 }
             } else {
                 layoutCreditScore.setVisibility(View.GONE);

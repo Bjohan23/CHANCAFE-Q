@@ -6,7 +6,8 @@ import java.util.Date;
 /**
  * Modelo de datos para el Producto
  */
-public class Product {
+public class Product implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
     private int id;
     
     private String name;

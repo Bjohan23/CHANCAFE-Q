@@ -97,6 +97,20 @@ public class Client implements java.io.Serializable {
     
     @SerializedName("updated_at")
     private Date updatedAt;
+    
+    // Campos adicionales de la respuesta JSON
+    @SerializedName("fullName")
+    private String fullName;
+    
+    @SerializedName("isActive")
+    private Boolean isActive;
+    
+    @SerializedName("isBusiness")
+    private Boolean isBusiness;
+    
+    // Información crediticia completa
+    @SerializedName("creditInfo")
+    private CreditInfo creditInfo;
 
     // Constructor vacío
     public Client() {
@@ -398,8 +412,43 @@ public class Client implements java.io.Serializable {
         this.lastCreditCheck = lastCreditCheck;
     }
 
+    // Getters y setters para campos adicionales
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public Boolean getIsBusiness() {
+        return isBusiness;
+    }
+
+    public void setIsBusiness(Boolean isBusiness) {
+        this.isBusiness = isBusiness;
+    }
+
+    public CreditInfo getCreditInfo() {
+        return creditInfo;
+    }
+
+    public void setCreditInfo(CreditInfo creditInfo) {
+        this.creditInfo = creditInfo;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     // Métodos de utilidad
     public String getFullName() {
+        // Si existe el campo fullName del JSON, usarlo
+        if (fullName != null && !fullName.isEmpty()) {
+            return fullName;
+        }
+        
+        // Fallback: calcular desde otros campos
         if (clientType != null && clientType.equals("business") && businessName != null) {
             return businessName;
         }
