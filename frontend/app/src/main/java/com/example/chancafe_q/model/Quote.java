@@ -1,8 +1,11 @@
 package com.example.chancafe_q.model;
 
 import com.google.gson.annotations.SerializedName;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Modelo de datos para la Cotización
@@ -10,67 +13,66 @@ import java.util.List;
 public class Quote {
     private int id;
     
-    @SerializedName("client_id")
+    @SerializedName("clientId")
     private Integer clientId;
     
-    @SerializedName("user_id")
+    @SerializedName("userId")
     private Integer userId;
     
-    @SerializedName("quote_number")
+    @SerializedName("quoteNumber")
     private String quoteNumber;
     
     private String title;
     private String description;
     
-    @SerializedName("subtotal")
     private Double subtotal;
     
-    @SerializedName("discount_percentage")
+    @SerializedName("discountPercentage")
     private Double discountPercentage;
     
-    @SerializedName("discount_amount")
+    @SerializedName("discountAmount")
     private Double discountAmount;
     
-    @SerializedName("tax_percentage")
+    @SerializedName("taxPercentage")
     private Double taxPercentage;
     
-    @SerializedName("tax_amount")
+    @SerializedName("taxAmount")
     private Double taxAmount;
     
-    @SerializedName("total_amount")
+    @SerializedName("totalAmount")
     private Double totalAmount;
     
     private String currency;
     
-    @SerializedName("exchange_rate")
+    @SerializedName("exchangeRate")
     private Double exchangeRate;
     
     private String status; // "draft", "sent", "approved", "rejected", "expired"
     
-    @SerializedName("valid_until")
-    private Date validUntil;
+    @SerializedName("validUntil")
+    private String validUntil;
     
     private String notes;
     
-    @SerializedName("internal_notes")
+    @SerializedName("internalNotes")
     private String internalNotes;
     
     private int revision;
     
-    @SerializedName("project_name")
+    @SerializedName("projectName")
     private String projectName;
     
-    @SerializedName("pdf_generated")
+    @SerializedName("pdfGenerated")
     private boolean pdfGenerated;
     
-    @SerializedName("pdf_url")
+    @SerializedName("pdfUrl")
     private String pdfUrl;
     
-    @SerializedName("created_at")
-    private Date createdAt;
+    @SerializedName("createdAt")
+    private String createdAt;
     
-    @SerializedName("updated_at")
-    private Date updatedAt;
+    @SerializedName("updatedAt")
+    private String updatedAt;
     
     @SerializedName("isDraft")
     private Boolean isDraft;
@@ -84,6 +86,9 @@ public class Quote {
     // Relaciones
     private Client client;
     private User user;
+    
+    @SerializedName("advisor")
+    private User advisor;
     
     @SerializedName("quote_items")
     private List<QuoteItem> quoteItems;
@@ -190,12 +195,34 @@ public class Quote {
         this.status = status;
     }
 
-    public Date getValidUntil() {
+    public String getValidUntil() {
         return validUntil;
     }
 
-    public void setValidUntil(Date validUntil) {
+    public void setValidUntil(String validUntil) {
         this.validUntil = validUntil;
+    }
+    
+    // Métodos de conversión para compatibilidad con Date
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    
+    public Date getValidUntilAsDate() {
+        if (validUntil == null || validUntil.isEmpty()) {
+            return null;
+        }
+        try {
+            return DATE_FORMAT.parse(validUntil);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+    
+    public void setValidUntil(Date date) {
+        if (date != null) {
+            this.validUntil = DATE_FORMAT.format(date);
+        } else {
+            this.validUntil = null;
+        }
     }
 
     public int getRevision() {
@@ -222,20 +249,55 @@ public class Quote {
         this.pdfUrl = pdfUrl;
     }
 
-    public Date getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    // Métodos de conversión para createdAt y updatedAt
+    public Date getCreatedAtAsDate() {
+        if (createdAt == null || createdAt.isEmpty()) {
+            return null;
+        }
+        try {
+            // El formato incluye hora: 2025-07-15 17:56:58
+            SimpleDateFormat fullDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            return fullDateFormat.parse(createdAt);
+        } catch (ParseException e) {
+            // Intentar solo fecha si falla
+            try {
+                return DATE_FORMAT.parse(createdAt);
+            } catch (ParseException ex) {
+                return null;
+            }
+        }
+    }
+    
+    public Date getUpdatedAtAsDate() {
+        if (updatedAt == null || updatedAt.isEmpty()) {
+            return null;
+        }
+        try {
+            SimpleDateFormat fullDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            return fullDateFormat.parse(updatedAt);
+        } catch (ParseException e) {
+            try {
+                return DATE_FORMAT.parse(updatedAt);
+            } catch (ParseException ex) {
+                return null;
+            }
+        }
     }
 
     public Client getClient() {
@@ -247,11 +309,20 @@ public class Quote {
     }
 
     public User getUser() {
-        return user;
+        // Si user es null, devolver advisor (para compatibilidad con backend)
+        return user != null ? user : advisor;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+    
+    public User getAdvisor() {
+        return advisor;
+    }
+
+    public void setAdvisor(User advisor) {
+        this.advisor = advisor;
     }
 
     public List<QuoteItem> getQuoteItems() {
@@ -373,12 +444,14 @@ public class Quote {
     }
 
     public boolean isExpired() {
-        return Boolean.TRUE.equals(isExpired) || "expired".equals(status) || (validUntil != null && validUntil.before(new Date()));
+        return Boolean.TRUE.equals(isExpired) || "expired".equals(status);
     }
 
     public String getStatusDisplayName() {
+        if (status == null) return "Borrador";
         switch (status) {
             case "draft": return "Borrador";
+            case "pending": return "Pendiente";
             case "sent": return "Enviada";
             case "approved": return "Aprobada";
             case "rejected": return "Rechazada";

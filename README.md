@@ -1,277 +1,396 @@
-# CHANCAFE Q - Sales Advisor Application
+# CHANCAFE Q - Sistema de Asesor de Ventas
 
-## 🎯 **Project Overview**
+Una aplicación móvil completa para asesoramiento de ventas con evaluación crediticia automática, diseñada para optimizar el proceso de cotización y gestión de clientes.
 
-CHANCAFE Q is a comprehensive sales advisor application designed to streamline client management, product catalog, quote generation, and automated credit assessment. The system integrates with Sentinel Credit Bureau API to provide real-time creditworthiness evaluation during the sales process.
+## 📱 Características Principales
 
-### **Architecture**
-- **Backend**: Node.js Express REST API with MySQL database
-- **Frontend**: Android application using Java/MVVM architecture  
-- **Integration**: Sentinel Credit Bureau API for automated credit assessment
+- **Gestión de Clientes**: Registro y administración completa de clientes
+- **Cotizaciones Inteligentes**: Generación automática de cotizaciones con evaluación crediticia
+- **Evaluación Crediticia**: Integración con Sentinel Credit Bureau para análisis automático de riesgo
+- **Catálogo de Productos**: Gestión completa de productos y categorías
+- **Dashboard Analítico**: Vista general de métricas y estadísticas de ventas
 
----
+## 🏗️ Arquitectura del Sistema
 
-## 📊 **Current Implementation Status**
+### Backend - API REST
+- **Patrón**: Arquitectura modular por dominios
+- **Capas**: Controllers → Services → Repository → Models
+- **Autenticación**: JWT con middleware de autorización
+- **Base de Datos**: MySQL con Sequelize ORM
 
-### **✅ FULLY IMPLEMENTED**
+### Frontend - Android Nativo
+- **Patrón**: MVVM (Model-View-ViewModel)
+- **Lenguaje**: Java
+- **UI**: Material Design Components con View Binding
+- **Arquitectura**: Clean Architecture con repositorios
+
+## 🛠️ Stack Tecnológico
+
+### Backend
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| **Node.js** | Latest | Runtime de JavaScript |
+| **Express.js** | Latest | Framework web |
+| **MySQL** | 8.0+ | Base de datos relacional |
+| **Sequelize** | Latest | ORM para JavaScript |
+| **JWT** | Latest | Autenticación y autorización |
+| **bcrypt** | Latest | Encriptación de contraseñas |
+
+### Frontend
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| **Android SDK** | API 25-35 | Plataforma móvil |
+| **Java** | 8+ | Lenguaje de programación |
+| **Material Design** | Latest | Sistema de diseño |
+| **Retrofit** | 2.9+ | Cliente HTTP |
+| **View Binding** | - | Vinculación de vistas |
+| **ViewModel & LiveData** | - | Arquitectura MVVM |
+
+### APIs Externas
+| Servicio | Propósito |
+|----------|-----------|
+| **Sentinel Credit Bureau** | Evaluación crediticia automática |
+
+## 🗄️ Base de Datos
+
+### Modelo de Datos Principal
+
+```sql
+-- Usuarios del sistema
+Users (id, username, email, password, role, created_at, updated_at)
+
+-- Clientes con información crediticia
+Clients (
+  id, name, email, phone, address, dni, ruc,
+  credit_score, risk_classification, total_debts,
+  automatic_evaluation, suggested_credit_limit,
+  is_banked, last_credit_check,
+  created_at, updated_at
+)
+
+-- Productos del catálogo
+Products (id, name, description, price, category_id, created_at, updated_at)
+Categories (id, name, description, created_at, updated_at)
+
+-- Cotizaciones con evaluación crediticia
+Quotes (
+  id, client_id, user_id, total_amount, status,
+  credit_approved, credit_limit_used,
+  created_at, updated_at
+)
+
+-- Items de cotización
+QuoteItems (id, quote_id, product_id, quantity, unit_price, total_price)
+
+-- Solicitudes de crédito
+CreditRequests (id, client_id, amount, status, approved_at, created_at)
+```
+
+## 🏛️ Arquitectura Detallada
+
+### Backend - Estructura Modular
+
+```
+backend/
+├── auth/                    # Módulo de autenticación
+│   ├── controllers/         # Manejo de requests HTTP
+│   ├── services/           # Lógica de negocio
+│   ├── repository/         # Acceso a datos
+│   ├── routes/            # Definición de rutas
+│   └── interfaces/        # DTOs y validación
+├── clients/               # Gestión de clientes
+├── quotes/                # Sistema de cotizaciones
+├── products/              # Catálogo de productos
+├── credit-requests/       # Solicitudes de crédito
+├── external-apis/         # Integración Sentinel
+└── shared/
+    ├── models/            # Modelos Sequelize
+    ├── config/            # Configuración DB
+    ├── middlewares/       # Autenticación JWT
+    └── utils/             # Utilidades comunes
+```
+
+### Frontend - Arquitectura MVVM
+
+```
+app/src/main/java/com/example/chancafe_q/
+├── ui/                    # Capa de presentación
+│   ├── login/             # Pantalla de login
+│   ├── dashboard/         # Dashboard principal
+│   ├── clients/           # Gestión de clientes
+│   ├── quotes/            # Cotizaciones
+│   └── products/          # Selección de productos
+├── viewmodel/             # ViewModels (lógica de UI)
+├── model/                 # Modelos de datos
+├── repository/            # Repositorios de datos
+├── data/
+│   ├── local/             # Base de datos local (Room)
+│   └── remote/            # Cliente API (Retrofit)
+└── utils/                 # Configuración y utilidades
+```
+
+## 🔧 Configuración del Entorno
+
+### Backend Setup
+
+```bash
+# Navegar al directorio backend
+cd backend
+
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp .env.example .env.development
+
+# Ejecutar migraciones
+npm run migrate
+
+# Iniciar en desarrollo
+npm run start:dev
+```
+
+### Variables de Entorno Requeridas
+
+```env
+# Base de datos
+DB_HOST=localhost
+DB_PORT=3306
+USERDB=your_db_user
+PASSWORD=your_db_password
+MASTER_DB=chancafe_db
+
+# Seguridad
+JWT_SECRET=your_super_secret_jwt_key
+
+# Servidor
+PORT=3000
+
+# Sentinel API
+SENTINEL_API_URL=https://sentinel-api-5c7y.vercel.app
+SENTINEL_API_TIMEOUT=10000
+SENTINEL_API_RETRY_ATTEMPTS=3
+SENTINEL_CACHE_TTL=3600
+```
+
+### Frontend Setup
+
+```bash
+# Navegar al directorio frontend
+cd frontend
+
+# Construir proyecto
+./gradlew build
+
+# Instalar en dispositivo/emulador
+./gradlew installDebug
+
+# Ejecutar pruebas
+./gradlew test
+```
+
+### Configuración de Entornos Android
+
+Editar `Configuration.java` para cambiar entre entornos:
+
+```java
+// Cambiar esta línea según el entorno deseado
+private static final Environment CURRENT_ENVIRONMENT = Environment.DEVELOPMENT;
+
+// Opciones disponibles:
+// Environment.DEVELOPMENT  - Local/Cloudflare tunnel
+// Environment.STAGING      - https://staging.chancafe.com/api/
+// Environment.PRODUCTION   - https://api.chancafe.com/api/
+```
+
+## 🔌 APIs y Endpoints
+
+### Autenticación
+- `POST /api/auth/login` - Iniciar sesión
+- `POST /api/auth/register` - Registrar usuario
+- `GET /api/auth/profile` - Obtener perfil
+
+### Clientes
+- `GET /api/clients` - Listar clientes
+- `POST /api/clients` - Crear cliente
+- `PUT /api/clients/:id` - Actualizar cliente
+- `GET /api/clients/:id` - Obtener cliente específico
+
+### Cotizaciones
+- `GET /api/quotes` - Listar cotizaciones
+- `POST /api/quotes` - Crear cotización
+- `POST /api/quotes/with-credit-check` - Cotización con evaluación crediticia
+- `GET /api/quotes/:id/credit-info` - Información crediticia de cotización
+
+### Productos
+- `GET /api/products` - Listar productos
+- `GET /api/categories` - Listar categorías
+
+### Evaluación Crediticia (Sentinel Integration)
+- `POST /api/quotes/client/:clientId/credit-check` - Evaluación manual
+- `GET /api/quotes/client/:clientId/credit-assessment` - Obtener evaluación
+
+## 💳 Sistema de Evaluación Crediticia
+
+### Reglas de Negocio Sentinel
+
+| Score Range | Clasificación | Límite de Crédito | Estado Bancario |
+|-------------|---------------|-------------------|------------------|
+| 750+ | BAJO | Hasta S/50,000 | Bancarizado |
+| 650-749 | MEDIO | Hasta S/30,000 | Bancarizado |
+| 550-649 | ALTO | Hasta S/20,000 | Bancarizado |
+| 450-549 | ALTO | Hasta S/10,000 | Bancarizado |
+| <450 | MUY_ALTO | Rechazado | No bancarizado |
+
+### Cache Strategy
+- **Consultas rápidas**: 30 minutos TTL
+- **Reportes detallados**: 60 minutos TTL
+- **Prevención de llamadas redundantes** a la API externa
+
+## 🚀 Comandos de Desarrollo
+
+### Backend
+```bash
+npm start              # Producción
+npm run start:dev      # Desarrollo
+npm run start:qa       # QAS
+npm run migrate        # Migraciones DB
+npm test              # Pruebas (pendiente configurar)
+```
+
+### Frontend
+```bash
+./gradlew build                    # Compilar proyecto
+./gradlew installDebug            # Instalar versión debug
+./gradlew clean                   # Limpiar build
+./gradlew test                    # Pruebas unitarias
+./gradlew connectedAndroidTest    # Pruebas instrumentadas
+./gradlew assembleRelease         # Build de producción
+./gradlew lint                    # Análisis de código
+```
+
+## 🔐 Seguridad
+
+### Backend
+- **JWT Authentication** con middleware personalizado
+- **Bcrypt** para hash de contraseñas
+- **Role-based access control** (Admin/User)
+- **Input validation** via DTOs
+- **Environment variables** para datos sensibles
+
+### Frontend
+- **Token storage** seguro en SharedPreferences
+- **HTTPS** para todas las comunicaciones
+- **Certificate pinning** (recomendado para producción)
+
+## 📊 Patrones de Diseño Implementados
+
+### Backend
+- **Repository Pattern** - Abstracción de acceso a datos
+- **Factory Pattern** - `routerFactory.js` para creación de rutas
+- **Middleware Pattern** - Autenticación y autorización
+- **Circuit Breaker** - Para APIs externas (Sentinel)
+
+### Frontend
+- **MVVM** - Separación de lógica de negocio y UI
+- **Repository Pattern** - Abstracción de fuentes de datos
+- **Observer Pattern** - LiveData para reactividad
+- **Singleton Pattern** - Configuración de entornos
+
+## 🧪 Testing (En Desarrollo)
+
+### Backend
+- Framework de testing pendiente de configuración
+- Estructura preparada para Jest/Mocha
+- Endpoints documentados para testing manual con Postman
+
+### Frontend
+- Tests unitarios con JUnit configurados
+- Tests instrumentados con Espresso preparados
+- Comandos Gradle listos para ejecución
+
+## 📱 Credenciales de Prueba
+
+**Usuario administrador:**
+- Username: `admin`
+- Password: `123456`
+
+## 📊 **Estado de Implementación**
+
+### **✅ MÓDULOS COMPLETADOS**
 
 #### **🔧 Backend Infrastructure (100%)**
-- ✅ Node.js Express REST API with MySQL database
-- ✅ JWT-based authentication system with role-based access control
-- ✅ Environment-specific configuration (dev/qa/production)
-- ✅ Standardized API response handling and error management
-- ✅ Comprehensive API documentation with 80+ endpoints
+- ✅ API REST Node.js/Express con MySQL
+- ✅ Sistema de autenticación JWT con roles
+- ✅ Configuración multi-entorno (dev/qa/prod)
+- ✅ Manejo estandarizado de respuestas
+- ✅ Documentación completa con 80+ endpoints
 
-#### **🏗️ Frontend Infrastructure (90%)**
-- ✅ Android MVVM architecture with ViewModels and repositories
-- ✅ Retrofit network layer with multi-environment support
-- ✅ Room database structure prepared
-- ✅ Material Design UI components with View Binding
-- ✅ JWT authentication with token management
+#### **📱 Frontend Infrastructure (95%)**
+- ✅ Arquitectura MVVM con ViewModels
+- ✅ Cliente Retrofit multi-entorno
+- ✅ Material Design con View Binding
+- ✅ Autenticación JWT integrada
 
-#### **👥 Client Management Module (95%)**
-- ✅ **Backend**: Complete CRUD API with 25+ endpoints
-- ✅ **Frontend**: Full UI implementation with advanced features
-  - ✅ Client listing with search and filters
-  - ✅ Add/Edit client functionality
-  - ✅ Status management (active/inactive/suspended/blacklisted)
-  - ✅ Credit limit updates
-  - ✅ Document-based search capabilities
-  - ✅ Client statistics integration
+#### **👥 Gestión de Clientes (100%)**
+- ✅ **Backend**: API CRUD completa
+- ✅ **Frontend**: UI completa implementada
+- ✅ Búsqueda y filtros avanzados
+- ✅ Gestión de estados y límites crediticios
 
-#### **📦 Product Management Module (90%)**
-- ✅ **Backend**: Complete CRUD API with 30+ endpoints
-- ✅ **Frontend**: Full UI implementation
-  - ✅ Product catalog with search and filtering
-  - ✅ Add/Edit product functionality
-  - ✅ Stock management and status updates
-  - ✅ Category and supplier filtering
-  - ✅ Quick filters (featured, low stock, out of stock)
+#### **📦 Gestión de Productos (95%)**
+- ✅ **Backend**: API completa con categorías
+- ✅ **Frontend**: Catálogo con filtros
+- ✅ Selector de productos para cotizaciones
 
-#### **🏷️ Categories Module (80%)**
-- ✅ **Backend**: Complete API with hierarchy support and statistics
-- 🚧 **Frontend**: API integration ready, UI not implemented
+#### **📄 Cotizaciones (98%)**
+- ✅ **Backend**: API completa con integración crediticia
+- ✅ **Frontend**: UI completa implementada
+- ✅ Creación/edición con items dinámicos
+- ✅ Integración con evaluación crediticia
+- ✅ Workflow de estados y aprobaciones
 
-#### **🏢 Suppliers Module (80%)**
-- ✅ **Backend**: Complete CRUD API with advanced queries
-- 🚧 **Frontend**: API integration ready, UI not implemented
+#### **💳 Evaluación Crediticia (100% Backend, 85% Frontend)**
+- ✅ **Backend**: Integración Sentinel completa
+- ✅ Cache inteligente y circuit breaker
+- ✅ **Frontend**: Displays de score y clasificación
+- 🚧 Visualización detallada de historial
 
-#### **🔐 Authentication Module (100%)**
-- ✅ **Backend**: JWT authentication with role-based access control
-- ✅ **Frontend**: Complete login system with validation
+### **🚧 PENDIENTES MENORES**
 
-#### **💳 Credit Bureau Integration (Backend - 100%)**
-- ✅ Sentinel API integration with smart caching (30-60 min TTL)
-- ✅ Automatic credit assessment during quote creation
-- ✅ Risk classification (BAJO/MEDIO/ALTO/MUY_ALTO)
-- ✅ Credit scoring (300-850 range) with business rules
-- ✅ Enhanced client model with credit fields
-- ✅ Circuit breaker pattern for API resilience
+#### **📱 Módulos Administrativos**
+- ❌ **Gestión de Categorías**: UI administrativa
+- ❌ **Gestión de Proveedores**: Interfaz de administración
+- ❌ **Perfil de Usuario**: Edición de perfil
+- ❌ **Configuraciones**: Preferencias de aplicación
 
----
+#### **🔧 Funcionalidades Avanzadas**
+- ❌ **Reportes y Analytics**: Dashboard con insights
+- ❌ **Notificaciones Push**: Sistema de notificaciones
+- ❌ **Capacidades Offline**: Sincronización local
+- ❌ **Testing**: Implementación de pruebas unitarias
 
-## 🚧 **PENDING IMPLEMENTATION**
+## 🤝 Contribución
 
-### **📄 Quote Management Module (98% Complete)**
-- ✅ **Backend**: Complete API with 15+ endpoints including credit integration
-- ✅ **Frontend**: Full implementation completed
-  - ✅ Quote creation/editing UI with comprehensive form
-  - ✅ Quote listing with advanced search and filtering
-  - ✅ Quote item management with add/edit/delete capabilities
-  - ✅ Status workflow management with visual indicators
-  - ✅ Client selector with credit score integration
-  - ✅ Real-time totals calculation
-  - ✅ Integration prepared for credit assessment features
-  - ✅ **Quote PDF generation** - Complete PDF generation system
-  - ✅ **Detailed quote view** - Complete view with all information
-  - ✅ **Email sending** - Professional email templates with PDF attachment
-  - ✅ PDF preview and file management
-  - ✅ Quote status management and workflow controls
-  - 🚧 Quote duplication feature (minor enhancement)
+1. Fork del proyecto
+2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit cambios (`git commit -m 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Crear Pull Request
 
-### **💰 Credit Requests Module (90% Complete)**
-- ✅ **Backend**: Complete CRUD API with workflow management
-- ✅ **Frontend**: Full implementation completed
-  - ✅ Credit request creation/editing UI with comprehensive form
-  - ✅ Request listing with advanced search and filtering
-  - ✅ Approval/rejection workflow interface with quick actions
-  - ✅ Risk assessment interface with credit score integration
-  - ✅ Status management with visual indicators and statistics
-  - ✅ Client selector integration with credit information
-  - ✅ Multi-currency support with exchange rate handling
-  - 🚧 Document upload and management (placeholder implemented)
-  - 🚧 Detailed request view (placeholder implemented)
+## 📝 Notas de Desarrollo
 
-### **🔍 Credit Assessment Integration (Frontend - 80% Complete)**
-- ✅ **Backend**: Fully implemented with Sentinel API
-- ✅ **Frontend**: Major implementation completed
-  - ✅ UI components for credit score display
-  - ✅ Credit assessment alerts and notifications
-  - ✅ Integration in quote creation workflow
-  - ✅ Client selector shows credit scores
-  - ✅ Manual credit check triggers implemented
-  - 🚧 Credit recommendations parsing (backend ready)
-  - 🚧 Detailed credit history visualization
+- **Timezone**: America/Lima (-05:00)
+- **Base de datos**: Usar `alter: true` solo en desarrollo
+- **Logs**: Implementar logging estructurado para producción
+- **Monitoreo**: Preparado para integración con herramientas de APM
 
-### **📱 Additional UI Modules**
-- ❌ **Agenda/Calendar**: Basic activity declared but no implementation
-- ❌ **Profile Management**: User profile editing interface
-- ❌ **Categories Management**: Administrative category management UI
-- ❌ **Suppliers Management**: Supplier management interface
-- ❌ **Settings**: Application configuration and preferences
+## 📄 Licencia
 
-### **🔧 Advanced Features**
-- ❌ **Reports & Analytics**: Advanced dashboard with business insights
-- ❌ **Notifications**: Push notification system
-- ❌ **File Management**: Document upload and management system
-- ❌ **Offline Capabilities**: Local data synchronization
-- ❌ **Advanced Search**: Cross-module search functionality
+Este proyecto es desarrollado para fines académicos en el marco del curso "Taller de Desarrollo de Aplicaciones Móviles".
 
 ---
 
-## 🎯 **Implementation Priority**
-
-### **🔥 High Priority (Critical Business Value)**
-1. **Quote Management Module** - Core sales functionality
-2. **Credit Assessment Frontend Integration** - Key differentiating feature
-3. **Quote PDF Generation** - Essential for client communication
-
-### **⚡ Medium Priority (Enhanced Functionality)**
-4. **Credit Request Management UI** - Important workflow feature
-5. **Categories/Suppliers Management UI** - Administrative needs
-6. **Advanced Dashboard Analytics** - Business insights
-
-### **📋 Low Priority (User Experience)**
-7. **Profile Management** - User convenience
-8. **Application Settings** - Configuration options
-9. **Offline Capabilities** - Enhanced UX
-
----
-
-## 🏗️ **Project Structure**
-
-```
-CHANCAFE Q/
-├── backend/                    # Node.js Express API
-│   ├── auth/                  # Authentication module
-│   ├── categories/            # Categories management
-│   ├── clients/               # Client management  
-│   ├── credit-requests/       # Credit request processing
-│   ├── external-apis/         # Sentinel API integration
-│   ├── products/              # Product catalog
-│   ├── quotes/                # Quote management
-│   ├── suppliers/             # Supplier management
-│   └── shared/                # Shared utilities and config
-└── frontend/                   # Android application
-    └── app/src/main/java/com/example/chancafe_q/
-        ├── ui/                # UI components (Activities)
-        ├── viewmodel/         # ViewModels for MVVM
-        ├── model/             # Data models
-        ├── repository/        # Data repositories
-        ├── data/              # Database and API clients
-        └── utils/             # Utilities and configuration
-```
-
----
-
-## 🚀 **Getting Started**
-
-### **Backend Setup**
-```bash
-cd backend
-npm install
-npm run start:dev  # Development environment
-```
-
-### **Frontend Setup**
-```bash
-cd frontend
-./gradlew build
-./gradlew installDebug  # Install on device/emulator
-```
-
-### **Environment Configuration**
-- Backend: Configure `.env.development` with database and API credentials
-- Frontend: Update `Configuration.java` for environment endpoints
-
----
-
-## 📚 **Documentation**
-
-- **Backend API**: Complete documentation in `backend/README.md`
-- **Architecture Guide**: Detailed information in `CLAUDE.md`
-- **Postman Collection**: API testing collection in `backend/postman/`
-
----
-
-## 🔧 **Development Commands**
-
-### **Backend**
-```bash
-npm run start:dev      # Development server
-npm run start:prod     # Production server
-npm run migrate        # Database migrations
-```
-
-### **Frontend**
-```bash
-./gradlew build        # Build project
-./gradlew test         # Run tests
-./gradlew clean        # Clean build
-```
-
----
-
-## ✔️ **Progress Tracking**
-
-### **✔️ Completed**
-- [x] Backend infrastructure and API development
-- [x] Frontend infrastructure and architecture
-- [x] Authentication system (full stack)
-- [x] Client management module (full stack)
-- [x] Product management module (full stack)
-- [x] **Quote management module (full stack)** - **NEW**
-- [x] Credit bureau API integration (backend)
-- [x] **Credit assessment frontend integration** - **NEW**
-- [x] Categories and suppliers API (backend)
-- [x] **Client selector with credit scores** - **NEW**
-- [x] **Quote status workflow management** - **NEW**
-
-### **🔄 In Progress**
-- [ ] Quote PDF generation frontend
-- [ ] Detailed quote view implementation
-- [ ] Credit requests frontend implementation
-
-### **📋 Pending**
-- [ ] Quote PDF generation
-- [ ] Administrative UI modules (categories, suppliers)
-- [ ] Advanced analytics and reporting
-- [ ] File upload and management
-- [ ] Offline capabilities
-- [ ] Push notifications
-
----
-
-## 👨‍💻 **Next Development Steps**
-
-1. **Implement Quote Management UI** - Priority #1
-   - Create quote creation/editing activities
-   - Implement quote listing with search and filters
-   - Add quote item management functionality
-   - Integrate with credit assessment features
-
-2. **Integrate Credit Assessment Frontend** - Priority #2
-   - Connect to Sentinel API endpoints
-   - Display credit scores and risk indicators
-   - Implement automatic credit checks in quote workflow
-   - Add manual credit assessment triggers
-
-3. **Complete Credit Request Module** - Priority #3
-   - Build credit request management UI
-   - Implement approval workflow interface
-   - Add document management capabilities
-
----
-
-**Last Updated**: $(date +%Y-%m-%d)  
-**Current Status**: Core modules implemented, quote management and credit features pending frontend implementation
+**Desarrollado para:** Curso de Aplicaciones Móviles  
+**Institución:** Facultad de Ingeniería, Arquitectura y Urbanismo - Ingeniería de Sistemas  
+**Estado:** Proyecto funcional con módulos core implementados

@@ -63,7 +63,7 @@ public class QuoteRepository {
         loadingLiveData.postValue(true);
         
         Call<ApiResponse<QuotesResponse>> call = apiService.getAllQuotes(
-            status, clientId, userId, currency, dateFrom, dateTo, search, page, limit
+            status, clientId, userId, currency, dateFrom, dateTo, search, page, limit, null
         );
         
         call.enqueue(new Callback<ApiResponse<QuotesResponse>>() {

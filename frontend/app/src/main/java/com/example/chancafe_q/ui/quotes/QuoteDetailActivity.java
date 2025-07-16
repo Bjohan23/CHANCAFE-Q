@@ -28,6 +28,7 @@ import com.example.chancafe_q.viewmodel.QuoteViewModel;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -186,19 +187,29 @@ public class QuoteDetailActivity extends AppCompatActivity {
         tvQuoteTitle.setText(quote.getTitle() != null ? quote.getTitle() : "Cotización sin título");
         
         // Dates
-        if (quote.getCreatedAt() != null) {
-            tvCreatedDate.setText(dateFormat.format(quote.getCreatedAt()));
+        if (quote.getCreatedAt() != null && !quote.getCreatedAt().isEmpty()) {
+            Date createdAtDate = quote.getCreatedAtAsDate();
+            if (createdAtDate != null) {
+                tvCreatedDate.setText(dateFormat.format(createdAtDate));
+            }
         }
         
-        if (quote.getValidUntil() != null) {
-            tvValidUntil.setText(dateFormat.format(quote.getValidUntil()));
-            
-            // Check if expired
-            if (quote.getValidUntil().before(new java.util.Date())) {
+        if (quote.getValidUntil() != null && !quote.getValidUntil().isEmpty()) {
+            Date validUntilDate = quote.getValidUntilAsDate();
+            if (validUntilDate != null) {
+                tvValidUntil.setText(dateFormat.format(validUntilDate));
+                
+                // Check if expired
+                if (validUntilDate.before(new java.util.Date())) {
                 tvValidUntil.setTextColor(Color.parseColor("#F44336"));
             } else {
                 tvValidUntil.setTextColor(Color.parseColor("#424242"));
             }
+            } else {
+                tvValidUntil.setText("Sin fecha límite");
+            }
+        } else {
+            tvValidUntil.setText("Sin fecha límite");
         }
         
         // Client information

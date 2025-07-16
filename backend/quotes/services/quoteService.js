@@ -533,7 +533,7 @@ class QuoteService {
   formatQuoteResponse(quote) {
     if (!quote) return null;
 
-    return {
+    const formattedQuote = {
       id: quote.id,
       clientId: quote.client_id,
       userId: quote.user_id,
@@ -562,6 +562,39 @@ class QuoteService {
       isApproved: quote.status === 'approved',
       isExpired: quote.valid_until ? new Date(quote.valid_until) < new Date() : false
     };
+
+    // Incluir relaciones si están disponibles
+    if (quote.client) {
+      formattedQuote.client = {
+        id: quote.client.id,
+        businessName: quote.client.business_name,
+        firstName: quote.client.first_name,
+        lastName: quote.client.last_name,
+        email: quote.client.email,
+        phone: quote.client.phone,
+        documentNumber: quote.client.document_number,
+        documentType: quote.client.document_type,
+        taxId: quote.client.tax_id,
+        clientType: quote.client.client_type,
+        status: quote.client.status,
+        creditScore: quote.client.credit_score,
+        riskClassification: quote.client.risk_classification,
+        suggestedCreditLimit: quote.client.suggested_credit_limit,
+        isBanked: quote.client.is_banked
+      };
+    }
+
+    if (quote.advisor) {
+      formattedQuote.advisor = {
+        id: quote.advisor.id,
+        firstName: quote.advisor.first_name,
+        lastName: quote.advisor.last_name,
+        email: quote.advisor.email,
+        role: quote.advisor.role
+      };
+    }
+
+    return formattedQuote;
   }
 
   formatQuoteItemResponse(item) {

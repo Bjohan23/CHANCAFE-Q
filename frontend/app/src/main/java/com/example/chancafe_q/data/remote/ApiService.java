@@ -109,7 +109,8 @@ public interface ApiService {
         @Query("date_to") String dateTo,
         @Query("search") String search,
         @Query("page") Integer page,
-        @Query("limit") Integer limit
+        @Query("limit") Integer limit,
+        @Query("relations") String relations
     );
     
     @GET("quotes")
@@ -145,7 +146,7 @@ public interface ApiService {
     @DELETE("quotes/{id}")
     Call<ApiResponse<String>> deleteQuote(@Path("id") int id);
     
-    @PUT("quotes/{id}/status")
+    @PATCH("quotes/{id}/status")
     Call<ApiResponse<Quote>> changeQuoteStatus(@Path("id") int id, @Query("status") String status);
     
     @POST("quotes/{id}/recalculate")
@@ -214,7 +215,7 @@ public interface ApiService {
     @GET("credit-requests/priority/{priority}")
     Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByPriority(@Path("priority") String priority);
     
-    @GET("credit-requests/statistics")
+    @GET("credit-requests/stats")
     Call<ApiResponse<java.util.Map<String, Object>>> getCreditRequestStatistics();
     
     @POST("credit-requests")

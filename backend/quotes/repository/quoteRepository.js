@@ -1,5 +1,95 @@
 const { Op } = require('sequelize');
 
+function getClientModel() {
+  try {
+    try {
+      const { getModel } = require('../../shared/models/index');
+      const Client = getModel('Client');
+      if (Client) {
+        return Client;
+      }
+    } catch (error) {
+      console.log('⚠️  No se pudo obtener Client desde shared/models:', error.message);
+    }
+
+    try {
+      const { getSequelize } = require('../../shared/config/db');
+      const sequelize = getSequelize();
+      
+      if (sequelize && sequelize.models && sequelize.models.Client) {
+        return sequelize.models.Client;
+      }
+    } catch (error) {
+      console.log('⚠️  No se pudo obtener Client desde sequelize.models:', error.message);
+    }
+
+    throw new Error('Modelo Client no está disponible');
+  } catch (error) {
+    console.error('❌ Error al obtener modelo Client:', error.message);
+    throw error;
+  }
+}
+
+function getUserModel() {
+  try {
+    try {
+      const { getModel } = require('../../shared/models/index');
+      const User = getModel('User');
+      if (User) {
+        return User;
+      }
+    } catch (error) {
+      console.log('⚠️  No se pudo obtener User desde shared/models:', error.message);
+    }
+
+    try {
+      const { getSequelize } = require('../../shared/config/db');
+      const sequelize = getSequelize();
+      
+      if (sequelize && sequelize.models && sequelize.models.User) {
+        return sequelize.models.User;
+      }
+    } catch (error) {
+      console.log('⚠️  No se pudo obtener User desde sequelize.models:', error.message);
+    }
+
+    throw new Error('Modelo User no está disponible');
+  } catch (error) {
+    console.error('❌ Error al obtener modelo User:', error.message);
+    throw error;
+  }
+}
+
+function getQuoteItemModel() {
+  try {
+    try {
+      const { getModel } = require('../../shared/models/index');
+      const QuoteItem = getModel('QuoteItem');
+      if (QuoteItem) {
+        return QuoteItem;
+      }
+    } catch (error) {
+      console.log('⚠️  No se pudo obtener QuoteItem desde shared/models:', error.message);
+    }
+
+    try {
+      const { getSequelize } = require('../../shared/config/db');
+      const sequelize = getSequelize();
+      
+      if (sequelize && sequelize.models && sequelize.models.QuoteItem) {
+        return sequelize.models.QuoteItem;
+      }
+    } catch (error) {
+      console.log('⚠️  No se pudo obtener QuoteItem desde sequelize.models:', error.message);
+    }
+
+    return null; // QuoteItem es opcional
+  } catch (error) {
+    console.error('❌ Error al obtener modelo QuoteItem:', error.message);
+    return null;
+  }
+}
+
 function getQuoteModel() {
   try {
     try {
@@ -107,9 +197,26 @@ class QuoteRepository {
   async findAll(filters = {}, options = {}) {
     try {
       const Quote = getQuoteModel();
+      const Client = getClientModel();
+      const User = getUserModel();
+      
       const queryOptions = {
         where: {},
         order: [['created_at', 'DESC']],
+        include: [
+          {
+            model: Client,
+            as: 'client',
+            required: false,
+            attributes: ['id', 'business_name', 'first_name', 'last_name', 'email', 'phone', 'document_number', 'document_type', 'tax_id', 'credit_score', 'risk_classification', 'suggested_credit_limit', 'is_banked', 'client_type', 'status']
+          },
+          {
+            model: User,
+            as: 'advisor', 
+            required: false,
+            attributes: ['id', 'first_name', 'last_name', 'email', 'role']
+          }
+        ],
         ...options
       };
 
@@ -146,6 +253,27 @@ class QuoteRepository {
         ];
       }
 
+      // Si se especifica relations en options, agregar más includes
+      if (options.relations && Array.isArray(options.relations)) {
+        const additionalIncludes = [];
+        
+        // Ya incluimos client y user por defecto, pero podemos agregar más si se especifican
+        if (options.relations.includes('items')) {
+          const QuoteItem = getQuoteItemModel();
+          if (QuoteItem) {
+            additionalIncludes.push({
+              model: QuoteItem,
+              as: 'items',
+              required: false
+            });
+          }
+        }
+        
+        if (additionalIncludes.length > 0) {
+          queryOptions.include.push(...additionalIncludes);
+        }
+      }
+
       const quotes = await Quote.findAll(queryOptions);
       return quotes;
     } catch (error) {
@@ -157,6 +285,8 @@ class QuoteRepository {
   async findAndCountAll(filters = {}, pagination = {}) {
     try {
       const Quote = getQuoteModel();
+      const Client = getClientModel();
+      const User = getUserModel();
       const { page = 1, limit = 10 } = pagination;
       const offset = (page - 1) * limit;
 
@@ -164,7 +294,21 @@ class QuoteRepository {
         where: {},
         limit: parseInt(limit),
         offset: parseInt(offset),
-        order: [['created_at', 'DESC']]
+        order: [['created_at', 'DESC']],
+        include: [
+          {
+            model: Client,
+            as: 'client',
+            required: false,
+            attributes: ['id', 'business_name', 'first_name', 'last_name', 'email', 'phone', 'document_number', 'document_type', 'tax_id', 'credit_score', 'risk_classification', 'suggested_credit_limit', 'is_banked', 'client_type', 'status']
+          },
+          {
+            model: User,
+            as: 'advisor', 
+            required: false,
+            attributes: ['id', 'first_name', 'last_name', 'email', 'role']
+          }
+        ]
       };
 
       if (filters.status) {

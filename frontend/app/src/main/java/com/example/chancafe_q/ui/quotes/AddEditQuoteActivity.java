@@ -356,8 +356,8 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
             if (currentQuote.getProjectName() != null) {
                 etProjectName.setText(currentQuote.getProjectName());
             }
-            if (currentQuote.getValidUntil() != null) {
-                tvValidUntil.setText(dateFormat.format(currentQuote.getValidUntil()));
+            if (currentQuote.getValidUntilAsDate() != null) {
+                tvValidUntil.setText(dateFormat.format(currentQuote.getValidUntilAsDate()));
             }
             if (currentQuote.getCurrency() != null) {
                 if ("USD".equals(currentQuote.getCurrency())) {
@@ -399,8 +399,8 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
 
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
-        if (currentQuote != null && currentQuote.getValidUntil() != null) {
-            calendar.setTime(currentQuote.getValidUntil());
+        if (currentQuote != null && currentQuote.getValidUntilAsDate() != null) {
+            calendar.setTime(currentQuote.getValidUntilAsDate());
         }
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(
@@ -633,7 +633,7 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
             return false;
         }
 
-        if (currentQuote == null || currentQuote.getValidUntil() == null) {
+        if (currentQuote == null || currentQuote.getValidUntil() == null || currentQuote.getValidUntil().isEmpty()) {
             showError("Debe seleccionar una fecha de validez");
             return false;
         }

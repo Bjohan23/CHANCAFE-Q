@@ -178,17 +178,23 @@ public class QuotesAdapter extends RecyclerView.Adapter<QuotesAdapter.QuoteViewH
             tvTotalAmount.setText(symbol + String.format(Locale.getDefault(), "%.2f", quote.getTotalAmount()));
 
             // Fecha de validez
-            if (quote.getValidUntil() != null) {
-                tvValidUntil.setText(dateFormat.format(quote.getValidUntil()));
-                
-                // Verificar si está por expirar (próximos 7 días)
-                long daysDifference = (quote.getValidUntil().getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
+            if (quote.getValidUntil() != null && !quote.getValidUntil().isEmpty()) {
+                Date validUntilDate = quote.getValidUntilAsDate();
+                if (validUntilDate != null) {
+                    tvValidUntil.setText(dateFormat.format(validUntilDate));
+                    
+                    // Verificar si está por expirar (próximos 7 días)
+                    long daysDifference = (validUntilDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
                 if (daysDifference <= 7 && daysDifference >= 0) {
                     tvValidUntil.setTextColor(Color.parseColor("#FF9800")); // Naranja para advertencia
                 } else if (daysDifference < 0) {
                     tvValidUntil.setTextColor(Color.parseColor("#F44336")); // Rojo para expiradas
                 } else {
                     tvValidUntil.setTextColor(Color.parseColor("#424242")); // Color normal
+                }
+                } else {
+                    tvValidUntil.setText("Sin fecha límite");
+                    tvValidUntil.setTextColor(Color.parseColor("#757575"));
                 }
             } else {
                 tvValidUntil.setText("Sin fecha límite");
