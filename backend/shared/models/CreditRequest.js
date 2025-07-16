@@ -195,10 +195,16 @@ module.exports = (sequelize) => {
 
   // Definir asociaciones
   CreditRequest.associate = (models) => {
-    // Una solicitud pertenece a un usuario (asesor)
+    // Una solicitud pertenece a un usuario (asesor) - alias 'advisor'
     CreditRequest.belongsTo(models.User, {
       foreignKey: 'user_id',
       as: 'advisor'
+    });
+
+    // Una solicitud pertenece a un usuario (asesor) - alias 'user' para compatibilidad
+    CreditRequest.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      as: 'user'
     });
 
     // Una solicitud pertenece a un cliente

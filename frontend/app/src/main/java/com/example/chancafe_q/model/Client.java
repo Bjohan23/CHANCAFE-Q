@@ -10,6 +10,12 @@ public class Client implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     private int id;
     
+    // Campos adicionales para compatibilidad con backend
+    private String name;
+    private String dni;
+    private String ruc;
+    private String username;
+    
     @SerializedName("firstName")
     private String firstName;
     
@@ -137,6 +143,38 @@ public class Client implements java.io.Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
+    public String getRuc() {
+        return ruc;
+    }
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFirstName() {

@@ -72,12 +72,13 @@ async function syncDatabase(options = {}) {
     let syncOptions = {};
     
     if (env === 'development' || env === 'qas') {
-      // En desarrollo/QAS: actualiza las tablas sin eliminar datos
+      // En desarrollo/QAS: temporalmente sin alter para evitar problemas de índices
       syncOptions = { 
-        alter: true,  // Actualiza las columnas sin eliminar la tabla
+        alter: false,  // Temporalmente deshabilitado para evitar problemas de índices
+        force: false,
         ...options 
       };
-      console.log('⚠️  Modo: ALTER (actualizará estructura sin eliminar datos)');
+      console.log('⚠️  Modo: SEGURO temporal (para evitar problemas de índices)');
     } else if (env === 'production') {
       // En producción: solo sincroniza sin cambios destructivos
       syncOptions = { 

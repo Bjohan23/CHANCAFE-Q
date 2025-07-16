@@ -78,6 +78,10 @@ class CreditRequestRepository {
       const queryOptions = {
         where: {},
         order: [['created_at', 'DESC']],
+        include: [
+          { association: 'client' },
+          { association: 'user' }
+        ],
         ...options
       };
 
@@ -149,7 +153,11 @@ class CreditRequestRepository {
         where: {},
         limit: parseInt(limit),
         offset: parseInt(offset),
-        order: [['created_at', 'DESC']]
+        order: [['created_at', 'DESC']],
+        include: [
+          { association: 'client' },
+          { association: 'user' }
+        ]
       };
 
       if (filters.status) {

@@ -487,7 +487,23 @@ class CreditRequestService {
       isApproved: creditRequest.status === 'approved',
       isRejected: creditRequest.status === 'rejected',
       isExpired: creditRequest.status === 'expired' || (creditRequest.expires_at && new Date(creditRequest.expires_at) < new Date()),
-      isUnderReview: creditRequest.status === 'under_review'
+      isUnderReview: creditRequest.status === 'under_review',
+      // Include client data if available
+      client: creditRequest.client ? {
+        id: creditRequest.client.id,
+        name: creditRequest.client.name,
+        email: creditRequest.client.email,
+        phone: creditRequest.client.phone,
+        dni: creditRequest.client.dni,
+        ruc: creditRequest.client.ruc
+      } : null,
+      // Include user data if available
+      user: creditRequest.user ? {
+        id: creditRequest.user.id,
+        name: creditRequest.user.name,
+        email: creditRequest.user.email,
+        username: creditRequest.user.username
+      } : null
     };
   }
 

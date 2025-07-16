@@ -174,9 +174,19 @@ public class CreditRequestsAdapter extends RecyclerView.Adapter<CreditRequestsAd
 
             // Cliente
             if (creditRequest.getClient() != null) {
-                String clientName = creditRequest.getClient().getBusinessName() != null 
-                    ? creditRequest.getClient().getBusinessName()
-                    : (creditRequest.getClient().getFirstName() + " " + creditRequest.getClient().getLastName()).trim();
+                String clientName = null;
+                
+                // Priorizar el campo name del backend
+                if (creditRequest.getClient().getName() != null && !creditRequest.getClient().getName().trim().isEmpty()) {
+                    clientName = creditRequest.getClient().getName();
+                } else if (creditRequest.getClient().getBusinessName() != null && !creditRequest.getClient().getBusinessName().trim().isEmpty()) {
+                    clientName = creditRequest.getClient().getBusinessName();
+                } else if (creditRequest.getClient().getFirstName() != null || creditRequest.getClient().getLastName() != null) {
+                    clientName = (creditRequest.getClient().getFirstName() + " " + creditRequest.getClient().getLastName()).trim();
+                } else {
+                    clientName = "Cliente ID: " + creditRequest.getClientId();
+                }
+                
                 tvClientName.setText(clientName);
                 
                 // Mostrar score crediticio si está disponible

@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(./gradlew:*)",
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Bash(npm run start:dev:*)",
+      "Bash(mysql:*)",
+      "Bash(node:*)",
+      "Bash(timeout 30 npm run start:dev)",
+      "Bash(timeout 20 npm run start:dev)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }
