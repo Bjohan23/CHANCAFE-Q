@@ -170,9 +170,28 @@ class QuoteRepository {
   async findById(id, options = {}) {
     try {
       const Quote = getQuoteModel();
-      const quote = await Quote.findByPk(id, {
+      const Client = getClientModel();
+      const User = getUserModel();
+      
+      const queryOptions = {
+        include: [
+          {
+            model: Client,
+            as: 'client',
+            required: false,
+            attributes: ['id', 'business_name', 'first_name', 'last_name', 'email', 'phone', 'document_number', 'document_type', 'tax_id', 'credit_score', 'risk_classification', 'suggested_credit_limit', 'is_banked', 'client_type', 'status']
+          },
+          {
+            model: User,
+            as: 'advisor', 
+            required: false,
+            attributes: ['id', 'first_name', 'last_name', 'email', 'role']
+          }
+        ],
         ...options
-      });
+      };
+      
+      const quote = await Quote.findByPk(id, queryOptions);
       return quote;
     } catch (error) {
       console.error('❌ Error en QuoteRepository.findById:', error.message);

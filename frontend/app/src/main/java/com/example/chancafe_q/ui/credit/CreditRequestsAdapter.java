@@ -195,7 +195,8 @@ public class CreditRequestsAdapter extends RecyclerView.Adapter<CreditRequestsAd
             tvRequestedAmount.setText(symbol + String.format(Locale.getDefault(), "%.0f", creditRequest.getRequestedAmount()));
 
             // Términos de pago
-            tvPaymentTerms.setText(creditRequest.getPaymentTerms() != null ? creditRequest.getPaymentTerms() : "No especificado");
+            tvPaymentTerms.setText(creditRequest.getPaymentTerms() != null ? 
+                String.valueOf(creditRequest.getPaymentTerms()) + " días" : "No especificado");
 
             // Información específica según el estado
             setupStatusSpecificInfo(creditRequest);

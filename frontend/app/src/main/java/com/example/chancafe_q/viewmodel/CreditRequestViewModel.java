@@ -263,7 +263,7 @@ public class CreditRequestViewModel extends ViewModel {
             return false;
         }
 
-        if (creditRequest.getPaymentTerms() == null || creditRequest.getPaymentTerms().trim().isEmpty()) {
+        if (creditRequest.getPaymentTerms() == null || creditRequest.getPaymentTerms() <= 0) {
             return false;
         }
 

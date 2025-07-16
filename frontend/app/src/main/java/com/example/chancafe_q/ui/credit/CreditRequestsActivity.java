@@ -377,7 +377,8 @@ public class CreditRequestsActivity extends AppCompatActivity implements CreditR
         
         // Set default values
         etApprovedAmount.setText(String.valueOf(creditRequest.getRequestedAmount()));
-        etApprovedTerms.setText(creditRequest.getPaymentTerms());
+        etApprovedTerms.setText(creditRequest.getPaymentTerms() != null ? 
+            String.valueOf(creditRequest.getPaymentTerms()) : "");
         
         // Quick amount buttons
         btn50Percent.setOnClickListener(v -> {

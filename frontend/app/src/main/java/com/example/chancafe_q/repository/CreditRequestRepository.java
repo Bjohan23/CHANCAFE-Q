@@ -6,6 +6,7 @@ import com.example.chancafe_q.data.remote.ApiClient;
 import com.example.chancafe_q.data.remote.ApiService;
 import com.example.chancafe_q.model.ApiResponse;
 import com.example.chancafe_q.model.CreditRequest;
+import com.example.chancafe_q.model.CreditRequestsResponse;
 import java.util.List;
 import java.util.Map;
 import retrofit2.Call;
@@ -56,17 +57,22 @@ public class CreditRequestRepository {
                                    Integer page, Integer limit) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<CreditRequest>>> call = apiService.getAllCreditRequests(
+        Call<ApiResponse<CreditRequestsResponse>> call = apiService.getAllCreditRequests(
             status, clientId, userId, priority, currency, dateFrom, dateTo, search, page, limit
         );
         
-        call.enqueue(new Callback<ApiResponse<List<CreditRequest>>>() {
+        call.enqueue(new Callback<ApiResponse<CreditRequestsResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<CreditRequest>>> call, Response<ApiResponse<List<CreditRequest>>> response) {
+            public void onResponse(Call<ApiResponse<CreditRequestsResponse>> call, Response<ApiResponse<CreditRequestsResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        creditRequestsLiveData.postValue(response.body().getData());
+                        CreditRequestsResponse data = response.body().getData();
+                        if (data != null && data.getCreditRequests() != null) {
+                            creditRequestsLiveData.postValue(data.getCreditRequests());
+                        } else {
+                            creditRequestsLiveData.postValue(new java.util.ArrayList<>());
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -76,7 +82,7 @@ public class CreditRequestRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<CreditRequest>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<CreditRequestsResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }
@@ -116,15 +122,20 @@ public class CreditRequestRepository {
     public void getCreditRequestsByStatus(String status) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<CreditRequest>>> call = apiService.getCreditRequestsByStatus(status);
+        Call<ApiResponse<CreditRequestsResponse>> call = apiService.getCreditRequestsByStatus(status);
         
-        call.enqueue(new Callback<ApiResponse<List<CreditRequest>>>() {
+        call.enqueue(new Callback<ApiResponse<CreditRequestsResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<CreditRequest>>> call, Response<ApiResponse<List<CreditRequest>>> response) {
+            public void onResponse(Call<ApiResponse<CreditRequestsResponse>> call, Response<ApiResponse<CreditRequestsResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        creditRequestsLiveData.postValue(response.body().getData());
+                        CreditRequestsResponse data = response.body().getData();
+                        if (data != null && data.getCreditRequests() != null) {
+                            creditRequestsLiveData.postValue(data.getCreditRequests());
+                        } else {
+                            creditRequestsLiveData.postValue(new java.util.ArrayList<>());
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -134,7 +145,7 @@ public class CreditRequestRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<CreditRequest>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<CreditRequestsResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }
@@ -145,15 +156,20 @@ public class CreditRequestRepository {
     public void getCreditRequestsByClient(int clientId) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<CreditRequest>>> call = apiService.getCreditRequestsByClient(clientId);
+        Call<ApiResponse<CreditRequestsResponse>> call = apiService.getCreditRequestsByClient(clientId);
         
-        call.enqueue(new Callback<ApiResponse<List<CreditRequest>>>() {
+        call.enqueue(new Callback<ApiResponse<CreditRequestsResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<CreditRequest>>> call, Response<ApiResponse<List<CreditRequest>>> response) {
+            public void onResponse(Call<ApiResponse<CreditRequestsResponse>> call, Response<ApiResponse<CreditRequestsResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        creditRequestsLiveData.postValue(response.body().getData());
+                        CreditRequestsResponse data = response.body().getData();
+                        if (data != null && data.getCreditRequests() != null) {
+                            creditRequestsLiveData.postValue(data.getCreditRequests());
+                        } else {
+                            creditRequestsLiveData.postValue(new java.util.ArrayList<>());
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -163,7 +179,7 @@ public class CreditRequestRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<CreditRequest>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<CreditRequestsResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }
@@ -174,15 +190,20 @@ public class CreditRequestRepository {
     public void getCreditRequestsByUser(int userId) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<CreditRequest>>> call = apiService.getCreditRequestsByUser(userId);
+        Call<ApiResponse<CreditRequestsResponse>> call = apiService.getCreditRequestsByUser(userId);
         
-        call.enqueue(new Callback<ApiResponse<List<CreditRequest>>>() {
+        call.enqueue(new Callback<ApiResponse<CreditRequestsResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<CreditRequest>>> call, Response<ApiResponse<List<CreditRequest>>> response) {
+            public void onResponse(Call<ApiResponse<CreditRequestsResponse>> call, Response<ApiResponse<CreditRequestsResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        creditRequestsLiveData.postValue(response.body().getData());
+                        CreditRequestsResponse data = response.body().getData();
+                        if (data != null && data.getCreditRequests() != null) {
+                            creditRequestsLiveData.postValue(data.getCreditRequests());
+                        } else {
+                            creditRequestsLiveData.postValue(new java.util.ArrayList<>());
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -192,7 +213,7 @@ public class CreditRequestRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<CreditRequest>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<CreditRequestsResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }
@@ -203,15 +224,20 @@ public class CreditRequestRepository {
     public void getCreditRequestsByPriority(String priority) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<CreditRequest>>> call = apiService.getCreditRequestsByPriority(priority);
+        Call<ApiResponse<CreditRequestsResponse>> call = apiService.getCreditRequestsByPriority(priority);
         
-        call.enqueue(new Callback<ApiResponse<List<CreditRequest>>>() {
+        call.enqueue(new Callback<ApiResponse<CreditRequestsResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<CreditRequest>>> call, Response<ApiResponse<List<CreditRequest>>> response) {
+            public void onResponse(Call<ApiResponse<CreditRequestsResponse>> call, Response<ApiResponse<CreditRequestsResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        creditRequestsLiveData.postValue(response.body().getData());
+                        CreditRequestsResponse data = response.body().getData();
+                        if (data != null && data.getCreditRequests() != null) {
+                            creditRequestsLiveData.postValue(data.getCreditRequests());
+                        } else {
+                            creditRequestsLiveData.postValue(new java.util.ArrayList<>());
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -221,7 +247,7 @@ public class CreditRequestRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<CreditRequest>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<CreditRequestsResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }

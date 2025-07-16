@@ -244,13 +244,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:hint="Términos de pago">
+                        android:hint="Términos de pago (días)">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_payment_terms"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="text" />
+                            android:inputType="number"
+                            android:hint="Ej: 30, 60, 90" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 

@@ -2,6 +2,7 @@ package com.example.chancafe_q.model;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Modelo de datos para la Solicitud de Crédito
@@ -27,7 +28,7 @@ public class CreditRequest {
     private Double exchangeRate;
     
     @SerializedName("payment_terms")
-    private String paymentTerms;
+    private Integer paymentTerms;
     
     private String purpose;
     private String description;
@@ -37,7 +38,8 @@ public class CreditRequest {
     @SerializedName("risk_assessment")
     private String riskAssessment;
     
-    private String documents;
+    @SerializedName("documents")
+    private List<String> documents;
     
     @SerializedName("approval_conditions")
     private String approvalConditions;
@@ -100,7 +102,7 @@ public class CreditRequest {
     }
 
     // Constructor con parámetros básicos
-    public CreditRequest(int clientId, int userId, Double requestedAmount, String paymentTerms, String purpose) {
+    public CreditRequest(int clientId, int userId, Double requestedAmount, Integer paymentTerms, String purpose) {
         this();
         this.clientId = clientId;
         this.userId = userId;
@@ -287,11 +289,11 @@ public class CreditRequest {
         this.exchangeRate = exchangeRate;
     }
 
-    public String getPaymentTerms() {
+    public Integer getPaymentTerms() {
         return paymentTerms;
     }
 
-    public void setPaymentTerms(String paymentTerms) {
+    public void setPaymentTerms(Integer paymentTerms) {
         this.paymentTerms = paymentTerms;
     }
 
@@ -319,11 +321,11 @@ public class CreditRequest {
         this.riskAssessment = riskAssessment;
     }
 
-    public String getDocuments() {
+    public List<String> getDocuments() {
         return documents;
     }
 
-    public void setDocuments(String documents) {
+    public void setDocuments(List<String> documents) {
         this.documents = documents;
     }
 

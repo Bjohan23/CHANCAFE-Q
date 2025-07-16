@@ -9,31 +9,48 @@ class CreditRequestService {
         clientId,
         client_id,
         userId,
+        user_id,
         requestedAmount,
+        requested_amount,
         currency = 'PEN',
         exchangeRate = 1,
+        exchange_rate,
         paymentTerms,
+        payment_terms,
         purpose,
         description,
         priority = 'medium',
         riskAssessment,
+        risk_assessment,
         documents,
         notes,
-        internalNotes
+        internalNotes,
+        internal_notes
       } = creditRequestData;
 
       const finalClientId = clientId || client_id;
+      const finalUserId = userId || user_id;
+      const finalRequestedAmount = requestedAmount || requested_amount;
+      const finalExchangeRate = exchangeRate || exchange_rate || 1;
+      const finalPaymentTerms = paymentTerms || payment_terms;
+      const finalRiskAssessment = riskAssessment || risk_assessment;
+      const finalInternalNotes = internalNotes || internal_notes;
 
-      if (!finalClientId || !userId) {
+      if (!finalClientId || !finalUserId) {
         throw new Error("Cliente y usuario son obligatorios");
       }
 
-      if (!requestedAmount || requestedAmount <= 0) {
+      if (!finalRequestedAmount || finalRequestedAmount <= 0) {
         throw new Error("El monto solicitado debe ser mayor a 0");
       }
 
-      if (!paymentTerms || paymentTerms <= 0) {
-        throw new Error("Los términos de pago deben ser mayor a 0");
+      if (!finalPaymentTerms) {
+        throw new Error("Los términos de pago son obligatorios");
+      }
+
+      const paymentTermsNumber = parseInt(finalPaymentTerms);
+      if (isNaN(paymentTermsNumber) || paymentTermsNumber <= 0) {
+        throw new Error("Los términos de pago deben ser un número mayor a 0 (días)");
       }
 
       if (!purpose) {
@@ -44,20 +61,20 @@ class CreditRequestService {
 
       const creditRequestDto = new CreditRequestDTO({
         clientId: finalClientId,
-        userId,
+        userId: finalUserId,
         requestNumber,
-        requestedAmount,
+        requestedAmount: finalRequestedAmount,
         currency,
-        exchangeRate,
-        paymentTerms,
+        exchangeRate: finalExchangeRate,
+        paymentTerms: paymentTermsNumber,
         purpose,
         description,
         status: 'pending',
         priority,
-        riskAssessment,
+        riskAssessment: finalRiskAssessment,
         documents,
         notes,
-        internalNotes
+        internalNotes: finalInternalNotes
       });
 
       const newCreditRequest = await creditRequestRepository.create({

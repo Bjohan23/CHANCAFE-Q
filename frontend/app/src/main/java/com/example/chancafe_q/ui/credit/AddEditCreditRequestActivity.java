@@ -3,6 +3,8 @@ package com.example.chancafe_q.ui.credit;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -103,6 +105,21 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
         spinnerPriority = findViewById(R.id.spinner_priority);
         progressBar = findViewById(R.id.progress_bar);
         layoutCreditInfo = findViewById(R.id.layout_credit_info);
+        
+        // Set up numeric filter for payment terms
+        etPaymentTerms.setFilters(new InputFilter[]{new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end,
+                                       Spanned dest, int dstart, int dend) {
+                // Only allow digits
+                for (int i = start; i < end; i++) {
+                    if (!Character.isDigit(source.charAt(i))) {
+                        return "";
+                    }
+                }
+                return null; // Accept the input
+            }
+        }});
     }
 
     private void setupToolbar() {
@@ -227,7 +244,8 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
         etPurpose.setText(creditRequest.getPurpose());
         etRequestedAmount.setText(creditRequest.getRequestedAmount() != null ? 
             String.valueOf(creditRequest.getRequestedAmount()) : "");
-        etPaymentTerms.setText(creditRequest.getPaymentTerms());
+        etPaymentTerms.setText(creditRequest.getPaymentTerms() != null ? 
+            String.valueOf(creditRequest.getPaymentTerms()) : "");
         etInternalNotes.setText(creditRequest.getInternalNotes());
         
         // Set currency and exchange rate
@@ -317,7 +335,8 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
             return;
         }
         
-        CreditRequest creditRequest = new CreditRequest();
+        try {
+            CreditRequest creditRequest = new CreditRequest();
         
         // Set client ID
         if (selectedClient != null) {
@@ -328,7 +347,11 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
         // Set basic fields
         creditRequest.setPurpose(etPurpose.getText().toString().trim());
         creditRequest.setRequestedAmount(Double.parseDouble(etRequestedAmount.getText().toString().trim()));
-        creditRequest.setPaymentTerms(etPaymentTerms.getText().toString().trim());
+        
+        // Parse payment terms safely (validation already done in validateForm)
+        String paymentTermsText = etPaymentTerms.getText().toString().trim();
+        creditRequest.setPaymentTerms(Integer.parseInt(paymentTermsText));
+        
         creditRequest.setInternalNotes(etInternalNotes.getText().toString().trim());
         
         // Set currency and exchange rate
@@ -350,12 +373,17 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
         creditRequest.setStatus("pending");
         creditRequest.setUserId(1); // TODO: Get from user session
         
-        // Save or update
-        if (isEditMode && creditRequestId != -1) {
-            creditRequest.setId(creditRequestId);
-            creditRequestViewModel.updateCreditRequest(creditRequestId, creditRequest);
-        } else {
-            creditRequestViewModel.createCreditRequest(creditRequest);
+            // Save or update
+            if (isEditMode && creditRequestId != -1) {
+                creditRequest.setId(creditRequestId);
+                creditRequestViewModel.updateCreditRequest(creditRequestId, creditRequest);
+            } else {
+                creditRequestViewModel.createCreditRequest(creditRequest);
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Error en el formato de los datos numéricos. Verifique los campos.", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error al procesar la solicitud: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -395,8 +423,22 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
         }
         
         // Validate payment terms
-        if (etPaymentTerms.getText().toString().trim().isEmpty()) {
+        String paymentTermsText = etPaymentTerms.getText().toString().trim();
+        if (paymentTermsText.isEmpty()) {
             etPaymentTerms.setError("Los términos de pago son requeridos");
+            etPaymentTerms.requestFocus();
+            return false;
+        }
+        
+        try {
+            int paymentTerms = Integer.parseInt(paymentTermsText);
+            if (paymentTerms <= 0) {
+                etPaymentTerms.setError("Los términos de pago deben ser mayor a 0 días");
+                etPaymentTerms.requestFocus();
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            etPaymentTerms.setError("Los términos de pago deben ser un número válido (días)");
             etPaymentTerms.requestFocus();
             return false;
         }

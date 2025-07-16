@@ -7,6 +7,7 @@ import com.example.chancafe_q.data.remote.ApiService;
 import com.example.chancafe_q.model.ApiResponse;
 import com.example.chancafe_q.model.Quote;
 import com.example.chancafe_q.model.QuoteItem;
+import com.example.chancafe_q.model.QuoteWithItemsResponse;
 import com.example.chancafe_q.model.QuotesResponse;
 import java.util.List;
 import java.util.Map;
@@ -453,15 +454,30 @@ public class QuoteRepository {
     public void getQuoteItems(int quoteId) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<List<QuoteItem>>> call = apiService.getQuoteItems(quoteId);
+        Call<ApiResponse<QuoteWithItemsResponse>> call = apiService.getQuoteItems(quoteId);
         
-        call.enqueue(new Callback<ApiResponse<List<QuoteItem>>>() {
+        call.enqueue(new Callback<ApiResponse<QuoteWithItemsResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<QuoteItem>>> call, Response<ApiResponse<List<QuoteItem>>> response) {
+            public void onResponse(Call<ApiResponse<QuoteWithItemsResponse>> call, Response<ApiResponse<QuoteWithItemsResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        quoteItemsLiveData.postValue(response.body().getData());
+                        QuoteWithItemsResponse data = response.body().getData();
+                        if (data != null && data.getQuote() != null) {
+                            Quote quote = data.getQuote();
+                            
+                            // Update quote data as well
+                            quoteLiveData.postValue(quote);
+                            
+                            // Extract items from the quote
+                            if (quote.getQuoteItems() != null) {
+                                quoteItemsLiveData.postValue(quote.getQuoteItems());
+                            } else {
+                                quoteItemsLiveData.postValue(new java.util.ArrayList<>());
+                            }
+                        } else {
+                            errorLiveData.postValue("Respuesta inválida del servidor");
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -471,7 +487,7 @@ public class QuoteRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<QuoteItem>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<QuoteWithItemsResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }

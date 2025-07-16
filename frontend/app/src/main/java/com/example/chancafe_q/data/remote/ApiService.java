@@ -9,6 +9,7 @@ import com.example.chancafe_q.model.Quote;
 import com.example.chancafe_q.model.QuotesResponse;
 import com.example.chancafe_q.model.ClientsResponse;
 import com.example.chancafe_q.model.CreditRequest;
+import com.example.chancafe_q.model.CreditRequestsResponse;
 import com.example.chancafe_q.model.Product;
 import com.example.chancafe_q.model.Category;
 import com.example.chancafe_q.model.Supplier;
@@ -153,7 +154,7 @@ public interface ApiService {
     Call<ApiResponse<Quote>> recalculateQuote(@Path("id") int id);
     
     @GET("quotes/{quoteId}/items")
-    Call<ApiResponse<List<com.example.chancafe_q.model.QuoteItem>>> getQuoteItems(@Path("quoteId") int quoteId);
+    Call<ApiResponse<com.example.chancafe_q.model.QuoteWithItemsResponse>> getQuoteItems(@Path("quoteId") int quoteId);
     
     @POST("quotes/{quoteId}/items")
     Call<ApiResponse<com.example.chancafe_q.model.QuoteItem>> addQuoteItem(@Path("quoteId") int quoteId, @Body com.example.chancafe_q.model.QuoteItem quoteItem);
@@ -181,7 +182,7 @@ public interface ApiService {
     // ===============================
     
     @GET("credit-requests")
-    Call<ApiResponse<List<CreditRequest>>> getAllCreditRequests(
+    Call<ApiResponse<CreditRequestsResponse>> getAllCreditRequests(
         @Query("status") String status,
         @Query("client_id") Integer clientId,
         @Query("user_id") Integer userId,
@@ -195,7 +196,7 @@ public interface ApiService {
     );
     
     @GET("credit-requests")
-    Call<ApiResponse<List<CreditRequest>>> getCreditRequests();
+    Call<ApiResponse<CreditRequestsResponse>> getCreditRequests();
     
     @GET("credit-requests/{id}")
     Call<ApiResponse<CreditRequest>> getCreditRequestById(@Path("id") int id);
@@ -204,16 +205,16 @@ public interface ApiService {
     Call<ApiResponse<CreditRequest>> getCreditRequest(@Path("id") int id);
     
     @GET("credit-requests/status/{status}")
-    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByStatus(@Path("status") String status);
+    Call<ApiResponse<CreditRequestsResponse>> getCreditRequestsByStatus(@Path("status") String status);
     
     @GET("credit-requests/client/{clientId}")
-    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByClient(@Path("clientId") int clientId);
+    Call<ApiResponse<CreditRequestsResponse>> getCreditRequestsByClient(@Path("clientId") int clientId);
     
     @GET("credit-requests/user/{userId}")
-    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByUser(@Path("userId") int userId);
+    Call<ApiResponse<CreditRequestsResponse>> getCreditRequestsByUser(@Path("userId") int userId);
     
     @GET("credit-requests/priority/{priority}")
-    Call<ApiResponse<List<CreditRequest>>> getCreditRequestsByPriority(@Path("priority") String priority);
+    Call<ApiResponse<CreditRequestsResponse>> getCreditRequestsByPriority(@Path("priority") String priority);
     
     @GET("credit-requests/stats")
     Call<ApiResponse<java.util.Map<String, Object>>> getCreditRequestStatistics();

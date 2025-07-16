@@ -159,18 +159,29 @@ public class Quote {
     }
 
     public double getSubtotal() {
-        return subtotal;
+        if (subtotal != null) {
+            return subtotal;
+        }
+        return 0.0;
     }
 
     public void setSubtotal(double subtotal) {
         this.subtotal = subtotal;
     }
+    
+    public void setSubtotal(Double subtotal) {
+        this.subtotal = subtotal;
+    }
 
     public double getTaxAmount() {
-        return taxAmount;
+        return taxAmount != null ? taxAmount : 0.0;
     }
 
     public void setTaxAmount(double taxAmount) {
+        this.taxAmount = taxAmount;
+    }
+    
+    public void setTaxAmount(Double taxAmount) {
         this.taxAmount = taxAmount;
     }
 
@@ -185,6 +196,11 @@ public class Quote {
     // Alias method for compatibility
     public Double getTotal() {
         return totalAmount;
+    }
+    
+    // Safe getter that returns 0.0 if totalAmount is null
+    public double getTotalAmountSafe() {
+        return totalAmount != null ? totalAmount : 0.0;
     }
 
     public String getStatus() {
@@ -357,6 +373,11 @@ public class Quote {
     public void setDiscountAmount(Double discountAmount) {
         this.discountAmount = discountAmount;
     }
+    
+    // Safe getters for UI
+    public double getDiscountAmountSafe() {
+        return discountAmount != null ? discountAmount : 0.0;
+    }
 
     public Double getTaxPercentage() {
         return taxPercentage;
@@ -449,14 +470,15 @@ public class Quote {
 
     public String getStatusDisplayName() {
         if (status == null) return "Borrador";
-        switch (status) {
+        switch (status.toLowerCase()) {
             case "draft": return "Borrador";
             case "pending": return "Pendiente";
             case "sent": return "Enviada";
             case "approved": return "Aprobada";
             case "rejected": return "Rechazada";
             case "expired": return "Expirada";
-            default: return status;
+            case "converted": return "Convertida";
+            default: return status.substring(0, 1).toUpperCase() + status.substring(1);
         }
     }
 

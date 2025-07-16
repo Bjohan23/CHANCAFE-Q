@@ -168,7 +168,7 @@ public class QuoteDetailActivity extends AppCompatActivity {
     }
 
     private void loadQuoteDetails() {
-        quoteViewModel.loadQuoteById(quoteId);
+        // The loadQuoteItems now returns both quote and items data
         quoteViewModel.loadQuoteItems(quoteId);
     }
 
@@ -178,13 +178,23 @@ public class QuoteDetailActivity extends AppCompatActivity {
         currentQuote = quote;
         
         // Quote header
-        tvQuoteNumber.setText(quote.getQuoteNumber() != null ? quote.getQuoteNumber() : "COT-" + quote.getId());
+        String quoteNumber = quote.getQuoteNumber();
+        if (quoteNumber != null && !quoteNumber.trim().isEmpty()) {
+            tvQuoteNumber.setText(quoteNumber);
+        } else {
+            tvQuoteNumber.setText("COT-" + quote.getId());
+        }
         
         // Status with color
         setupStatusBadge(quote.getStatus());
         
         // Title
-        tvQuoteTitle.setText(quote.getTitle() != null ? quote.getTitle() : "Cotización sin título");
+        String title = quote.getTitle();
+        if (title != null && !title.trim().isEmpty()) {
+            tvQuoteTitle.setText(title);
+        } else {
+            tvQuoteTitle.setText("Cotización sin título");
+        }
         
         // Dates
         if (quote.getCreatedAt() != null && !quote.getCreatedAt().isEmpty()) {
@@ -214,9 +224,18 @@ public class QuoteDetailActivity extends AppCompatActivity {
         
         // Client information
         if (quote.getClient() != null) {
-            String clientName = quote.getClient().getBusinessName() != null 
-                ? quote.getClient().getBusinessName()
-                : (quote.getClient().getFirstName() + " " + quote.getClient().getLastName()).trim();
+            // Client name - handle business name or full name
+            String clientName;
+            if (quote.getClient().getBusinessName() != null && !quote.getClient().getBusinessName().trim().isEmpty()) {
+                clientName = quote.getClient().getBusinessName();
+            } else {
+                String firstName = quote.getClient().getFirstName() != null ? quote.getClient().getFirstName() : "";
+                String lastName = quote.getClient().getLastName() != null ? quote.getClient().getLastName() : "";
+                clientName = (firstName + " " + lastName).trim();
+                if (clientName.isEmpty()) {
+                    clientName = "Cliente sin nombre";
+                }
+            }
             tvClientName.setText(clientName);
             
             // Client details
@@ -224,8 +243,15 @@ public class QuoteDetailActivity extends AppCompatActivity {
             String documentNumber = quote.getClient().getDocumentNumber() != null ? quote.getClient().getDocumentNumber() : "N/A";
             tvClientDocument.setText(documentType + ": " + documentNumber);
             
-            tvClientPhone.setText("Teléfono: " + (quote.getClient().getPhone() != null ? quote.getClient().getPhone() : "No registrado"));
-            tvClientEmail.setText(quote.getClient().getEmail() != null ? quote.getClient().getEmail() : "Sin email");
+            String phoneText = quote.getClient().getPhone() != null && !quote.getClient().getPhone().trim().isEmpty() 
+                ? quote.getClient().getPhone() 
+                : "No registrado";
+            tvClientPhone.setText("Teléfono: " + phoneText);
+            
+            String emailText = quote.getClient().getEmail() != null && !quote.getClient().getEmail().trim().isEmpty() 
+                ? quote.getClient().getEmail() 
+                : "Sin email";
+            tvClientEmail.setText(emailText);
             
             // Credit score info
             if (quote.getClient().getCreditScore() != null && quote.getClient().getCreditScore() > 0) {
@@ -244,24 +270,37 @@ public class QuoteDetailActivity extends AppCompatActivity {
             } else {
                 layoutCreditInfo.setVisibility(View.GONE);
             }
+        } else {
+            // Handle case where client is null
+            tvClientName.setText("Cliente no disponible");
+            tvClientDocument.setText("DNI: N/A");
+            tvClientPhone.setText("Teléfono: No registrado");
+            tvClientEmail.setText("Sin email");
+            layoutCreditInfo.setVisibility(View.GONE);
         }
         
         // Totals
         String currency = quote.getCurrency() != null ? quote.getCurrency() : "PEN";
         String symbol = "PEN".equals(currency) ? "S/ " : "$ ";
         
-        tvSubtotal.setText(symbol + String.format(Locale.getDefault(), "%.2f", quote.getSubtotal()));
+        // Ensure we have valid totals to display
+        double subtotal = quote.getSubtotal();
+        double taxAmount = quote.getTaxAmount();
+        double totalAmount = quote.getTotalAmountSafe();
+        double discountAmount = quote.getDiscountAmountSafe();
+        
+        tvSubtotal.setText(symbol + String.format(Locale.getDefault(), "%.2f", subtotal));
         
         // Discount (if any)
-        if (quote.getDiscountAmount() != null && quote.getDiscountAmount() > 0) {
+        if (discountAmount > 0) {
             layoutDiscount.setVisibility(View.VISIBLE);
-            tvDiscount.setText("-" + symbol + String.format(Locale.getDefault(), "%.2f", quote.getDiscountAmount()));
+            tvDiscount.setText("-" + symbol + String.format(Locale.getDefault(), "%.2f", discountAmount));
         } else {
             layoutDiscount.setVisibility(View.GONE);
         }
         
-        tvTax.setText(symbol + String.format(Locale.getDefault(), "%.2f", quote.getTaxAmount()));
-        tvTotal.setText(symbol + String.format(Locale.getDefault(), "%.2f", quote.getTotal()));
+        tvTax.setText(symbol + String.format(Locale.getDefault(), "%.2f", taxAmount));
+        tvTotal.setText(symbol + String.format(Locale.getDefault(), "%.2f", totalAmount));
         
         // Notes
         if (quote.getNotes() != null && !quote.getNotes().trim().isEmpty()) {
@@ -294,6 +333,10 @@ public class QuoteDetailActivity extends AppCompatActivity {
                 statusText = "Pendiente";
                 backgroundColor = "#FF9800";
                 break;
+            case "sent":
+                statusText = "Enviada";
+                backgroundColor = "#2196F3";
+                break;
             case "approved":
                 statusText = "Aprobada";
                 backgroundColor = "#4CAF50";
@@ -306,8 +349,12 @@ public class QuoteDetailActivity extends AppCompatActivity {
                 statusText = "Expirada";
                 backgroundColor = "#9C27B0";
                 break;
+            case "converted":
+                statusText = "Convertida";
+                backgroundColor = "#00BCD4";
+                break;
             default:
-                statusText = status != null ? status : "Borrador";
+                statusText = status != null ? status.substring(0, 1).toUpperCase() + status.substring(1) : "Borrador";
                 backgroundColor = "#757575";
                 break;
         }
