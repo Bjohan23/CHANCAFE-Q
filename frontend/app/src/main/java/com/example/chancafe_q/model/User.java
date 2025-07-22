@@ -129,10 +129,21 @@ public class User {
     public String getFullName() {
         // Priorizar el full_name de la API si está disponible
         if (fullName != null && !fullName.trim().isEmpty()) {
-            return fullName;
+            return fullName.trim();
         }
+        
         // Fallback a concatenar first_name + last_name
-        return (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+        StringBuilder nameBuilder = new StringBuilder();
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            nameBuilder.append(firstName.trim());
+        }
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            if (nameBuilder.length() > 0) nameBuilder.append(" ");
+            nameBuilder.append(lastName.trim());
+        }
+        
+        String result = nameBuilder.toString();
+        return result.isEmpty() ? "Usuario sin nombre" : result;
     }
 
     public void setFullName(String fullName) {
@@ -283,7 +294,8 @@ public class User {
 
     // Método de compatibilidad para getName()
     public String getName() {
-        return getFullName().trim();
+        String fullName = getFullName();
+        return fullName != null ? fullName.trim() : "Usuario desconocido";
     }
 
     // Métodos de compatibilidad para getUsername()

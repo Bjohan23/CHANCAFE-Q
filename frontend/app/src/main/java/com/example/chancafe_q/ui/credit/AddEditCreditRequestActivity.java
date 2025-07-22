@@ -240,13 +240,20 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
     private void populateFields(CreditRequest creditRequest) {
         if (creditRequest == null) return;
         
+        // DEBUG: Log to verify data received
+        android.util.Log.d("AddEditCreditRequest", "=== POPULATE FIELDS ===");
+        android.util.Log.d("AddEditCreditRequest", "Credit Request ID: " + creditRequest.getId());
+        android.util.Log.d("AddEditCreditRequest", "Purpose: " + creditRequest.getPurpose());
+        android.util.Log.d("AddEditCreditRequest", "Requested Amount: " + creditRequest.getRequestedAmount());
+        android.util.Log.d("AddEditCreditRequest", "Client is null: " + (creditRequest.getClient() == null));
+        
         // Populate basic fields
-        etPurpose.setText(creditRequest.getPurpose());
+        etPurpose.setText(creditRequest.getPurpose() != null ? creditRequest.getPurpose() : "");
         etRequestedAmount.setText(creditRequest.getRequestedAmount() != null ? 
-            String.valueOf(creditRequest.getRequestedAmount()) : "");
+            String.format(Locale.getDefault(), "%.0f", creditRequest.getRequestedAmount()) : "");
         etPaymentTerms.setText(creditRequest.getPaymentTerms() != null ? 
             String.valueOf(creditRequest.getPaymentTerms()) : "");
-        etInternalNotes.setText(creditRequest.getInternalNotes());
+        etInternalNotes.setText(creditRequest.getInternalNotes() != null ? creditRequest.getInternalNotes() : "");
         
         // Set currency and exchange rate
         if (creditRequest.getCurrency() != null) {
@@ -257,11 +264,16 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
                     break;
                 }
             }
-        }
-        
-        if (creditRequest.getExchangeRate() != null && creditRequest.getExchangeRate() > 0) {
-            etExchangeRate.setText(String.valueOf(creditRequest.getExchangeRate()));
-            layoutExchangeRate.setVisibility(View.VISIBLE);
+            
+            // Update exchange rate field visibility based on currency
+            if ("USD".equals(creditRequest.getCurrency())) {
+                layoutExchangeRate.setVisibility(View.VISIBLE);
+                if (creditRequest.getExchangeRate() != null && creditRequest.getExchangeRate() > 0) {
+                    etExchangeRate.setText(String.format(Locale.getDefault(), "%.4f", creditRequest.getExchangeRate()));
+                }
+            } else {
+                layoutExchangeRate.setVisibility(View.GONE);
+            }
         }
         
         // Set priority
@@ -285,31 +297,62 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
             tvExpiresAt.setText(dateFormat.format(selectedExpirationDate));
         }
         
-        // Set client information
+        // Set client information - This is the key fix
         if (creditRequest.getClient() != null) {
+            android.util.Log.d("AddEditCreditRequest", "Setting client from credit request");
             selectedClient = creditRequest.getClient();
             updateClientInfo();
+            
+            // In edit mode, disable client selection button since client is already set
+            if (isEditMode) {
+                btnSelectClient.setEnabled(false);
+                btnSelectClient.setText("Cliente asignado");
+                btnSelectClient.setAlpha(0.6f);
+            }
+        } else {
+            android.util.Log.w("AddEditCreditRequest", "No client in credit request");
         }
     }
 
     private void updateClientInfo() {
+        android.util.Log.d("AddEditCreditRequest", "=== UPDATE CLIENT INFO ===");
+        
         if (selectedClient != null) {
-            String clientName = selectedClient.getBusinessName() != null 
-                ? selectedClient.getBusinessName()
-                : (selectedClient.getFirstName() + " " + selectedClient.getLastName()).trim();
+            android.util.Log.d("AddEditCreditRequest", "Client object exists");
+            android.util.Log.d("AddEditCreditRequest", "Client ID: " + selectedClient.getId());
+            android.util.Log.d("AddEditCreditRequest", "Business name: " + selectedClient.getBusinessName());
+            android.util.Log.d("AddEditCreditRequest", "First name: " + selectedClient.getFirstName());
+            android.util.Log.d("AddEditCreditRequest", "Last name: " + selectedClient.getLastName());
             
+            // Use the getFullName() method from Client model, fallback to business name
+            String clientName = selectedClient.getFullName();
+            if (clientName == null || clientName.trim().isEmpty()) {
+                if (selectedClient.getBusinessName() != null && !selectedClient.getBusinessName().trim().isEmpty()) {
+                    clientName = selectedClient.getBusinessName();
+                } else if (selectedClient.getFirstName() != null && selectedClient.getLastName() != null) {
+                    clientName = (selectedClient.getFirstName() + " " + selectedClient.getLastName()).trim();
+                } else {
+                    clientName = "Cliente ID: " + selectedClient.getId();
+                }
+            }
+            
+            android.util.Log.d("AddEditCreditRequest", "Setting client name: " + clientName);
             tvSelectedClient.setText(clientName);
             
             // Show credit info if available
-            if (selectedClient.getCreditScore() != null && selectedClient.getCreditScore() > 0) {
+            Integer creditScore = selectedClient.getCreditScore();
+            android.util.Log.d("AddEditCreditRequest", "Credit score: " + creditScore);
+            
+            if (creditScore != null && creditScore > 0) {
+                android.util.Log.d("AddEditCreditRequest", "Showing credit info");
                 layoutCreditInfo.setVisibility(View.VISIBLE);
                 
-                String scoreText = selectedClient.getCreditScore() + " - ";
-                if (selectedClient.getCreditScore() >= 750) {
+                String scoreText = creditScore + " - ";
+                if (creditScore >= 750) {
                     scoreText += "Excelente";
-                } else if (selectedClient.getCreditScore() >= 650) {
+                } else if (creditScore >= 650) {
                     scoreText += "Bueno";
-                } else if (selectedClient.getCreditScore() >= 550) {
+                } else if (creditScore >= 550) {
                     scoreText += "Regular";
                 } else {
                     scoreText += "Malo";
@@ -318,15 +361,23 @@ public class AddEditCreditRequestActivity extends AppCompatActivity {
                 tvClientCreditScore.setText(scoreText);
                 
                 // Show suggested limit
-                if (selectedClient.getSuggestedCreditLimit() != null) {
+                Double suggestedLimit = selectedClient.getSuggestedCreditLimit();
+                android.util.Log.d("AddEditCreditRequest", "Suggested limit: " + suggestedLimit);
+                
+                if (suggestedLimit != null && suggestedLimit > 0) {
                     tvSuggestedLimit.setText("Límite: S/ " + 
-                        String.format(Locale.getDefault(), "%.0f", selectedClient.getSuggestedCreditLimit()));
+                        String.format(Locale.getDefault(), "%.0f", suggestedLimit));
                 } else {
                     tvSuggestedLimit.setText("Sin límite definido");
                 }
             } else {
+                android.util.Log.d("AddEditCreditRequest", "Hiding credit info - no valid score");
                 layoutCreditInfo.setVisibility(View.GONE);
             }
+        } else {
+            android.util.Log.w("AddEditCreditRequest", "selectedClient is null");
+            tvSelectedClient.setText("Seleccionar cliente...");
+            layoutCreditInfo.setVisibility(View.GONE);
         }
     }
 

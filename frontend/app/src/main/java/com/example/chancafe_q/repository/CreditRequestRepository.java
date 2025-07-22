@@ -6,6 +6,7 @@ import com.example.chancafe_q.data.remote.ApiClient;
 import com.example.chancafe_q.data.remote.ApiService;
 import com.example.chancafe_q.model.ApiResponse;
 import com.example.chancafe_q.model.CreditRequest;
+import com.example.chancafe_q.model.CreditRequestDetailResponse;
 import com.example.chancafe_q.model.CreditRequestsResponse;
 import java.util.List;
 import java.util.Map;
@@ -93,15 +94,20 @@ public class CreditRequestRepository {
     public void getCreditRequestById(int id) {
         loadingLiveData.postValue(true);
         
-        Call<ApiResponse<CreditRequest>> call = apiService.getCreditRequestById(id);
+        Call<ApiResponse<CreditRequestDetailResponse>> call = apiService.getCreditRequestById(id);
         
-        call.enqueue(new Callback<ApiResponse<CreditRequest>>() {
+        call.enqueue(new Callback<ApiResponse<CreditRequestDetailResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<CreditRequest>> call, Response<ApiResponse<CreditRequest>> response) {
+            public void onResponse(Call<ApiResponse<CreditRequestDetailResponse>> call, Response<ApiResponse<CreditRequestDetailResponse>> response) {
                 loadingLiveData.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        creditRequestLiveData.postValue(response.body().getData());
+                        CreditRequestDetailResponse detailResponse = response.body().getData();
+                        if (detailResponse != null && detailResponse.getCreditRequest() != null) {
+                            creditRequestLiveData.postValue(detailResponse.getCreditRequest());
+                        } else {
+                            errorLiveData.postValue("No se encontraron datos de la solicitud");
+                        }
                     } else {
                         errorLiveData.postValue(response.body().getMessage());
                     }
@@ -111,7 +117,7 @@ public class CreditRequestRepository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<CreditRequest>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<CreditRequestDetailResponse>> call, Throwable t) {
                 loadingLiveData.postValue(false);
                 errorLiveData.postValue("Error de conexión: " + t.getMessage());
             }

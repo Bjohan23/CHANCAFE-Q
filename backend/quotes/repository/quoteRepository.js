@@ -585,11 +585,41 @@ class QuoteRepository {
   async findItemsByQuote(quoteId, options = {}) {
     try {
       const QuoteItem = getQuoteItemModel();
-      const items = await QuoteItem.findAll({
+      
+      // Get Product model for including product information
+      let productInclude = null;
+      try {
+        const { getSequelize } = require('../../shared/config/db');
+        const sequelize = getSequelize();
+        
+        if (sequelize && sequelize.models && sequelize.models.Product) {
+          const Product = sequelize.models.Product;
+          productInclude = {
+            model: Product,
+            as: 'product',
+            required: false,
+            attributes: ['id', 'name', 'description', 'sku', 'brand', 'model', 'price', 'image_url', 'status']
+          };
+          console.log('✅ Product model incluido correctamente para quote items');
+        } else {
+          console.log('❌ No se encontró el modelo Product en sequelize.models');
+        }
+      } catch (error) {
+        console.log('⚠️  No se pudo incluir información del producto:', error.message);
+      }
+
+      const queryOptions = {
         where: { quote_id: quoteId },
         order: [['sort_order', 'ASC']],
         ...options
-      });
+      };
+
+      // Add product include if available
+      if (productInclude) {
+        queryOptions.include = [productInclude];
+      }
+
+      const items = await QuoteItem.findAll(queryOptions);
       return items;
     } catch (error) {
       console.error('❌ Error en QuoteRepository.findItemsByQuote:', error.message);

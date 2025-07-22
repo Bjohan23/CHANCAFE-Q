@@ -491,18 +491,34 @@ class CreditRequestService {
       // Include client data if available
       client: creditRequest.client ? {
         id: creditRequest.client.id,
-        name: creditRequest.client.name,
+        name: creditRequest.client.business_name || 
+              `${creditRequest.client.first_name || ''} ${creditRequest.client.last_name || ''}`.trim() || 
+              `Cliente ${creditRequest.client.id}`,
+        firstName: creditRequest.client.first_name,
+        lastName: creditRequest.client.last_name,
+        businessName: creditRequest.client.business_name,
         email: creditRequest.client.email,
         phone: creditRequest.client.phone,
-        dni: creditRequest.client.dni,
-        ruc: creditRequest.client.ruc
+        phoneSecondary: creditRequest.client.phone_secondary,
+        address: creditRequest.client.address,
+        documentType: creditRequest.client.document_type,
+        documentNumber: creditRequest.client.document_number,
+        clientType: creditRequest.client.client_type,
+        creditScore: creditRequest.client.credit_score,
+        riskClassification: creditRequest.client.risk_classification,
+        suggestedCreditLimit: creditRequest.client.suggested_credit_limit,
+        isBanked: creditRequest.client.is_banked,
+        dni: creditRequest.client.document_number,
+        ruc: creditRequest.client.tax_id
       } : null,
       // Include user data if available
       user: creditRequest.user ? {
         id: creditRequest.user.id,
-        name: creditRequest.user.name,
+        name: `${creditRequest.user.first_name || ''} ${creditRequest.user.last_name || ''}`.trim() || `Usuario ${creditRequest.user.id}`,
+        firstName: creditRequest.user.first_name,
+        lastName: creditRequest.user.last_name,
         email: creditRequest.user.email,
-        username: creditRequest.user.username
+        role: creditRequest.user.role
       } : null
     };
   }

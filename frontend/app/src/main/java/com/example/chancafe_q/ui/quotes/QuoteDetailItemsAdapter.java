@@ -93,18 +93,18 @@ public class QuoteDetailItemsAdapter extends RecyclerView.Adapter<QuoteDetailIte
             // Unit price
             String currency = item.getCurrency() != null ? item.getCurrency() : "PEN";
             String symbol = "PEN".equals(currency) ? "S/ " : "$ ";
-            tvUnitPrice.setText(symbol + String.format(Locale.getDefault(), "%.2f", item.getUnitPrice()));
+            tvUnitPrice.setText(symbol + String.format(Locale.getDefault(), "%.2f", item.getUnitPriceAsDouble()));
 
             // Quantity
-            tvQuantity.setText(String.valueOf(item.getQuantity()));
+            tvQuantity.setText(String.format(Locale.getDefault(), "%.0f", item.getQuantityAsDouble()));
 
             // Discount (if any)
-            if (item.getDiscountPercentage() != null && item.getDiscountPercentage() > 0) {
+            if (item.getDiscountPercentageAsDouble() > 0) {
                 layoutItemDiscount.setVisibility(View.VISIBLE);
-                tvItemDiscount.setText(String.format(Locale.getDefault(), "%.1f%%", item.getDiscountPercentage()));
-            } else if (item.getDiscountAmount() != null && item.getDiscountAmount() > 0) {
+                tvItemDiscount.setText(String.format(Locale.getDefault(), "%.1f%%", item.getDiscountPercentageAsDouble()));
+            } else if (item.getDiscountAmountAsDouble() > 0) {
                 layoutItemDiscount.setVisibility(View.VISIBLE);
-                tvItemDiscount.setText(symbol + String.format(Locale.getDefault(), "%.2f", item.getDiscountAmount()));
+                tvItemDiscount.setText(symbol + String.format(Locale.getDefault(), "%.2f", item.getDiscountAmountAsDouble()));
             } else {
                 layoutItemDiscount.setVisibility(View.GONE);
             }
@@ -123,13 +123,18 @@ public class QuoteDetailItemsAdapter extends RecyclerView.Adapter<QuoteDetailIte
         }
 
         private double calculateItemSubtotal(QuoteItem item) {
-            double subtotal = item.getUnitPrice() * item.getQuantity();
+            // Use the subtotal from API if available, otherwise calculate
+            if (item.getSubtotalAsDouble() > 0) {
+                return item.getSubtotalAsDouble();
+            }
+            
+            double subtotal = item.getUnitPriceAsDouble() * item.getQuantityAsDouble();
             
             // Apply discount
-            if (item.getDiscountPercentage() != null && item.getDiscountPercentage() > 0) {
-                subtotal = subtotal * (1 - item.getDiscountPercentage() / 100);
-            } else if (item.getDiscountAmount() != null && item.getDiscountAmount() > 0) {
-                subtotal = subtotal - item.getDiscountAmount();
+            if (item.getDiscountPercentageAsDouble() > 0) {
+                subtotal = subtotal * (1 - item.getDiscountPercentageAsDouble() / 100);
+            } else if (item.getDiscountAmountAsDouble() > 0) {
+                subtotal = subtotal - item.getDiscountAmountAsDouble();
             }
             
             return Math.max(0, subtotal); // Ensure non-negative

@@ -9,7 +9,8 @@
       "Bash(timeout 30 npm run start:dev)",
       "Bash(timeout 20 npm run start:dev)",
       "Bash(pkill:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

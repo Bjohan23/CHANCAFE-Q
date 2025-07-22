@@ -90,7 +90,7 @@ public class Quote {
     @SerializedName("advisor")
     private User advisor;
     
-    @SerializedName("quote_items")
+    @SerializedName("items")
     private List<QuoteItem> quoteItems;
 
     // Constructor vacío
@@ -485,7 +485,7 @@ public class Quote {
     public void calculateTotals() {
         if (quoteItems != null) {
             subtotal = quoteItems.stream()
-                    .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
+                    .mapToDouble(item -> item.getQuantityAsDouble() * item.getUnitPriceAsDouble())
                     .sum();
             taxAmount = subtotal * 0.18; // IGV 18%
             totalAmount = subtotal + taxAmount;

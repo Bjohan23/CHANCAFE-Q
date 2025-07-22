@@ -16,13 +16,18 @@ public class QuoteItem implements Serializable {
     private Integer productId;
     
     private String description;
-    private int quantity;
+    
+    // Cambiar quantity a String para coincidir con la API
+    private String quantity;
     
     @SerializedName("unit_price")
-    private double unitPrice;
+    private String unitPrice;
     
     @SerializedName("total_price")
-    private double totalPrice;
+    private String totalPrice;
+    
+    // Agregar subtotal que viene de la API
+    private String subtotal;
     
     private Double discount;
     
@@ -40,19 +45,28 @@ public class QuoteItem implements Serializable {
 
     // Constructor vacío
     public QuoteItem() {
-        this.quantity = 1;
-        this.unitPrice = 0.0;
-        this.totalPrice = 0.0;
+        this.quantity = "1";
+        this.unitPrice = "0.0";
+        this.totalPrice = "0.0";
+        this.subtotal = "0.0";
     }
 
     // Constructor con parámetros
-    public QuoteItem(int quoteId, String description, int quantity, double unitPrice) {
+    public QuoteItem(int quoteId, String description, String quantity, String unitPrice) {
         this();
         this.quoteId = quoteId;
         this.description = description;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
-        this.totalPrice = quantity * unitPrice;
+        try {
+            double qty = Double.parseDouble(quantity);
+            double price = Double.parseDouble(unitPrice);
+            this.totalPrice = String.valueOf(qty * price);
+            this.subtotal = this.totalPrice;
+        } catch (NumberFormatException e) {
+            this.totalPrice = "0.0";
+            this.subtotal = "0.0";
+        }
     }
 
     // Getters y Setters
@@ -88,30 +102,78 @@ public class QuoteItem implements Serializable {
         this.description = description;
     }
 
-    public int getQuantity() {
+    public String getQuantity() {
         return quantity;
     }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-        this.totalPrice = quantity * unitPrice;
+    
+    public int getQuantityAsInt() {
+        try {
+            return (int) Double.parseDouble(quantity != null ? quantity : "0");
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+    
+    public double getQuantityAsDouble() {
+        try {
+            return Double.parseDouble(quantity != null ? quantity : "0");
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 
-    public double getUnitPrice() {
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
+        calculateTotalPrice();
+    }
+
+    public String getUnitPrice() {
         return unitPrice;
     }
-
-    public void setUnitPrice(double unitPrice) {
-        this.unitPrice = unitPrice;
-        this.totalPrice = quantity * unitPrice;
+    
+    public double getUnitPriceAsDouble() {
+        try {
+            return Double.parseDouble(unitPrice != null ? unitPrice : "0");
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 
-    public double getTotalPrice() {
+    public void setUnitPrice(String unitPrice) {
+        this.unitPrice = unitPrice;
+        calculateTotalPrice();
+    }
+
+    public String getTotalPrice() {
         return totalPrice;
     }
+    
+    public double getTotalPriceAsDouble() {
+        try {
+            return Double.parseDouble(totalPrice != null ? totalPrice : "0");
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(String totalPrice) {
         this.totalPrice = totalPrice;
+    }
+    
+    public String getSubtotal() {
+        return subtotal;
+    }
+    
+    public double getSubtotalAsDouble() {
+        try {
+            return Double.parseDouble(subtotal != null ? subtotal : "0");
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+    
+    public void setSubtotal(String subtotal) {
+        this.subtotal = subtotal;
     }
 
     public String getNotes() {
@@ -142,12 +204,26 @@ public class QuoteItem implements Serializable {
         return discountPercentage;
     }
     
+    public double getDiscountPercentageAsDouble() {
+        if (discountPercentage != null) {
+            return discountPercentage;
+        }
+        return 0.0;
+    }
+    
     public void setDiscountPercentage(Double discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
     
     public Double getDiscountAmount() {
         return discountAmount;
+    }
+    
+    public double getDiscountAmountAsDouble() {
+        if (discountAmount != null) {
+            return discountAmount;
+        }
+        return 0.0;
     }
     
     public void setDiscountAmount(Double discountAmount) {
@@ -170,12 +246,29 @@ public class QuoteItem implements Serializable {
     }
 
     // Métodos de utilidad
-    public void calculateTotal() {
-        double total = this.quantity * this.unitPrice;
-        if (discount != null && discount > 0) {
-            total = total * (1 - discount / 100);
+    public void calculateTotalPrice() {
+        try {
+            double qty = getQuantityAsDouble();
+            double price = getUnitPriceAsDouble();
+            double total = qty * price;
+            
+            // Apply discount if any
+            if (discountPercentage != null && discountPercentage > 0) {
+                total = total * (1 - discountPercentage / 100);
+            } else if (discountAmount != null && discountAmount > 0) {
+                total = Math.max(0, total - discountAmount);
+            }
+            
+            this.totalPrice = String.valueOf(total);
+            this.subtotal = this.totalPrice;
+        } catch (Exception e) {
+            this.totalPrice = "0.0";
+            this.subtotal = "0.0";
         }
-        this.totalPrice = total;
+    }
+    
+    public void calculateTotal() {
+        calculateTotalPrice();
     }
 
     public String getDisplayDescription() {

@@ -309,11 +309,11 @@ public class QuoteViewModel extends ViewModel {
             return false;
         }
 
-        if (quoteItem.getQuantity() <= 0) {
+        if (quoteItem.getQuantityAsDouble() <= 0) {
             return false;
         }
 
-        if (quoteItem.getUnitPrice() <= 0) {
+        if (quoteItem.getUnitPriceAsDouble() <= 0) {
             return false;
         }
 
@@ -450,7 +450,7 @@ public class QuoteViewModel extends ViewModel {
 
         double subtotal = 0.0;
         for (QuoteItem item : items) {
-            double itemTotal = item.getQuantity() * item.getUnitPrice();
+            double itemTotal = item.getQuantityAsDouble() * item.getUnitPriceAsDouble();
             if (item.getDiscount() != null && item.getDiscount() > 0) {
                 itemTotal = itemTotal * (1 - item.getDiscount() / 100);
             }

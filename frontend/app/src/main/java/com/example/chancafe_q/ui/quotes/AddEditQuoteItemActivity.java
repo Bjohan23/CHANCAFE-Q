@@ -143,7 +143,7 @@ public class AddEditQuoteItemActivity extends AppCompatActivity {
                 selectedProduct = new Product();
                 selectedProduct.setId(currentItem.getProductId());
                 selectedProduct.setName("Producto ID: " + currentItem.getProductId());
-                selectedProduct.setPrice(currentItem.getUnitPrice());
+                selectedProduct.setPrice(currentItem.getUnitPriceAsDouble());
                 selectedProduct.setDescription(currentItem.getDescription());
                 updateProductSelection();
             }
@@ -193,8 +193,8 @@ public class AddEditQuoteItemActivity extends AppCompatActivity {
             }
             
             currentItem.setDescription(etDescription.getText().toString().trim());
-            currentItem.setQuantity(Integer.parseInt(etQuantity.getText().toString().trim()));
-            currentItem.setUnitPrice(Double.parseDouble(etUnitPrice.getText().toString().trim()));
+            currentItem.setQuantity(etQuantity.getText().toString().trim());
+            currentItem.setUnitPrice(etUnitPrice.getText().toString().trim());
             currentItem.setDiscount(Double.parseDouble(etDiscount.getText().toString().trim()));
             currentItem.setNotes(etNotes.getText().toString().trim());
             

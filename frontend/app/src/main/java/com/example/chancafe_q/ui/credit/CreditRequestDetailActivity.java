@@ -17,7 +17,9 @@ import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.chancafe_q.R;
+import com.example.chancafe_q.model.Client;
 import com.example.chancafe_q.model.CreditRequest;
+import com.example.chancafe_q.model.User;
 import com.example.chancafe_q.viewmodel.CreditRequestViewModel;
 
 import java.text.NumberFormat;
@@ -46,6 +48,7 @@ public class CreditRequestDetailActivity extends AppCompatActivity {
 
     // Client Information
     private TextView tvClientName;
+    private TextView tvClientDocument;
     private TextView tvClientEmail;
     private TextView tvClientPhone;
     private TextView tvCreditScore;
@@ -136,6 +139,7 @@ public class CreditRequestDetailActivity extends AppCompatActivity {
 
         // Client information
         tvClientName = findViewById(R.id.tv_client_name);
+        tvClientDocument = findViewById(R.id.tv_client_document);
         tvClientEmail = findViewById(R.id.tv_client_email);
         tvClientPhone = findViewById(R.id.tv_client_phone);
         tvCreditScore = findViewById(R.id.tv_credit_score);
@@ -206,6 +210,30 @@ public class CreditRequestDetailActivity extends AppCompatActivity {
     }
 
     private void populateViews(CreditRequest creditRequest) {
+        // DEBUG: Log para verificar datos recibidos
+        android.util.Log.d("CreditRequestDetail", "=== POPULATE VIEWS ===");
+        android.util.Log.d("CreditRequestDetail", "Credit Request ID: " + creditRequest.getId());
+        android.util.Log.d("CreditRequestDetail", "Request Number: " + creditRequest.getRequestNumber());
+        android.util.Log.d("CreditRequestDetail", "Status: " + creditRequest.getStatus());
+        android.util.Log.d("CreditRequestDetail", "Client is null: " + (creditRequest.getClient() == null));
+        android.util.Log.d("CreditRequestDetail", "User is null: " + (creditRequest.getUser() == null));
+        
+        if (creditRequest.getClient() != null) {
+            android.util.Log.d("CreditRequestDetail", "Client full name: " + creditRequest.getClient().getFullName());
+            android.util.Log.d("CreditRequestDetail", "Client firstName: " + creditRequest.getClient().getFirstName());
+            android.util.Log.d("CreditRequestDetail", "Client lastName: " + creditRequest.getClient().getLastName());
+            android.util.Log.d("CreditRequestDetail", "Client businessName: " + creditRequest.getClient().getBusinessName());
+            android.util.Log.d("CreditRequestDetail", "Client email: " + creditRequest.getClient().getEmail());
+            android.util.Log.d("CreditRequestDetail", "Client phone: " + creditRequest.getClient().getPhone());
+            android.util.Log.d("CreditRequestDetail", "Client creditScore: " + creditRequest.getClient().getCreditScore());
+        }
+        if (creditRequest.getUser() != null) {
+            android.util.Log.d("CreditRequestDetail", "User full name: " + creditRequest.getUser().getFullName());
+            android.util.Log.d("CreditRequestDetail", "User firstName: " + creditRequest.getUser().getFirstName());
+            android.util.Log.d("CreditRequestDetail", "User lastName: " + creditRequest.getUser().getLastName());
+            android.util.Log.d("CreditRequestDetail", "User email: " + creditRequest.getUser().getEmail());
+        }
+        
         // Header information
         tvRequestNumber.setText(creditRequest.getRequestNumber() != null ? 
             creditRequest.getRequestNumber() : "CR-" + creditRequest.getId());
@@ -234,11 +262,11 @@ public class CreditRequestDetailActivity extends AppCompatActivity {
         }
 
         tvPaymentTerms.setText(creditRequest.getPaymentTerms() != null ? 
-            creditRequest.getPaymentTerms() + " días" : "No especificado");
+            String.valueOf(creditRequest.getPaymentTerms()) + " días" : "No especificado");
         
         tvCurrency.setText(currency);
         
-        if (creditRequest.getExchangeRate() != null && creditRequest.getExchangeRate() != 1.0) {
+        if (creditRequest.getExchangeRate() != null && Math.abs(creditRequest.getExchangeRate() - 1.0) > 0.0001) {
             tvExchangeRate.setText(String.format(Locale.getDefault(), "%.4f", creditRequest.getExchangeRate()));
             tvExchangeRate.setVisibility(View.VISIBLE);
             labelExchangeRate.setVisibility(View.VISIBLE);
@@ -283,54 +311,90 @@ public class CreditRequestDetailActivity extends AppCompatActivity {
     }
 
     private void populateClientInfo(CreditRequest creditRequest) {
+        android.util.Log.d("CreditRequestDetail", "=== POPULATE CLIENT INFO ===");
+        
         if (creditRequest.getClient() != null) {
-            // Client name
-            String clientName = null;
-            if (creditRequest.getClient().getName() != null && !creditRequest.getClient().getName().trim().isEmpty()) {
-                clientName = creditRequest.getClient().getName();
-            } else if (creditRequest.getClient().getBusinessName() != null && !creditRequest.getClient().getBusinessName().trim().isEmpty()) {
-                clientName = creditRequest.getClient().getBusinessName();
-            } else if (creditRequest.getClient().getFirstName() != null || creditRequest.getClient().getLastName() != null) {
-                clientName = (creditRequest.getClient().getFirstName() + " " + creditRequest.getClient().getLastName()).trim();
-            } else {
+            android.util.Log.d("CreditRequestDetail", "Client object exists");
+            Client client = creditRequest.getClient();
+            
+            // Use the getFullName() method from Client model
+            String clientName = client.getFullName();
+            if (clientName == null || clientName.trim().isEmpty()) {
                 clientName = "Cliente ID: " + creditRequest.getClientId();
             }
-            tvClientName.setText(clientName);
+            android.util.Log.d("CreditRequestDetail", "Setting client name: " + clientName);
+            if (tvClientName != null) tvClientName.setText(clientName);
+            
+            // Client document
+            String documentInfo = "No disponible";
+            if (client.getDocumentType() != null && client.getDocumentNumber() != null) {
+                documentInfo = client.getDocumentType() + ": " + client.getDocumentNumber();
+            } else if (client.getDocumentNumber() != null) {
+                documentInfo = client.getDocumentNumber();
+            }
+            android.util.Log.d("CreditRequestDetail", "Setting client document: " + documentInfo);
+            if (tvClientDocument != null) tvClientDocument.setText(documentInfo);
 
             // Client email and phone
-            tvClientEmail.setText(creditRequest.getClient().getEmail() != null ? creditRequest.getClient().getEmail() : "No disponible");
-            tvClientPhone.setText(creditRequest.getClient().getPhone() != null ? creditRequest.getClient().getPhone() : "No disponible");
+            String clientEmail = client.getEmail() != null ? client.getEmail() : "No disponible";
+            String clientPhone = client.getPhone() != null ? client.getPhone() : "No disponible";
+            android.util.Log.d("CreditRequestDetail", "Setting client email: " + clientEmail);
+            android.util.Log.d("CreditRequestDetail", "Setting client phone: " + clientPhone);
+            
+            if (tvClientEmail != null) tvClientEmail.setText(clientEmail);
+            if (tvClientPhone != null) tvClientPhone.setText(clientPhone);
 
             // Credit score
-            if (creditRequest.getClient().getCreditScore() != null && creditRequest.getClient().getCreditScore() > 0) {
-                tvCreditScore.setText(String.valueOf(creditRequest.getClient().getCreditScore()));
+            Integer creditScore = client.getCreditScore();
+            android.util.Log.d("CreditRequestDetail", "Credit score: " + creditScore);
+            
+            if (creditScore != null && creditScore >= 0 && tvCreditScore != null && layoutCreditScore != null) {
+                tvCreditScore.setText(String.valueOf(creditScore));
                 layoutCreditScore.setVisibility(View.VISIBLE);
                 
                 // Color based on score
-                if (creditRequest.getClient().getCreditScore() >= 650) {
+                if (creditScore >= 650) {
                     tvCreditScore.setTextColor(Color.parseColor("#2E7D32")); // Green
-                } else if (creditRequest.getClient().getCreditScore() >= 550) {
+                } else if (creditScore >= 550) {
                     tvCreditScore.setTextColor(Color.parseColor("#F57F17")); // Yellow
                 } else {
                     tvCreditScore.setTextColor(Color.parseColor("#D32F2F")); // Red
                 }
             } else {
-                layoutCreditScore.setVisibility(View.GONE);
+                if (layoutCreditScore != null) layoutCreditScore.setVisibility(View.GONE);
             }
         } else {
-            tvClientName.setText("Cliente no disponible");
-            tvClientEmail.setText("No disponible");
-            tvClientPhone.setText("No disponible");
-            layoutCreditScore.setVisibility(View.GONE);
+            android.util.Log.w("CreditRequestDetail", "Client object is null");
+            if (tvClientName != null) tvClientName.setText("Cliente no disponible");
+            if (tvClientDocument != null) tvClientDocument.setText("No disponible");
+            if (tvClientEmail != null) tvClientEmail.setText("No disponible");
+            if (tvClientPhone != null) tvClientPhone.setText("No disponible");
+            if (layoutCreditScore != null) layoutCreditScore.setVisibility(View.GONE);
         }
     }
 
     private void populateUserInfo(CreditRequest creditRequest) {
+        android.util.Log.d("CreditRequestDetail", "=== POPULATE USER INFO ===");
+        
         if (creditRequest.getUser() != null) {
-            tvUserName.setText(creditRequest.getUser().getName() != null ? creditRequest.getUser().getName() : "Usuario ID: " + creditRequest.getUserId());
-            tvUserEmail.setText(creditRequest.getUser().getEmail() != null ? creditRequest.getUser().getEmail() : "No disponible");
+            android.util.Log.d("CreditRequestDetail", "User object exists");
+            User user = creditRequest.getUser();
+            
+            // Use the getFullName() method from User model
+            String userName = user.getFullName();
+            if (userName == null || userName.trim().isEmpty()) {
+                userName = "Usuario ID: " + creditRequest.getUserId();
+            }
+            android.util.Log.d("CreditRequestDetail", "Setting user name: " + userName);
+            
+            String userEmail = user.getEmail() != null ? user.getEmail() : "No disponible";
+            android.util.Log.d("CreditRequestDetail", "Setting user email: " + userEmail);
+            
+            tvUserName.setText(userName);
+            tvUserEmail.setText(userEmail);
             cardUserInfo.setVisibility(View.VISIBLE);
         } else {
+            android.util.Log.w("CreditRequestDetail", "User object is null");
             cardUserInfo.setVisibility(View.GONE);
         }
     }

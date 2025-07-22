@@ -605,12 +605,10 @@ class QuoteService {
   formatQuoteItemResponse(item) {
     if (!item) return null;
 
-    return {
+    const response = {
       id: item.id,
       quoteId: item.quote_id,
       productId: item.product_id,
-      productName: item.product_name,
-      productDescription: item.product_description,
       quantity: item.quantity,
       unitPrice: item.unit_price,
       discountPercentage: item.discount_percentage,
@@ -621,6 +619,31 @@ class QuoteService {
       createdAt: item.created_at,
       updatedAt: item.updated_at
     };
+
+    // Include product information if available
+    if (item.product) {
+      response.product = {
+        id: item.product.id,
+        name: item.product.name,
+        description: item.product.description,
+        sku: item.product.sku,
+        brand: item.product.brand,
+        model: item.product.model,
+        price: item.product.price,
+        imageUrl: item.product.image_url,
+        status: item.product.status
+      };
+      
+      // Also add legacy fields for backward compatibility
+      response.productName = item.product.name;
+      response.productDescription = item.product.description;
+    } else {
+      // Fallback to null if no product info
+      response.productName = null;
+      response.productDescription = null;
+    }
+
+    return response;
   }
 }
 

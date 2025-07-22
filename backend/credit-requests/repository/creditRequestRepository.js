@@ -49,6 +49,20 @@ class CreditRequestRepository {
     try {
       const CreditRequest = getCreditRequestModel();
       const creditRequest = await CreditRequest.findByPk(id, {
+        include: [
+          { 
+            association: 'client',
+            attributes: ['id', 'first_name', 'last_name', 'business_name', 
+                        'email', 'phone', 'phone_secondary', 'address', 
+                        'document_type', 'document_number', 'client_type',
+                        'credit_score', 'risk_classification', 'suggested_credit_limit',
+                        'is_banked', 'tax_id', 'status', 'created_at']
+          },
+          { 
+            association: 'user',
+            attributes: ['id', 'first_name', 'last_name', 'email', 'role']
+          }
+        ],
         ...options
       });
       return creditRequest;
@@ -79,8 +93,18 @@ class CreditRequestRepository {
         where: {},
         order: [['created_at', 'DESC']],
         include: [
-          { association: 'client' },
-          { association: 'user' }
+          { 
+            association: 'client',
+            attributes: ['id', 'first_name', 'last_name', 'business_name', 
+                        'email', 'phone', 'phone_secondary', 'address', 
+                        'document_type', 'document_number', 'client_type',
+                        'credit_score', 'risk_classification', 'suggested_credit_limit',
+                        'is_banked', 'tax_id', 'status', 'created_at']
+          },
+          { 
+            association: 'user',
+            attributes: ['id', 'first_name', 'last_name', 'email', 'role']
+          }
         ],
         ...options
       };

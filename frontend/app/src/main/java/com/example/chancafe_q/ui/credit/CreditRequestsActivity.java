@@ -371,28 +371,52 @@ public class CreditRequestsActivity extends AppCompatActivity implements CreditR
                 : creditRequest.getClient().getFirstName() + " " + creditRequest.getClient().getLastName())
             : "Cliente no disponible";
         
+        Double requestedAmount = creditRequest.getRequestedAmount();
+        String amountText = requestedAmount != null && requestedAmount > 0 
+            ? "S/ " + String.format(Locale.getDefault(), "%.0f", requestedAmount)
+            : "No disponible";
+            
         String requestInfo = (creditRequest.getRequestNumber() != null ? creditRequest.getRequestNumber() : "CR-" + creditRequest.getId())
-            + " - " + clientName + "\nMonto solicitado: S/ " + String.format(Locale.getDefault(), "%.0f", creditRequest.getRequestedAmount());
+            + " - " + clientName 
+            + "\nMonto solicitado: " + amountText
+            + "\nPropósito: " + (creditRequest.getPurpose() != null ? creditRequest.getPurpose() : "No especificado")
+            + "\n\nInstrucciones: Use los botones de sugerencias rápidas (50%, 75%, 100%) para calcular montos automáticamente, o ingrese un monto personalizado.";
         tvRequestInfo.setText(requestInfo);
         
         // Set default values
-        etApprovedAmount.setText(String.valueOf(creditRequest.getRequestedAmount()));
+        if (requestedAmount != null && requestedAmount > 0) {
+            etApprovedAmount.setText(String.format(Locale.getDefault(), "%.0f", requestedAmount));
+        } else {
+            etApprovedAmount.setText("");
+        }
         etApprovedTerms.setText(creditRequest.getPaymentTerms() != null ? 
             String.valueOf(creditRequest.getPaymentTerms()) : "");
         
         // Quick amount buttons
         btn50Percent.setOnClickListener(v -> {
-            double amount = creditRequest.getRequestedAmount() * 0.5;
-            etApprovedAmount.setText(String.format(Locale.getDefault(), "%.0f", amount));
+            if (requestedAmount != null && requestedAmount > 0) {
+                double amount = requestedAmount * 0.5;
+                etApprovedAmount.setText(String.format(Locale.getDefault(), "%.0f", amount));
+            } else {
+                Toast.makeText(this, "No se puede calcular: monto solicitado no disponible", Toast.LENGTH_SHORT).show();
+            }
         });
         
         btn75Percent.setOnClickListener(v -> {
-            double amount = creditRequest.getRequestedAmount() * 0.75;
-            etApprovedAmount.setText(String.format(Locale.getDefault(), "%.0f", amount));
+            if (requestedAmount != null && requestedAmount > 0) {
+                double amount = requestedAmount * 0.75;
+                etApprovedAmount.setText(String.format(Locale.getDefault(), "%.0f", amount));
+            } else {
+                Toast.makeText(this, "No se puede calcular: monto solicitado no disponible", Toast.LENGTH_SHORT).show();
+            }
         });
         
         btn100Percent.setOnClickListener(v -> {
-            etApprovedAmount.setText(String.format(Locale.getDefault(), "%.0f", creditRequest.getRequestedAmount()));
+            if (requestedAmount != null && requestedAmount > 0) {
+                etApprovedAmount.setText(String.format(Locale.getDefault(), "%.0f", requestedAmount));
+            } else {
+                Toast.makeText(this, "No se puede calcular: monto solicitado no disponible", Toast.LENGTH_SHORT).show();
+            }
         });
         
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -406,11 +430,11 @@ public class CreditRequestsActivity extends AppCompatActivity implements CreditR
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         
         btnApprove.setOnClickListener(v -> {
-            String amountText = etApprovedAmount.getText().toString().trim();
+            String approvedAmountText = etApprovedAmount.getText().toString().trim();
             String terms = etApprovedTerms.getText().toString().trim();
             String conditions = etApprovalConditions.getText().toString().trim();
             
-            if (amountText.isEmpty()) {
+            if (approvedAmountText.isEmpty()) {
                 etApprovedAmount.setError("Monto requerido");
                 return;
             }
@@ -421,7 +445,7 @@ public class CreditRequestsActivity extends AppCompatActivity implements CreditR
             }
             
             try {
-                double approvedAmount = Double.parseDouble(amountText);
+                double approvedAmount = Double.parseDouble(approvedAmountText);
                 if (approvedAmount <= 0) {
                     etApprovedAmount.setError("Monto debe ser mayor a cero");
                     return;

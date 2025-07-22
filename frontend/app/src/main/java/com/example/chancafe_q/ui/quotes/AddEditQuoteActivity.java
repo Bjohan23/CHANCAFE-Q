@@ -191,7 +191,6 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
             Intent intent = new Intent(this, com.example.chancafe_q.ui.clients.AddEditClientActivity.class);
             startActivity(intent);
         });
-        
         // Actualizar evaluación crediticia
         btnRefreshCredit.setOnClickListener(v -> {
             if (selectedClient != null) {
@@ -530,7 +529,7 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
         // Calcular subtotal
         double subtotal = 0.0;
         for (QuoteItem item : quoteItems) {
-            subtotal += item.getTotalPrice();
+            subtotal += item.getTotalPriceAsDouble();
         }
 
         // Calcular descuento (por ahora 0)

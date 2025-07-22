@@ -9,6 +9,7 @@ import com.example.chancafe_q.model.Quote;
 import com.example.chancafe_q.model.QuotesResponse;
 import com.example.chancafe_q.model.ClientsResponse;
 import com.example.chancafe_q.model.CreditRequest;
+import com.example.chancafe_q.model.CreditRequestDetailResponse;
 import com.example.chancafe_q.model.CreditRequestsResponse;
 import com.example.chancafe_q.model.Product;
 import com.example.chancafe_q.model.Category;
@@ -199,10 +200,10 @@ public interface ApiService {
     Call<ApiResponse<CreditRequestsResponse>> getCreditRequests();
     
     @GET("credit-requests/{id}")
-    Call<ApiResponse<CreditRequest>> getCreditRequestById(@Path("id") int id);
+    Call<ApiResponse<CreditRequestDetailResponse>> getCreditRequestById(@Path("id") int id);
     
     @GET("credit-requests/{id}")
-    Call<ApiResponse<CreditRequest>> getCreditRequest(@Path("id") int id);
+    Call<ApiResponse<CreditRequestDetailResponse>> getCreditRequest(@Path("id") int id);
     
     @GET("credit-requests/status/{status}")
     Call<ApiResponse<CreditRequestsResponse>> getCreditRequestsByStatus(@Path("status") String status);
@@ -231,7 +232,7 @@ public interface ApiService {
     @PATCH("credit-requests/{id}/status")
     Call<ApiResponse<CreditRequest>> changeCreditRequestStatus(@Path("id") int id, @Query("status") String status);
     
-    @PUT("credit-requests/{id}/approve")
+    @PATCH("credit-requests/{id}/approve")
     Call<ApiResponse<CreditRequest>> approveCreditRequest(
         @Path("id") int id, 
         @Query("approved_amount") Double approvedAmount, 

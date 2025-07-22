@@ -89,7 +89,10 @@ public class CreditRequest {
     private String riskLevel;
     
     // Relaciones
+    @SerializedName("client")
     private Client client;
+    
+    @SerializedName("user")
     private User user;
 
     // Constructor vacío

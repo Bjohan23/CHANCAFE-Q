@@ -260,7 +260,7 @@ public class PDFGenerator {
                 canvas.drawText(discountText, col4, currentY, tablePaint);
                 
                 // Calculate subtotal
-                double subtotal = item.getUnitPrice() * item.getQuantity();
+                double subtotal = item.getUnitPriceAsDouble() * item.getQuantityAsDouble();
                 if (item.getDiscountPercentage() != null && item.getDiscountPercentage() > 0) {
                     subtotal = subtotal * (1 - item.getDiscountPercentage() / 100);
                 } else if (item.getDiscountAmount() != null && item.getDiscountAmount() > 0) {

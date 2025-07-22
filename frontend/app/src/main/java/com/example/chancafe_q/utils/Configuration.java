@@ -18,10 +18,10 @@ public class Configuration {
     
     // URLs por ambiente
     //private static final String DEV_BASE_URL = "http://192.168.0.112/api/";  // IP Ethernet principal
-    //private static final String DEV_BASE_URL = "http://10.0.2.2:3000/v1/api/"; // Para emulador (localhost del host)
+    private static final String DEV_BASE_URL = "http://10.0.2.2:3000/api/"; // Para emulador (localhost del host)
     // private static final String DEV_BASE_URL = "http://172.21.208.1:3000/v1/api/"; // Si usas WSL
-    private static final String DEV_BASE_URL = "https://overall-obj-housewives-infants.trycloudflare.com/api/"; //con tunel de cloudflare
-    //private static final String DEV_BASE_URL = "https://inspiration-morning-seniors-downloading.trycloudflare.com/api/";
+    //private static final String DEV_BASE_URL = "https://guyana-active-decorative-individually.trycloudflare.com/api/"; //con tunel de cloudflare (no funciona)
+    //private static final String DEV_BASE_URL = "https://anonymous-prize-conferences-reynolds.trycloudflare.com/api/"; // Tunnel que no funciona
     private static final String STAGING_BASE_URL = "https://staging.chancafe.com/api/";
     private static final String PROD_BASE_URL = "https://api.chancafe.com/api/";
     

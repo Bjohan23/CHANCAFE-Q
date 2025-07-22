@@ -202,7 +202,8 @@ public class CreditRequestsAdapter extends RecyclerView.Adapter<CreditRequestsAd
             // Monto solicitado
             String currency = creditRequest.getCurrency() != null ? creditRequest.getCurrency() : "PEN";
             String symbol = "PEN".equals(currency) ? "S/ " : "$ ";
-            tvRequestedAmount.setText(symbol + String.format(Locale.getDefault(), "%.0f", creditRequest.getRequestedAmount()));
+            double amount = creditRequest.getRequestedAmount() != null ? creditRequest.getRequestedAmount() : 0.0;
+            tvRequestedAmount.setText(symbol + String.format(Locale.getDefault(), "%.0f", amount));
 
             // Términos de pago
             tvPaymentTerms.setText(creditRequest.getPaymentTerms() != null ? 
