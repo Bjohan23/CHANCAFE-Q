@@ -149,7 +149,18 @@ const approveCreditRequest = async (req, res) => {
       return sendError(res, 401, 'Usuario no autenticado');
     }
 
-    const result = await creditRequestService.approveCreditRequest(id, req.body, approvedByUserId);
+    // Combinar datos del body y query parameters para mayor flexibilidad
+    const approvalData = {
+      ...req.body,
+      // Si vienen parámetros en la URL, los usamos (para compatibilidad con Android)
+      ...(req.query.approved_amount && { approvedAmount: req.query.approved_amount }),
+      ...(req.query.approved_terms && { approvedTerms: req.query.approved_terms }),
+      ...(req.query.conditions && { approvalConditions: req.query.conditions }),
+      ...(req.query.notes && { notes: req.query.notes }),
+      ...(req.query.expires_at && { expiresAt: req.query.expires_at })
+    };
+
+    const result = await creditRequestService.approveCreditRequest(id, approvalData, approvedByUserId);
     sendSuccess(res, result, result.message);
   } catch (error) {
     sendError(res, 400, error.message);
@@ -165,7 +176,15 @@ const rejectCreditRequest = async (req, res) => {
       return sendError(res, 401, 'Usuario no autenticado');
     }
 
-    const result = await creditRequestService.rejectCreditRequest(id, req.body, rejectedByUserId);
+    // Combinar datos del body y query parameters para mayor flexibilidad
+    const rejectionData = {
+      ...req.body,
+      // Si vienen parámetros en la URL, los usamos (para compatibilidad con Android)
+      ...(req.query.rejection_reason && { rejectionReason: req.query.rejection_reason }),
+      ...(req.query.notes && { notes: req.query.notes })
+    };
+
+    const result = await creditRequestService.rejectCreditRequest(id, rejectionData, rejectedByUserId);
     sendSuccess(res, result, result.message);
   } catch (error) {
     sendError(res, 400, error.message);
