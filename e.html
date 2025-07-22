@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHANCAFE Q - Sistema de Cotizaciones y Evaluación Crediticia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'coffee': '#8B4513',
+                        'coffee-light': '#D2B48C',
+                        'coffee-dark': '#654321'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-coffee rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">Q</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">CHANCAFE Q</h1>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#overview" class="text-gray-600 hover:text-coffee transition-colors">Resumen</a>
+                    <a href="#features" class="text-gray-600 hover:text-coffee transition-colors">Características</a>
+                    <a href="#tech" class="text-gray-600 hover:text-coffee transition-colors">Tecnología</a>
+                    <a href="#results" class="text-gray-600 hover:text-coffee transition-colors">Resultados</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-coffee to-coffee-dark text-white py-20">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-5xl font-bold mb-6">📱 CHANCAFE Q</h1>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">
+                Sistema de Cotizaciones y Evaluación Crediticia para empresas especializadas en electrodomésticos y equipos para cafeterías
+            </p>
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Android (Java)</span>
+                <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Node.js + Express</span>
+                <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">MySQL</span>
+                <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Sentinel API</span>
+            </div>
+            <button onclick="scrollToSection('overview')" class="bg-white text-coffee px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                Explorar Proyecto
+            </button>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section id="overview" class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">📋 Resumen Ejecutivo</h2>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-coffee">Contexto del Negocio</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl">🏢</span>
+                            <div>
+                                <h4 class="font-semibold">Sector Retail Especializado</h4>
+                                <p class="text-gray-600">Electrodomésticos, máquinas espresso, molinos de café y accesorios para baristas</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl">🎯</span>
+                            <div>
+                                <h4 class="font-semibold">Mercado Objetivo</h4>
+                                <p class="text-gray-600">Cafeterías, hoteles, restaurantes y consumidores individuales</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl">⚡</span>
+                            <div>
+                                <h4 class="font-semibold">Solución Implementada</h4>
+                                <p class="text-gray-600">Automatización completa del proceso de cotización con evaluación crediticia integrada</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-xl font-bold mb-6 text-center text-coffee">Problemática Resuelta</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-red-500">❌ Proceso manual de cotizaciones</span>
+                            <span class="text-green-500">✅ Automatización completa</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-red-500">❌ Evaluación crediticia lenta</span>
+                            <span class="text-green-500">✅ Integración con API Sentinel</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-red-500">❌ Seguimiento deficiente</span>
+                            <span class="text-green-500">✅ Sistema de estados y notificaciones</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-red-500">❌ Alto riesgo crediticio</span>
+                            <span class="text-green-500">✅ Evaluación automática</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">🚀 Características Principales</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Sistema de Cotizaciones -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-8">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold mb-4 text-blue-800">Sistema de Cotizaciones</h3>
+                    <ul class="space-y-2 text-blue-700">
+                        <li>• Creación de cotizaciones digitales</li>
+                        <li>• Gestión de productos y precios</li>
+                        <li>• Cálculo automático de IGV (18%)</li>
+                        <li>• Estados: Draft → Sent → Approved</li>
+                        <li>• Soporte para PEN y USD</li>
+                    </ul>
+                </div>
+
+                <!-- Evaluación Crediticia -->
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-8">
+                    <div class="text-4xl mb-4">💳</div>
+                    <h3 class="text-xl font-bold mb-4 text-green-800">Evaluación Crediticia</h3>
+                    <ul class="space-y-2 text-green-700">
+                        <li>• Integración con Sentinel API</li>
+                        <li>• Score crediticio 300-850</li>
+                        <li>• Clasificación de riesgo automática</li>
+                        <li>• Límites de crédito sugeridos</li>
+                        <li>• Cache inteligente (30-60 min)</li>
+                    </ul>
+                </div>
+
+                <!-- Gestión de Usuarios -->
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-8">
+                    <div class="text-4xl mb-4">👥</div>
+                    <h3 class="text-xl font-bold mb-4 text-purple-800">Gestión de Usuarios</h3>
+                    <ul class="space-y-2 text-purple-700">
+                        <li>• Roles: Sales Rep, Supervisor, Admin</li>
+                        <li>• Autenticación JWT</li>
+                        <li>• Permisos granulares</li>
+                        <li>• Dashboard personalizado</li>
+                        <li>• Seguimiento por equipo</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Flujo de Evaluación Crediticia -->
+            <div class="mt-16">
+                <h3 class="text-2xl font-bold text-center mb-8 text-gray-800">🔄 Flujo de Evaluación Crediticia</h3>
+                <div class="bg-gray-50 rounded-xl p-8">
+                    <div class="grid md:grid-cols-5 gap-4 text-center">
+                        <div class="bg-white rounded-lg p-4 shadow">
+                            <div class="text-2xl mb-2">🆔</div>
+                            <h4 class="font-semibold text-sm">Cliente con DNI</h4>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 shadow">
+                            <div class="text-2xl mb-2">🔍</div>
+                            <h4 class="font-semibold text-sm">Consulta Sentinel</h4>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 shadow">
+                            <div class="text-2xl mb-2">📊</div>
+                            <h4 class="font-semibold text-sm">Score 300-850</h4>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 shadow">
+                            <div class="text-2xl mb-2">⚖️</div>
+                            <h4 class="font-semibold text-sm">Clasificación Riesgo</h4>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 shadow">
+                            <div class="text-2xl mb-2">✅</div>
+                            <h4 class="font-semibold text-sm">Recomendación</h4>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 grid md:grid-cols-5 gap-4 text-center">
+                        <div class="bg-green-100 rounded-lg p-3">
+                            <div class="font-bold text-green-800">Score 750+</div>
+                            <div class="text-sm text-green-600">RIESGO BAJO</div>
+                            <div class="text-xs text-green-500">Límite: S/50,000</div>
+                        </div>
+                        <div class="bg-blue-100 rounded-lg p-3">
+                            <div class="font-bold text-blue-800">Score 650-749</div>
+                            <div class="text-sm text-blue-600">RIESGO MEDIO</div>
+                            <div class="text-xs text-blue-500">Límite: S/30,000</div>
+                        </div>
+                        <div class="bg-yellow-100 rounded-lg p-3">
+                            <div class="font-bold text-yellow-800">Score 550-649</div>
+                            <div class="text-sm text-yellow-600">REVISAR</div>
+                            <div class="text-xs text-yellow-500">Límite: S/20,000</div>
+                        </div>
+                        <div class="bg-orange-100 rounded-lg p-3">
+                            <div class="font-bold text-orange-800">Score 450-549</div>
+                            <div class="text-sm text-orange-600">RIESGO ALTO</div>
+                            <div class="text-xs text-orange-500">Límite: S/10,000</div>
+                        </div>
+                        <div class="bg-red-100 rounded-lg p-3">
+                            <div class="font-bold text-red-800">Score <450</div>
+                            <div class="text-sm text-red-600">MUY ALTO</div>
+                            <div class="text-xs text-red-500">Límite: S/0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Architecture -->
+    <section id="tech" class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">🏗️ Arquitectura Técnica</h2>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Backend -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-coffee flex items-center">
+                        <span class="mr-3">⚙️</span>Backend - Node.js + Express
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <h4 class="font-semibold">📁 auth/</h4>
+                            <p class="text-gray-600 text-sm">Autenticación JWT y gestión de usuarios</p>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-4">
+                            <h4 class="font-semibold">📁 quotes/ (CORE)</h4>
+                            <p class="text-gray-600 text-sm">Sistema completo de cotizaciones</p>
+                        </div>
+                        <div class="border-l-4 border-purple-500 pl-4">
+                            <h4 class="font-semibold">📁 external-apis/</h4>
+                            <p class="text-gray-600 text-sm">Integración con Sentinel Credit Bureau</p>
+                        </div>
+                        <div class="border-l-4 border-orange-500 pl-4">
+                            <h4 class="font-semibold">📁 shared/</h4>
+                            <p class="text-gray-600 text-sm">Modelos Sequelize + MySQL</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Frontend -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-coffee flex items-center">
+                        <span class="mr-3">📱</span>Frontend - Android MVVM
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <h4 class="font-semibold">📁 ui/quotes/</h4>
+                            <p class="text-gray-600 text-sm">QuotesActivity, AddEditQuote, QuoteDetail</p>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-4">
+                            <h4 class="font-semibold">📁 viewmodel/</h4>
+                            <p class="text-gray-600 text-sm">ViewModels para patrón MVVM</p>
+                        </div>
+                        <div class="border-l-4 border-purple-500 pl-4">
+                            <h4 class="font-semibold">📁 repository/</h4>
+                            <p class="text-gray-600 text-sm">Repositories para acceso a datos</p>
+                        </div>
+                        <div class="border-l-4 border-orange-500 pl-4">
+                            <h4 class="font-semibold">📁 utils/</h4>
+                            <p class="text-gray-600 text-sm">Configuration.java para ambientes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Endpoints -->
+            <div class="mt-12 bg-gray-900 rounded-xl p-8 text-white">
+                <h3 class="text-2xl font-bold mb-6 flex items-center">
+                    <span class="mr-3">🔌</span>API Endpoints Principales
+                </h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-green-400">Cotizaciones</h4>
+                        <div class="space-y-2 font-mono text-sm">
+                            <div><span class="text-green-400">GET</span> /api/quotes/</div>
+                            <div><span class="text-blue-400">POST</span> /api/quotes/</div>
+                            <div><span class="text-blue-400">POST</span> /api/quotes/with-credit-check</div>
+                            <div><span class="text-yellow-400">PUT</span> /api/quotes/:id</div>
+                            <div><span class="text-red-400">DELETE</span> /api/quotes/:id</div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-green-400">Evaluación Crediticia</h4>
+                        <div class="space-y-2 font-mono text-sm">
+                            <div><span class="text-green-400">GET</span> /api/quotes/client/:id/credit-assessment</div>
+                            <div><span class="text-blue-400">POST</span> /api/quotes/client/:id/credit-check</div>
+                            <div><span class="text-green-400">GET</span> /api/quotes/:id/credit-info</div>
+                            <div><span class="text-yellow-400">PATCH</span> /api/quotes/:id/status</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results" class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">📊 Resultados e Impacto</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <!-- Para Asesores -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-8">
+                    <h3 class="text-xl font-bold mb-6 text-blue-800 flex items-center">
+                        <span class="mr-3">👨‍💼</span>Para Asesores de Ventas
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">⚡</span>
+                            <div>
+                                <div class="font-semibold text-blue-800">50% menos tiempo</div>
+                                <div class="text-blue-600 text-sm">en crear cotizaciones</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">📊</span>
+                            <div>
+                                <div class="font-semibold text-blue-800">Evaluación instantánea</div>
+                                <div class="text-blue-600 text-sm">crediticia automática</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">📱</span>
+                            <div>
+                                <div class="font-semibold text-blue-800">Movilidad total</div>
+                                <div class="text-blue-600 text-sm">trabajo desde cualquier lugar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Para la Empresa -->
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-8">
+                    <h3 class="text-xl font-bold mb-6 text-green-800 flex items-center">
+                        <span class="mr-3">🏢</span>Para la Empresa
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">💰</span>
+                            <div>
+                                <div class="font-semibold text-green-800">40% reducción</div>
+                                <div class="text-green-600 text-sm">del riesgo crediticio</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">📈</span>
+                            <div>
+                                <div class="font-semibold text-green-800">25% aumento</div>
+                                <div class="text-green-600 text-sm">de conversión</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🔄</span>
+                            <div>
+                                <div class="font-semibold text-green-800">Automatización</div>
+                                <div class="text-green-600 text-sm">completa del proceso</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Para Clientes -->
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-8">
+                    <h3 class="text-xl font-bold mb-6 text-purple-800 flex items-center">
+                        <span class="mr-3">🤝</span>Para Clientes
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">⏰</span>
+                            <div>
+                                <div class="font-semibold text-purple-800">Respuesta inmediata</div>
+                                <div class="text-purple-600 text-sm">a solicitudes</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">📄</span>
+                            <div>
+                                <div class="font-semibold text-purple-800">Propuestas profesionales</div>
+                                <div class="text-purple-600 text-sm">con PDF</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🎯</span>
+                            <div>
+                                <div class="font-semibold text-purple-800">Ofertas personalizadas</div>
+                                <div class="text-purple-600 text-sm">según perfil crediticio</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métricas Técnicas -->
+            <div class="bg-gray-50 rounded-xl p-8">
+                <h3 class="text-2xl font-bold mb-8 text-center text-gray-800">📈 Métricas Técnicas</h3>
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-blue-600">&lt;2s</div>
+                        <div class="text-gray-600">Tiempo respuesta Sentinel API</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-600">&gt;80%</div>
+                        <div class="text-gray-600">Cache hit ratio crediticio</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-purple-600">&gt;99.5%</div>
+                        <div class="text-gray-600">Uptime del sistema</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-orange-600">&lt;1%</div>
+                        <div class="text-gray-600">Errores por consulta</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Future Features -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">🔮 Funcionalidades Futuras</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Corto Plazo -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-xl font-bold mb-6 text-green-600">📅 Corto Plazo (3 meses)</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                            Generación automática de PDFs
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                            Notificaciones push
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                            Integración WhatsApp Business
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                            Dashboard analytics avanzado
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Mediano Plazo -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-xl font-bold mb-6 text-blue-600">📅 Mediano Plazo (6 meses)</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            Módulo seguimiento post-venta
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            Integración con ERP empresarial
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            App web responsive
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            Sistema comisiones automático
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Largo Plazo -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-xl font-bold mb-6 text-purple-600">📅 Largo Plazo (12 meses)</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+                            Machine Learning para ventas
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+                            Chatbot con IA
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+                            Múltiples bureaus crediticios
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+                            Análisis predictivo cobranza
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center">

@@ -162,6 +162,23 @@ public class CreditRequestsAdapter extends RecyclerView.Adapter<CreditRequestsAd
         }
 
         public void bind(CreditRequest creditRequest) {
+            android.util.Log.d("CreditRequestsAdapter", "=== BINDING CREDIT REQUEST ===");
+            android.util.Log.d("CreditRequestsAdapter", "Credit Request ID: " + creditRequest.getId());
+            android.util.Log.d("CreditRequestsAdapter", "Request Number: " + creditRequest.getRequestNumber());
+            android.util.Log.d("CreditRequestsAdapter", "Status: " + creditRequest.getStatus());
+            android.util.Log.d("CreditRequestsAdapter", "Requested Amount: " + creditRequest.getRequestedAmount());
+            android.util.Log.d("CreditRequestsAdapter", "Currency: " + creditRequest.getCurrency());
+            android.util.Log.d("CreditRequestsAdapter", "Payment Terms: " + creditRequest.getPaymentTerms());
+            android.util.Log.d("CreditRequestsAdapter", "Created At: " + creditRequest.getCreatedAt());
+            android.util.Log.d("CreditRequestsAdapter", "Expires At: " + creditRequest.getExpiresAt());
+            android.util.Log.d("CreditRequestsAdapter", "Client: " + (creditRequest.getClient() != null ? "Present" : "Null"));
+            if (creditRequest.getClient() != null) {
+                android.util.Log.d("CreditRequestsAdapter", "Client Name: " + creditRequest.getClient().getName());
+                android.util.Log.d("CreditRequestsAdapter", "Client Business Name: " + creditRequest.getClient().getBusinessName());
+                android.util.Log.d("CreditRequestsAdapter", "Client First Name: " + creditRequest.getClient().getFirstName());
+                android.util.Log.d("CreditRequestsAdapter", "Client Last Name: " + creditRequest.getClient().getLastName());
+            }
+            
             // Número de solicitud
             tvRequestNumber.setText(creditRequest.getRequestNumber() != null ? 
                 creditRequest.getRequestNumber() : "CR-" + creditRequest.getId());
@@ -172,66 +189,72 @@ public class CreditRequestsAdapter extends RecyclerView.Adapter<CreditRequestsAd
             // Estado
             setupStatusBadge(creditRequest.getStatus());
 
-            // Cliente
+            // Cliente con manejo mejorado de nombres
             if (creditRequest.getClient() != null) {
-                String clientName = null;
-                
-                // Priorizar el campo name del backend
-                if (creditRequest.getClient().getName() != null && !creditRequest.getClient().getName().trim().isEmpty()) {
-                    clientName = creditRequest.getClient().getName();
-                } else if (creditRequest.getClient().getBusinessName() != null && !creditRequest.getClient().getBusinessName().trim().isEmpty()) {
-                    clientName = creditRequest.getClient().getBusinessName();
-                } else if (creditRequest.getClient().getFirstName() != null || creditRequest.getClient().getLastName() != null) {
-                    clientName = (creditRequest.getClient().getFirstName() + " " + creditRequest.getClient().getLastName()).trim();
-                } else {
-                    clientName = "Cliente ID: " + creditRequest.getClientId();
-                }
-                
+                String clientName = getClientDisplayName(creditRequest.getClient(), creditRequest.getClientId());
                 tvClientName.setText(clientName);
+                android.util.Log.d("CreditRequestsAdapter", "Final client name displayed: '" + clientName + "'");
                 
                 // Mostrar score crediticio si está disponible
                 setupCreditScore(creditRequest.getClient());
             } else {
                 tvClientName.setText("Cliente no disponible");
                 layoutCreditScore.setVisibility(View.GONE);
+                android.util.Log.d("CreditRequestsAdapter", "Client object is null");
             }
 
             // Propósito
             tvPurpose.setText(creditRequest.getPurpose() != null ? creditRequest.getPurpose() : "Sin propósito especificado");
 
-            // Monto solicitado
+            // Monto solicitado con mejor formato
             String currency = creditRequest.getCurrency() != null ? creditRequest.getCurrency() : "PEN";
             String symbol = "PEN".equals(currency) ? "S/ " : "$ ";
-            double amount = creditRequest.getRequestedAmount() != null ? creditRequest.getRequestedAmount() : 0.0;
-            tvRequestedAmount.setText(symbol + String.format(Locale.getDefault(), "%.0f", amount));
+            if (creditRequest.getRequestedAmount() != null && creditRequest.getRequestedAmount() > 0) {
+                tvRequestedAmount.setText(String.format(Locale.getDefault(), "%s%.0f", symbol, creditRequest.getRequestedAmount()));
+            } else {
+                tvRequestedAmount.setText(symbol + "0");
+            }
 
-            // Términos de pago
-            tvPaymentTerms.setText(creditRequest.getPaymentTerms() != null ? 
-                String.valueOf(creditRequest.getPaymentTerms()) + " días" : "No especificado");
+            // Términos de pago con mejor formato
+            if (creditRequest.getPaymentTerms() != null && creditRequest.getPaymentTerms() > 0) {
+                tvPaymentTerms.setText(creditRequest.getPaymentTerms() + " días");
+            } else {
+                tvPaymentTerms.setText("No especificado");
+            }
 
             // Información específica según el estado
             setupStatusSpecificInfo(creditRequest);
 
-            // Fechas
+            // Fechas con mejor manejo de nulos
             if (creditRequest.getCreatedAt() != null) {
-                tvCreatedDate.setText("Creada: " + dateFormat.format(creditRequest.getCreatedAt()));
+                try {
+                    tvCreatedDate.setText("Creada: " + dateFormat.format(creditRequest.getCreatedAt()));
+                } catch (Exception e) {
+                    tvCreatedDate.setText("Creada: Fecha inválida");
+                }
             } else {
                 tvCreatedDate.setText("Fecha de creación no disponible");
             }
 
-            // Fecha de expiración
+            // Fecha de expiración con mejor manejo
             if (creditRequest.getExpiresAt() != null) {
-                tvExpiresDate.setText("Expira: " + dateFormat.format(creditRequest.getExpiresAt()));
-                tvExpiresDate.setVisibility(View.VISIBLE);
-                
-                // Verificar si está por expirar
-                long daysDifference = (creditRequest.getExpiresAt().getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
-                if (daysDifference <= 3 && daysDifference >= 0) {
-                    tvExpiresDate.setTextColor(Color.parseColor("#FF9800")); // Naranja para advertencia
-                } else if (daysDifference < 0) {
-                    tvExpiresDate.setTextColor(Color.parseColor("#F44336")); // Rojo para expiradas
-                } else {
-                    tvExpiresDate.setTextColor(Color.parseColor("#999999")); // Color normal
+                try {
+                    tvExpiresDate.setText("Expira: " + dateFormat.format(creditRequest.getExpiresAt()));
+                    tvExpiresDate.setVisibility(View.VISIBLE);
+                    
+                    // Verificar si está por expirar
+                    long daysDifference = (creditRequest.getExpiresAt().getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
+                    if (daysDifference <= 3 && daysDifference >= 0) {
+                        tvExpiresDate.setTextColor(Color.parseColor("#FF9800")); // Naranja para advertencia
+                    } else if (daysDifference < 0) {
+                        tvExpiresDate.setTextColor(Color.parseColor("#F44336")); // Rojo para expiradas
+                    } else {
+                        tvExpiresDate.setTextColor(Color.parseColor("#999999")); // Color normal
+                    }
+                } catch (Exception e) {
+                    tvExpiresDate.setText("Expira: Fecha inválida");
+                    tvExpiresDate.setVisibility(View.VISIBLE);
+                    tvExpiresDate.setTextColor(Color.parseColor("#F44336"));
                 }
             } else {
                 tvExpiresDate.setVisibility(View.GONE);
@@ -301,21 +324,29 @@ public class CreditRequestsAdapter extends RecyclerView.Adapter<CreditRequestsAd
         }
 
         private void setupCreditScore(com.example.chancafe_q.model.Client client) {
-            // Verificar si el cliente tiene información crediticia
-            if (client.getCreditScore() != null && client.getCreditScore() > 0) {
-                layoutCreditScore.setVisibility(View.VISIBLE);
-                tvCreditScore.setText(String.valueOf(client.getCreditScore()));
-                
-                // Cambiar color según el score
-                if (client.getCreditScore() >= 650) {
-                    tvCreditScore.setTextColor(Color.parseColor("#2E7D32")); // Verde
-                } else if (client.getCreditScore() >= 550) {
-                    tvCreditScore.setTextColor(Color.parseColor("#F57F17")); // Amarillo
+            try {
+                // Verificar si el cliente tiene información crediticia válida
+                if (client != null && client.getCreditScore() != null && client.getCreditScore() > 0) {
+                    layoutCreditScore.setVisibility(View.VISIBLE);
+                    tvCreditScore.setText(String.valueOf(client.getCreditScore()));
+                    
+                    android.util.Log.d("CreditRequestsAdapter", "Credit score: " + client.getCreditScore());
+                    
+                    // Cambiar color según el score
+                    if (client.getCreditScore() >= 650) {
+                        tvCreditScore.setTextColor(Color.parseColor("#2E7D32")); // Verde
+                    } else if (client.getCreditScore() >= 550) {
+                        tvCreditScore.setTextColor(Color.parseColor("#F57F17")); // Amarillo
+                    } else {
+                        tvCreditScore.setTextColor(Color.parseColor("#D32F2F")); // Rojo
+                    }
                 } else {
-                    tvCreditScore.setTextColor(Color.parseColor("#D32F2F")); // Rojo
+                    layoutCreditScore.setVisibility(View.GONE);
+                    android.util.Log.d("CreditRequestsAdapter", "No credit score available");
                 }
-            } else {
+            } catch (Exception e) {
                 layoutCreditScore.setVisibility(View.GONE);
+                android.util.Log.e("CreditRequestsAdapter", "Error setting up credit score: " + e.getMessage());
             }
         }
 
@@ -327,12 +358,26 @@ public class CreditRequestsAdapter extends RecyclerView.Adapter<CreditRequestsAd
 
             switch (creditRequest.getStatus() != null ? creditRequest.getStatus().toLowerCase() : "pending") {
                 case "approved":
-                    if (creditRequest.getApprovedAmount() != null) {
+                    if (creditRequest.getApprovedAmount() != null && creditRequest.getApprovedAmount() > 0) {
                         layoutApprovedInfo.setVisibility(View.VISIBLE);
                         String currency = creditRequest.getCurrency() != null ? creditRequest.getCurrency() : "PEN";
                         String symbol = "PEN".equals(currency) ? "S/ " : "$ ";
-                        tvApprovedAmount.setText(symbol + String.format(Locale.getDefault(), "%.0f", creditRequest.getApprovedAmount()));
-                        tvApprovedTerms.setText(creditRequest.getApprovedTerms() != null ? creditRequest.getApprovedTerms() : "");
+                        tvApprovedAmount.setText(String.format(Locale.getDefault(), "%s%.0f", symbol, creditRequest.getApprovedAmount()));
+                        
+                        // Formatear términos aprobados
+                        if (creditRequest.getApprovedTerms() != null && !creditRequest.getApprovedTerms().trim().isEmpty()) {
+                            String approvedTermsText = creditRequest.getApprovedTerms();
+                            try {
+                                // Si es un número, agregar "días"
+                                int terms = Integer.parseInt(approvedTermsText.trim());
+                                tvApprovedTerms.setText(terms + " días");
+                            } catch (NumberFormatException e) {
+                                // Si no es un número, mostrar tal como viene
+                                tvApprovedTerms.setText(approvedTermsText);
+                            }
+                        } else {
+                            tvApprovedTerms.setText("Términos no especificados");
+                        }
                     }
                     break;
                     
@@ -390,6 +435,46 @@ public class CreditRequestsAdapter extends RecyclerView.Adapter<CreditRequestsAd
             });
 
             popup.show();
+        }
+        
+        /**
+         * Helper method to get the best available client display name
+         */
+        private String getClientDisplayName(com.example.chancafe_q.model.Client client, int clientId) {
+            android.util.Log.d("CreditRequestsAdapter", "Getting display name for client ID: " + clientId);
+            
+            // Prioridad 1: Campo "name" del backend (formato completo)
+            if (client.getName() != null && !client.getName().trim().isEmpty()) {
+                android.util.Log.d("CreditRequestsAdapter", "Using 'name' field: " + client.getName());
+                return client.getName().trim();
+            }
+            
+            // Prioridad 2: Business name para empresas
+            if (client.getBusinessName() != null && !client.getBusinessName().trim().isEmpty()) {
+                android.util.Log.d("CreditRequestsAdapter", "Using business name: " + client.getBusinessName());
+                return client.getBusinessName().trim();
+            }
+            
+            // Prioridad 3: Concatenar firstName + lastName
+            String firstName = client.getFirstName() != null ? client.getFirstName().trim() : "";
+            String lastName = client.getLastName() != null ? client.getLastName().trim() : "";
+            
+            if (!firstName.isEmpty() || !lastName.isEmpty()) {
+                String fullName = (firstName + " " + lastName).trim();
+                android.util.Log.d("CreditRequestsAdapter", "Using firstName + lastName: " + fullName);
+                return fullName;
+            }
+            
+            // Prioridad 4: FullName field (respaldo)
+            if (client.getFullName() != null && !client.getFullName().trim().isEmpty()) {
+                android.util.Log.d("CreditRequestsAdapter", "Using fullName field: " + client.getFullName());
+                return client.getFullName().trim();
+            }
+            
+            // Fallback: Usar ID del cliente
+            String fallbackName = "Cliente ID: " + clientId;
+            android.util.Log.d("CreditRequestsAdapter", "Using fallback name: " + fallbackName);
+            return fallbackName;
         }
     }
 }

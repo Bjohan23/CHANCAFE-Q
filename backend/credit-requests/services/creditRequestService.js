@@ -271,7 +271,8 @@ class CreditRequestService {
         notes
       } = approvalData;
 
-      if (!approvedAmount || approvedAmount <= 0) {
+      const parsedAmount = parseFloat(approvedAmount);
+      if (!parsedAmount || parsedAmount <= 0) {
         throw new Error("El monto aprobado debe ser mayor a 0");
       }
 
@@ -280,7 +281,7 @@ class CreditRequestService {
       }
 
       const approvalDto = new CreditRequestApprovalDTO({
-        approvedAmount,
+        approvedAmount: parsedAmount,
         approvedTerms,
         approvalConditions,
         expiresAt,
@@ -462,10 +463,10 @@ class CreditRequestService {
       clientId: creditRequest.client_id,
       userId: creditRequest.user_id,
       requestNumber: creditRequest.request_number,
-      requestedAmount: creditRequest.requested_amount,
-      approvedAmount: creditRequest.approved_amount,
+      requestedAmount: parseFloat(creditRequest.requested_amount) || 0,
+      approvedAmount: creditRequest.approved_amount ? parseFloat(creditRequest.approved_amount) : null,
       currency: creditRequest.currency,
-      exchangeRate: creditRequest.exchange_rate,
+      exchangeRate: parseFloat(creditRequest.exchange_rate) || 1.0,
       paymentTerms: creditRequest.payment_terms,
       approvedTerms: creditRequest.approved_terms,
       purpose: creditRequest.purpose,
@@ -504,9 +505,9 @@ class CreditRequestService {
         documentType: creditRequest.client.document_type,
         documentNumber: creditRequest.client.document_number,
         clientType: creditRequest.client.client_type,
-        creditScore: creditRequest.client.credit_score,
+        creditScore: creditRequest.client.credit_score ? parseInt(creditRequest.client.credit_score) : null,
         riskClassification: creditRequest.client.risk_classification,
-        suggestedCreditLimit: creditRequest.client.suggested_credit_limit,
+        suggestedCreditLimit: creditRequest.client.suggested_credit_limit ? parseFloat(creditRequest.client.suggested_credit_limit) : null,
         isBanked: creditRequest.client.is_banked,
         dni: creditRequest.client.document_number,
         ruc: creditRequest.client.tax_id
