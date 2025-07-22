@@ -170,12 +170,22 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
         
         // Observar éxito
         quoteViewModel.getSuccess().observe(this, success -> {
+            android.util.Log.d("AddEditQuote", "=== SUCCESS OBSERVER TRIGGERED ===");
+            android.util.Log.d("AddEditQuote", "Success message: '" + success + "'");
+            android.util.Log.d("AddEditQuote", "Success is null: " + (success == null));
+            android.util.Log.d("AddEditQuote", "Success is empty: " + (success != null ? success.isEmpty() : "N/A"));
+            
             if (success != null && !success.isEmpty()) {
+                android.util.Log.d("AddEditQuote", "Showing success message and finishing activity");
                 showSuccess(success);
                 quoteViewModel.clearMessages();
                 // Volver a la lista después de guardar
+                android.util.Log.d("AddEditQuote", "CALLING FINISH() - This will close the activity!");
                 finish();
+            } else {
+                android.util.Log.d("AddEditQuote", "Not finishing - success message is null or empty");
             }
+            android.util.Log.d("AddEditQuote", "=== SUCCESS OBSERVER END ===");
         });
         
         // Observar evaluación crediticia
@@ -511,51 +521,88 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
     }
 
     private void updateItemsList() {
-        if (quoteItems.isEmpty()) {
-            rvQuoteItems.setVisibility(View.GONE);
-            layoutEmptyItems.setVisibility(View.VISIBLE);
-        } else {
-            rvQuoteItems.setVisibility(View.VISIBLE);
-            layoutEmptyItems.setVisibility(View.GONE);
-            quoteItemsAdapter.updateItems(quoteItems);
+        android.util.Log.d("AddEditQuote", "=== UPDATE ITEMS LIST START ===");
+        android.util.Log.d("AddEditQuote", "Quote items size: " + quoteItems.size());
+        android.util.Log.d("AddEditQuote", "Quote items is empty: " + quoteItems.isEmpty());
+        
+        try {
+            if (quoteItems.isEmpty()) {
+                android.util.Log.d("AddEditQuote", "Showing empty layout");
+                rvQuoteItems.setVisibility(View.GONE);
+                layoutEmptyItems.setVisibility(View.VISIBLE);
+            } else {
+                android.util.Log.d("AddEditQuote", "Showing items list");
+                rvQuoteItems.setVisibility(View.VISIBLE);
+                layoutEmptyItems.setVisibility(View.GONE);
+                
+                android.util.Log.d("AddEditQuote", "Updating adapter with " + quoteItems.size() + " items");
+                if (quoteItemsAdapter != null) {
+                    quoteItemsAdapter.updateItems(quoteItems);
+                    android.util.Log.d("AddEditQuote", "Adapter updated successfully");
+                } else {
+                    android.util.Log.e("AddEditQuote", "Adapter is null!");
+                }
+            }
+            android.util.Log.d("AddEditQuote", "=== UPDATE ITEMS LIST END ===");
+        } catch (Exception e) {
+            android.util.Log.e("AddEditQuote", "Error in updateItemsList: " + e.getMessage(), e);
         }
     }
 
     private void updateTotals() {
-        if (currentQuote == null) {
-            currentQuote = new Quote();
+        android.util.Log.d("AddEditQuote", "=== UPDATE TOTALS START ===");
+        
+        try {
+            if (currentQuote == null) {
+                currentQuote = new Quote();
+                android.util.Log.d("AddEditQuote", "Created new Quote object");
+            }
+
+            android.util.Log.d("AddEditQuote", "Calculating subtotal from " + quoteItems.size() + " items");
+            // Calcular subtotal
+            double subtotal = 0.0;
+            for (QuoteItem item : quoteItems) {
+                double itemTotal = item.getTotalPriceAsDouble();
+                android.util.Log.d("AddEditQuote", "Item total: " + itemTotal);
+                subtotal += itemTotal;
+            }
+            android.util.Log.d("AddEditQuote", "Calculated subtotal: " + subtotal);
+
+            // Calcular descuento (por ahora 0)
+            double discountAmount = 0.0;
+            
+            // Calcular impuesto
+            double taxPercentage = currentQuote.getTaxPercentage() != null ? currentQuote.getTaxPercentage() : 18.0;
+            double taxAmount = (subtotal - discountAmount) * (taxPercentage / 100);
+            android.util.Log.d("AddEditQuote", "Tax percentage: " + taxPercentage + ", Tax amount: " + taxAmount);
+            
+            // Calcular total
+            double total = subtotal - discountAmount + taxAmount;
+            android.util.Log.d("AddEditQuote", "Final total: " + total);
+
+            android.util.Log.d("AddEditQuote", "Updating quote model...");
+            // Actualizar modelo
+            currentQuote.setSubtotal(subtotal);
+            currentQuote.setDiscountAmount(discountAmount);
+            currentQuote.setTaxAmount(taxAmount);
+            currentQuote.setTotalAmount(total);
+
+            android.util.Log.d("AddEditQuote", "Updating UI...");
+            // Actualizar UI
+            String currency = spinnerCurrency.getSelectedItem().toString();
+            String symbol = "PEN".equals(currency) ? "S/ " : "$ ";
+            android.util.Log.d("AddEditQuote", "Currency: " + currency + ", Symbol: " + symbol);
+            
+            tvSubtotal.setText(symbol + String.format(Locale.getDefault(), "%.2f", subtotal));
+            tvDiscount.setText(symbol + String.format(Locale.getDefault(), "%.2f", discountAmount));
+            tvTax.setText(symbol + String.format(Locale.getDefault(), "%.2f", taxAmount));
+            tvTotal.setText(symbol + String.format(Locale.getDefault(), "%.2f", total));
+            
+            android.util.Log.d("AddEditQuote", "=== UPDATE TOTALS END ===");
+            
+        } catch (Exception e) {
+            android.util.Log.e("AddEditQuote", "Error in updateTotals: " + e.getMessage(), e);
         }
-
-        // Calcular subtotal
-        double subtotal = 0.0;
-        for (QuoteItem item : quoteItems) {
-            subtotal += item.getTotalPriceAsDouble();
-        }
-
-        // Calcular descuento (por ahora 0)
-        double discountAmount = 0.0;
-        
-        // Calcular impuesto
-        double taxPercentage = currentQuote.getTaxPercentage() != null ? currentQuote.getTaxPercentage() : 18.0;
-        double taxAmount = (subtotal - discountAmount) * (taxPercentage / 100);
-        
-        // Calcular total
-        double total = subtotal - discountAmount + taxAmount;
-
-        // Actualizar modelo
-        currentQuote.setSubtotal(subtotal);
-        currentQuote.setDiscountAmount(discountAmount);
-        currentQuote.setTaxAmount(taxAmount);
-        currentQuote.setTotalAmount(total);
-
-        // Actualizar UI
-        String currency = spinnerCurrency.getSelectedItem().toString();
-        String symbol = "PEN".equals(currency) ? "S/ " : "$ ";
-        
-        tvSubtotal.setText(symbol + String.format(Locale.getDefault(), "%.2f", subtotal));
-        tvDiscount.setText(symbol + String.format(Locale.getDefault(), "%.2f", discountAmount));
-        tvTax.setText(symbol + String.format(Locale.getDefault(), "%.2f", taxAmount));
-        tvTotal.setText(symbol + String.format(Locale.getDefault(), "%.2f", total));
     }
 
     private void saveQuote(String status) {
@@ -731,15 +778,38 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
                     break;
                     
                 case REQUEST_ADD_ITEM:
-                    if (data != null && data.hasExtra("quote_item")) {
-                        QuoteItem newItem = (QuoteItem) data.getSerializableExtra("quote_item");
-                        if (newItem != null) {
-                            quoteItems.add(newItem);
-                            updateItemsList();
-                            updateTotals();
-                            Toast.makeText(this, "Item agregado exitosamente", Toast.LENGTH_SHORT).show();
+                    android.util.Log.d("AddEditQuote", "=== PROCESSING ADD ITEM RESULT ===");
+                    android.util.Log.d("AddEditQuote", "Data is null: " + (data == null));
+                    if (data != null) {
+                        android.util.Log.d("AddEditQuote", "Data has quote_item: " + data.hasExtra("quote_item"));
+                        if (data.hasExtra("quote_item")) {
+                            QuoteItem newItem = (QuoteItem) data.getSerializableExtra("quote_item");
+                            android.util.Log.d("AddEditQuote", "New item is null: " + (newItem == null));
+                            if (newItem != null) {
+                                android.util.Log.d("AddEditQuote", "Adding item to list. Current size: " + quoteItems.size());
+                                quoteItems.add(newItem);
+                                android.util.Log.d("AddEditQuote", "New list size: " + quoteItems.size());
+                                
+                                android.util.Log.d("AddEditQuote", "Updating items list...");
+                                updateItemsList();
+                                
+                                android.util.Log.d("AddEditQuote", "Updating totals...");
+                                updateTotals();
+                                
+                                android.util.Log.d("AddEditQuote", "Showing success toast...");
+                                Toast.makeText(this, "Item agregado exitosamente", Toast.LENGTH_SHORT).show();
+                                
+                                android.util.Log.d("AddEditQuote", "ADD ITEM processing completed successfully");
+                            } else {
+                                android.util.Log.e("AddEditQuote", "New item is null!");
+                            }
+                        } else {
+                            android.util.Log.e("AddEditQuote", "Data doesn't have quote_item extra!");
                         }
+                    } else {
+                        android.util.Log.e("AddEditQuote", "Data is null!");
                     }
+                    android.util.Log.d("AddEditQuote", "=== ADD ITEM RESULT PROCESSING END ===");
                     break;
                     
                 case REQUEST_EDIT_ITEM:

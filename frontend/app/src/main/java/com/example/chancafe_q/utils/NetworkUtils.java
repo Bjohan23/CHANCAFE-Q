@@ -53,8 +53,20 @@ public class NetworkUtils {
         call.enqueue(new Callback<ApiResponse<T>>() {
             @Override
             public void onResponse(Call<ApiResponse<T>> call, Response<ApiResponse<T>> response) {
+                Log.d(TAG, "=== API RESPONSE DEBUG ===");
+                Log.d(TAG, "Response code: " + response.code());
+                Log.d(TAG, "Response successful: " + response.isSuccessful());
+                Log.d(TAG, "Response body is null: " + (response.body() == null));
+                
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<T> apiResponse = response.body();
+                    Log.d(TAG, "ApiResponse toString: " + apiResponse.toString());
+                    Log.d(TAG, "ApiResponse success: " + apiResponse.isSuccess());
+                    Log.d(TAG, "ApiResponse data is null: " + (apiResponse.getData() == null));
+                    
+                    if (apiResponse.getData() != null) {
+                        Log.d(TAG, "ApiResponse data toString: " + apiResponse.getData().toString());
+                    }
                     
                     if (apiResponse.isSuccess()) {
                         callback.onSuccess(apiResponse.getData());
@@ -62,8 +74,10 @@ public class NetworkUtils {
                         callback.onError(apiResponse.getMessage(), apiResponse.getStatusCode());
                     }
                 } else {
+                    Log.d(TAG, "Response not successful or body is null");
                     handleHttpError(response.code(), callback);
                 }
+                Log.d(TAG, "=== END API RESPONSE DEBUG ===");
             }
 
             @Override

@@ -102,10 +102,17 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientsAdapter.ClientVi
         }
 
         public void bind(Client client, OnClientClickListener listener) {
+            android.util.Log.d("ClientsAdapter", "=== BINDING CLIENT ===");
+            android.util.Log.d("ClientsAdapter", "Client ID: " + client.getId());
+            android.util.Log.d("ClientsAdapter", "Client toString: " + client.toString());
+            
             // Mostrar nombre completo
             String displayName = client.getFullName();
+            android.util.Log.d("ClientsAdapter", "Display name from getFullName(): '" + displayName + "'");
+            
             if (displayName.trim().isEmpty()) {
                 displayName = "Cliente sin nombre";
+                android.util.Log.d("ClientsAdapter", "Display name was empty, using fallback: " + displayName);
             }
             
             // Agregar indicador de tipo de cliente

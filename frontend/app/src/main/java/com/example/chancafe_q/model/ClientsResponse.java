@@ -31,8 +31,26 @@ public class ClientsResponse {
 
     @Override
     public String toString() {
-        return "ClientsResponse{" +
-                "clients=" + clients +
-                '}';
+        StringBuilder sb = new StringBuilder("ClientsResponse{");
+        sb.append("clients=");
+        if (clients == null) {
+            sb.append("null");
+        } else {
+            sb.append("[size=").append(clients.size()).append(", data=");
+            for (int i = 0; i < Math.min(clients.size(), 2); i++) {
+                if (i > 0) sb.append(", ");
+                Client client = clients.get(i);
+                sb.append("{id=").append(client.getId())
+                  .append(", firstName='").append(client.getFirstName()).append("'")
+                  .append(", lastName='").append(client.getLastName()).append("'")
+                  .append(", fullName='").append(client.getFullName()).append("'}");
+            }
+            if (clients.size() > 2) {
+                sb.append("...");
+            }
+            sb.append("]");
+        }
+        sb.append('}');
+        return sb.toString();
     }
 }

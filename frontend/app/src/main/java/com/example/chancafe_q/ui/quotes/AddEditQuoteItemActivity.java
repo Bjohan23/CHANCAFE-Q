@@ -175,44 +175,77 @@ public class AddEditQuoteItemActivity extends AppCompatActivity {
     }
 
     private void saveItem() {
+        android.util.Log.d("AddEditQuoteItem", "=== SAVE ITEM START ===");
+        
         if (!validateForm()) {
+            android.util.Log.e("AddEditQuoteItem", "Form validation failed");
             return;
         }
 
         // Crear o actualizar item
         if (currentItem == null) {
             currentItem = new QuoteItem();
+            android.util.Log.d("AddEditQuoteItem", "Created new QuoteItem");
         }
 
         try {
+            android.util.Log.d("AddEditQuoteItem", "Setting item data...");
+            
             // Establecer producto seleccionado
             if (selectedProduct != null) {
                 currentItem.setProductId(selectedProduct.getId());
+                android.util.Log.d("AddEditQuoteItem", "Set product ID: " + selectedProduct.getId());
                 // No establecer el objeto Product completo para evitar problemas de serialización
                 // currentItem.setProduct(selectedProduct);
             }
             
-            currentItem.setDescription(etDescription.getText().toString().trim());
-            currentItem.setQuantity(etQuantity.getText().toString().trim());
-            currentItem.setUnitPrice(etUnitPrice.getText().toString().trim());
-            currentItem.setDiscount(Double.parseDouble(etDiscount.getText().toString().trim()));
-            currentItem.setNotes(etNotes.getText().toString().trim());
+            String description = etDescription.getText().toString().trim();
+            String quantity = etQuantity.getText().toString().trim();
+            String unitPrice = etUnitPrice.getText().toString().trim();
+            String discountText = etDiscount.getText().toString().trim();
+            String notes = etNotes.getText().toString().trim();
             
+            android.util.Log.d("AddEditQuoteItem", "Item data - Description: " + description);
+            android.util.Log.d("AddEditQuoteItem", "Item data - Quantity: " + quantity);
+            android.util.Log.d("AddEditQuoteItem", "Item data - Unit Price: " + unitPrice);
+            android.util.Log.d("AddEditQuoteItem", "Item data - Discount: " + discountText);
+            
+            currentItem.setDescription(description);
+            currentItem.setQuantity(quantity);
+            currentItem.setUnitPrice(unitPrice);
+            currentItem.setDiscount(Double.parseDouble(discountText));
+            currentItem.setNotes(notes);
+            
+            android.util.Log.d("AddEditQuoteItem", "Calculating total...");
             // Calcular total
             currentItem.calculateTotal();
+            android.util.Log.d("AddEditQuoteItem", "Total calculated: " + currentItem.getTotalPrice());
 
+            android.util.Log.d("AddEditQuoteItem", "Preparing result intent...");
             // Devolver resultado
             Intent resultIntent = new Intent();
             resultIntent.putExtra("quote_item", currentItem);
             if (isEditing) {
                 resultIntent.putExtra("item_position", itemPosition);
+                android.util.Log.d("AddEditQuoteItem", "Added item position: " + itemPosition);
             }
             
+            android.util.Log.d("AddEditQuoteItem", "Setting result and finishing...");
             setResult(RESULT_OK, resultIntent);
+            
+            // Mostrar mensaje de éxito antes de cerrar
+            Toast.makeText(this, "Item guardado correctamente", Toast.LENGTH_SHORT).show();
+            
+            android.util.Log.d("AddEditQuoteItem", "Calling finish()...");
             finish();
+            android.util.Log.d("AddEditQuoteItem", "=== SAVE ITEM END ===");
             
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Error en los valores numéricos", Toast.LENGTH_SHORT).show();
+            android.util.Log.e("AddEditQuoteItem", "Number format error: " + e.getMessage());
+            Toast.makeText(this, "Error en los valores numéricos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            android.util.Log.e("AddEditQuoteItem", "Unexpected error in saveItem: " + e.getMessage(), e);
+            Toast.makeText(this, "Error inesperado: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

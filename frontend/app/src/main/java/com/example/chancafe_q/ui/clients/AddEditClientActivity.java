@@ -178,13 +178,15 @@ public class AddEditClientActivity extends AppCompatActivity {
             if (isLoading != null) {
                 progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
                 btnSave.setEnabled(!isLoading);
+                android.util.Log.d("AddEditClient", "Loading state: " + isLoading);
             }
         });
 
         // Observar mensajes de error
         clientViewModel.getErrorMessage().observe(this, errorMessage -> {
             if (errorMessage != null && !errorMessage.isEmpty()) {
-                Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+                android.util.Log.e("AddEditClient", "Error received: " + errorMessage);
+                showError("Error al guardar cliente", errorMessage);
                 clientViewModel.clearMessages();
             }
         });
@@ -192,7 +194,8 @@ public class AddEditClientActivity extends AppCompatActivity {
         // Observar mensajes de éxito
         clientViewModel.getSuccessMessage().observe(this, successMessage -> {
             if (successMessage != null && !successMessage.isEmpty()) {
-                Toast.makeText(this, successMessage, Toast.LENGTH_SHORT).show();
+                android.util.Log.d("AddEditClient", "Success: " + successMessage);
+                Toast.makeText(this, "Cliente guardado exitosamente", Toast.LENGTH_SHORT).show();
                 clientViewModel.clearMessages();
                 // Regresar a la activity anterior con resultado exitoso
                 setResult(RESULT_OK);
@@ -262,53 +265,90 @@ public class AddEditClientActivity extends AppCompatActivity {
     }
 
     private void saveClient() {
+        android.util.Log.d("AddEditClient", "=== SAVE CLIENT START ===");
+        
         if (!validateFields()) {
+            android.util.Log.e("AddEditClient", "Validation failed");
             return;
         }
 
         // Recopilar datos del formulario
         collectFormData();
 
+        android.util.Log.d("AddEditClient", "Client data collected: " + currentClient.toString());
+        android.util.Log.d("AddEditClient", "Is edit mode: " + isEditMode);
+
         // Guardar o actualizar cliente
         if (isEditMode) {
+            android.util.Log.d("AddEditClient", "Updating client with ID: " + currentClient.getId());
             clientViewModel.updateClient(currentClient.getId(), currentClient);
         } else {
+            android.util.Log.d("AddEditClient", "Creating new client");
             clientViewModel.createClient(currentClient);
         }
     }
 
     private boolean validateFields() {
+        android.util.Log.d("AddEditClient", "=== VALIDATION START ===");
+        
+        // Limpiar errores previos
+        clearFieldErrors();
+        
         // Validaciones obligatorias: documentType y documentNumber
         String documentType = getSpinnerValue(spinnerDocumentType, new String[]{"DNI", "RUC", "passport", "CE"});
+        android.util.Log.d("AddEditClient", "Document type: " + documentType);
+        
         if (documentType == null || documentType.trim().isEmpty()) {
-            Toast.makeText(this, "Tipo de documento es obligatorio", Toast.LENGTH_LONG).show();
+            String errorMsg = "Tipo de documento es obligatorio";
+            android.util.Log.e("AddEditClient", errorMsg);
+            showFieldError("Tipo de documento", errorMsg);
             spinnerDocumentType.requestFocus();
             return false;
         }
 
         String documentNumber = etDocumentNumber.getText().toString().trim();
+        android.util.Log.d("AddEditClient", "Document number: " + documentNumber);
+        
         if (documentNumber.isEmpty()) {
-            etDocumentNumber.setError("Número de documento es obligatorio");
+            String errorMsg = "Número de documento es obligatorio";
+            android.util.Log.e("AddEditClient", errorMsg);
+            etDocumentNumber.setError(errorMsg);
             etDocumentNumber.requestFocus();
             return false;
         }
 
+        // Validar formato según tipo de documento
+        if (!validateDocumentFormat(documentType, documentNumber)) {
+            return false;
+        }
+
         String clientType = getSpinnerValue(spinnerClientType, new String[]{"individual", "business"});
+        android.util.Log.d("AddEditClient", "Client type: " + clientType);
         
         if ("individual".equals(clientType)) {
-            if (etFirstName.getText().toString().trim().isEmpty()) {
-                etFirstName.setError("Nombre requerido para persona natural");
+            String firstName = etFirstName.getText().toString().trim();
+            if (firstName.isEmpty()) {
+                String errorMsg = "Nombre requerido para persona natural";
+                android.util.Log.e("AddEditClient", errorMsg);
+                etFirstName.setError(errorMsg);
                 etFirstName.requestFocus();
                 return false;
             }
-            if (etLastName.getText().toString().trim().isEmpty()) {
-                etLastName.setError("Apellido requerido para persona natural");
+            
+            String lastName = etLastName.getText().toString().trim();
+            if (lastName.isEmpty()) {
+                String errorMsg = "Apellido requerido para persona natural";
+                android.util.Log.e("AddEditClient", errorMsg);
+                etLastName.setError(errorMsg);
                 etLastName.requestFocus();
                 return false;
             }
         } else if ("business".equals(clientType)) {
-            if (etBusinessName.getText().toString().trim().isEmpty()) {
-                etBusinessName.setError("Razón social requerida para empresa");
+            String businessName = etBusinessName.getText().toString().trim();
+            if (businessName.isEmpty()) {
+                String errorMsg = "Razón social requerida para empresa";
+                android.util.Log.e("AddEditClient", errorMsg);
+                etBusinessName.setError(errorMsg);
                 etBusinessName.requestFocus();
                 return false;
             }
@@ -317,58 +357,191 @@ public class AddEditClientActivity extends AppCompatActivity {
         // Validar email si se proporciona
         String email = etEmail.getText().toString().trim();
         if (!email.isEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Email inválido");
+            String errorMsg = "Formato de email inválido";
+            android.util.Log.e("AddEditClient", errorMsg + ": " + email);
+            etEmail.setError(errorMsg);
             etEmail.requestFocus();
             return false;
         }
 
+        // Validar teléfono si se proporciona
+        String phone = etPhone.getText().toString().trim();
+        if (!phone.isEmpty() && !isValidPhone(phone)) {
+            String errorMsg = "Formato de teléfono inválido (debe tener 9 dígitos)";
+            android.util.Log.e("AddEditClient", errorMsg + ": " + phone);
+            etPhone.setError(errorMsg);
+            etPhone.requestFocus();
+            return false;
+        }
+
+        android.util.Log.d("AddEditClient", "All validations passed");
         return true;
     }
 
+    private boolean validateDocumentFormat(String documentType, String documentNumber) {
+        switch (documentType) {
+            case "DNI":
+                if (!documentNumber.matches("\\d{8}")) {
+                    String errorMsg = "DNI debe tener 8 dígitos";
+                    android.util.Log.e("AddEditClient", errorMsg + ": " + documentNumber);
+                    etDocumentNumber.setError(errorMsg);
+                    etDocumentNumber.requestFocus();
+                    return false;
+                }
+                break;
+            case "RUC":
+                if (!documentNumber.matches("\\d{11}")) {
+                    String errorMsg = "RUC debe tener 11 dígitos";
+                    android.util.Log.e("AddEditClient", errorMsg + ": " + documentNumber);
+                    etDocumentNumber.setError(errorMsg);
+                    etDocumentNumber.requestFocus();
+                    return false;
+                }
+                break;
+            case "passport":
+                if (documentNumber.length() < 6 || documentNumber.length() > 12) {
+                    String errorMsg = "Pasaporte debe tener entre 6 y 12 caracteres";
+                    android.util.Log.e("AddEditClient", errorMsg + ": " + documentNumber);
+                    etDocumentNumber.setError(errorMsg);
+                    etDocumentNumber.requestFocus();
+                    return false;
+                }
+                break;
+            case "CE":
+                if (documentNumber.length() < 8 || documentNumber.length() > 12) {
+                    String errorMsg = "Carné de extranjería debe tener entre 8 y 12 caracteres";
+                    android.util.Log.e("AddEditClient", errorMsg + ": " + documentNumber);
+                    etDocumentNumber.setError(errorMsg);
+                    etDocumentNumber.requestFocus();
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
+    private boolean isValidPhone(String phone) {
+        // Remover espacios y caracteres especiales
+        String cleanPhone = phone.replaceAll("[\\s\\-\\(\\)]", "");
+        // Validar que tenga 9 dígitos (formato peruano)
+        return cleanPhone.matches("\\d{9}");
+    }
+
+    private void clearFieldErrors() {
+        etDocumentNumber.setError(null);
+        etFirstName.setError(null);
+        etLastName.setError(null);
+        etBusinessName.setError(null);
+        etEmail.setError(null);
+        etPhone.setError(null);
+    }
+
+    private void showFieldError(String fieldName, String message) {
+        Toast.makeText(this, fieldName + ": " + message, Toast.LENGTH_LONG).show();
+    }
+
+    private void showError(String title, String message) {
+        android.util.Log.e("AddEditClient", title + ": " + message);
+        
+        // Crear un diálogo de error más informativo
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setPositiveButton("Entendido", (dialog, which) -> dialog.dismiss())
+            .setCancelable(true)
+            .show();
+    }
+
     private void collectFormData() {
-        // Datos básicos
-        currentClient.setFirstName(etFirstName.getText().toString().trim());
-        currentClient.setLastName(etLastName.getText().toString().trim());
-        currentClient.setBusinessName(etBusinessName.getText().toString().trim());
-        currentClient.setDocumentType(getSpinnerValue(spinnerDocumentType, new String[]{"DNI", "RUC", "passport", "CE"}));
-        currentClient.setDocumentNumber(etDocumentNumber.getText().toString().trim());
-        currentClient.setEmail(etEmail.getText().toString().trim());
-        currentClient.setPhone(etPhone.getText().toString().trim());
-        currentClient.setPhoneSecondary(etPhoneSecondary.getText().toString().trim());
-
-        // Dirección
-        currentClient.setAddress(etAddress.getText().toString().trim());
-        currentClient.setDistrict(etDistrict.getText().toString().trim());
-        currentClient.setProvince(etProvince.getText().toString().trim());
-        currentClient.setDepartment(etDepartment.getText().toString().trim());
-        currentClient.setPostalCode(etPostalCode.getText().toString().trim());
-
-        // Información adicional
-        currentClient.setClientType(getSpinnerValue(spinnerClientType, new String[]{"individual", "business"}));
-        currentClient.setStatus(getSpinnerValue(spinnerStatus, new String[]{"active", "inactive", "suspended", "blacklisted"}));
+        android.util.Log.d("AddEditClient", "=== COLLECT FORM DATA START ===");
         
         try {
-            currentClient.setCreditLimit(Double.parseDouble(etCreditLimit.getText().toString().trim()));
-        } catch (NumberFormatException e) {
-            currentClient.setCreditLimit(0.0);
-        }
-        
-        try {
-            String paymentTermsStr = etPaymentTerms.getText().toString().trim();
-            if (!paymentTermsStr.isEmpty()) {
-                currentClient.setPaymentTerms(Integer.parseInt(paymentTermsStr));
+            // Datos básicos
+            String firstName = etFirstName.getText().toString().trim();
+            String lastName = etLastName.getText().toString().trim();
+            String businessName = etBusinessName.getText().toString().trim();
+            String documentType = getSpinnerValue(spinnerDocumentType, new String[]{"DNI", "RUC", "passport", "CE"});
+            String documentNumber = etDocumentNumber.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String phone = etPhone.getText().toString().trim();
+            
+            currentClient.setFirstName(firstName);
+            currentClient.setLastName(lastName);
+            currentClient.setBusinessName(businessName);
+            currentClient.setDocumentType(documentType);
+            currentClient.setDocumentNumber(documentNumber);
+            currentClient.setEmail(email);
+            currentClient.setPhone(phone);
+            currentClient.setPhoneSecondary(etPhoneSecondary.getText().toString().trim());
+
+            android.util.Log.d("AddEditClient", "Basic data - Name: " + firstName + " " + lastName);
+            android.util.Log.d("AddEditClient", "Basic data - Business: " + businessName);
+            android.util.Log.d("AddEditClient", "Basic data - Document: " + documentType + " " + documentNumber);
+            android.util.Log.d("AddEditClient", "Basic data - Contact: " + email + " | " + phone);
+
+            // Dirección
+            currentClient.setAddress(etAddress.getText().toString().trim());
+            currentClient.setDistrict(etDistrict.getText().toString().trim());
+            currentClient.setProvince(etProvince.getText().toString().trim());
+            currentClient.setDepartment(etDepartment.getText().toString().trim());
+            currentClient.setPostalCode(etPostalCode.getText().toString().trim());
+
+            // Información adicional
+            String clientType = getSpinnerValue(spinnerClientType, new String[]{"individual", "business"});
+            String status = getSpinnerValue(spinnerStatus, new String[]{"active", "inactive", "suspended", "blacklisted"});
+            
+            currentClient.setClientType(clientType);
+            currentClient.setStatus(status);
+            
+            android.util.Log.d("AddEditClient", "Additional data - Type: " + clientType + " | Status: " + status);
+            
+            // Límite de crédito
+            try {
+                String creditLimitStr = etCreditLimit.getText().toString().trim();
+                if (!creditLimitStr.isEmpty()) {
+                    double creditLimit = Double.parseDouble(creditLimitStr);
+                    currentClient.setCreditLimit(creditLimit);
+                    android.util.Log.d("AddEditClient", "Credit limit set: " + creditLimit);
+                } else {
+                    currentClient.setCreditLimit(0.0);
+                    android.util.Log.d("AddEditClient", "Credit limit set to default: 0.0");
+                }
+            } catch (NumberFormatException e) {
+                android.util.Log.e("AddEditClient", "Error parsing credit limit: " + e.getMessage());
+                currentClient.setCreditLimit(0.0);
             }
-        } catch (NumberFormatException e) {
-            currentClient.setPaymentTerms(30); // Default
-        }
+            
+            // Términos de pago
+            try {
+                String paymentTermsStr = etPaymentTerms.getText().toString().trim();
+                if (!paymentTermsStr.isEmpty()) {
+                    int paymentTerms = Integer.parseInt(paymentTermsStr);
+                    currentClient.setPaymentTerms(paymentTerms);
+                    android.util.Log.d("AddEditClient", "Payment terms set: " + paymentTerms);
+                } else {
+                    currentClient.setPaymentTerms(30); // Default
+                    android.util.Log.d("AddEditClient", "Payment terms set to default: 30");
+                }
+            } catch (NumberFormatException e) {
+                android.util.Log.e("AddEditClient", "Error parsing payment terms: " + e.getMessage());
+                currentClient.setPaymentTerms(30); // Default
+            }
 
-        currentClient.setContactMethod(getSpinnerValue(spinnerContactMethod, new String[]{"email", "phone", "whatsapp", "visit"}));
-        currentClient.setContactPreference(getSpinnerValue(spinnerContactPreference, new String[]{"morning", "afternoon", "evening", "anytime"}));
-        currentClient.setWebsite(etWebsite.getText().toString().trim());
-        currentClient.setIndustry(etIndustry.getText().toString().trim());
-        currentClient.setCompanySize(getSpinnerValue(spinnerCompanySize, new String[]{"", "micro", "small", "medium", "large"}));
-        currentClient.setTaxId(etTaxId.getText().toString().trim());
-        currentClient.setNotes(etNotes.getText().toString().trim());
+            currentClient.setContactMethod(getSpinnerValue(spinnerContactMethod, new String[]{"email", "phone", "whatsapp", "visit"}));
+            currentClient.setContactPreference(getSpinnerValue(spinnerContactPreference, new String[]{"morning", "afternoon", "evening", "anytime"}));
+            currentClient.setWebsite(etWebsite.getText().toString().trim());
+            currentClient.setIndustry(etIndustry.getText().toString().trim());
+            currentClient.setCompanySize(getSpinnerValue(spinnerCompanySize, new String[]{"", "micro", "small", "medium", "large"}));
+            currentClient.setTaxId(etTaxId.getText().toString().trim());
+            currentClient.setNotes(etNotes.getText().toString().trim());
+            
+            android.util.Log.d("AddEditClient", "=== FORM DATA COLLECTION COMPLETED SUCCESSFULLY ===");
+            
+        } catch (Exception e) {
+            android.util.Log.e("AddEditClient", "Error collecting form data: " + e.getMessage(), e);
+            showError("Error en datos", "Error al recopilar los datos del formulario: " + e.getMessage());
+        }
     }
 
     private String getSpinnerValue(Spinner spinner, String[] values) {

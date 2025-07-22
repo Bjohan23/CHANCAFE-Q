@@ -118,30 +118,39 @@ public class ClientViewModel extends AndroidViewModel {
      * Crea un nuevo cliente
      */
     public LiveData<ApiResponse<Client>> createClient(Client client) {
+        android.util.Log.d("ClientViewModel", "=== CREATE CLIENT START ===");
+        
         if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            android.util.Log.e("ClientViewModel", "No network available");
             MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
             ApiResponse<Client> errorResponse = new ApiResponse<>(
                 false, 
-                "No hay conexión a internet", 
+                "No hay conexión a internet. Verifica tu conexión y vuelve a intentar.", 
                 null, 
                 0
             );
             result.setValue(errorResponse);
+            errorMessage.setValue("No hay conexión a internet");
             return result;
         }
         
         // Validaciones básicas
         if (client == null) {
+            android.util.Log.e("ClientViewModel", "Client object is null");
             MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
             ApiResponse<Client> errorResponse = new ApiResponse<>(
                 false, 
-                "Datos del cliente requeridos", 
+                "Error interno: Datos del cliente no válidos", 
                 null, 
                 400
             );
             result.setValue(errorResponse);
+            errorMessage.setValue("Error interno: Datos del cliente no válidos");
             return result;
         }
+        
+        android.util.Log.d("ClientViewModel", "Client validation passed, starting network call");
+        android.util.Log.d("ClientViewModel", "Client data: " + client.toString());
         
         isLoading.setValue(true);
         
@@ -150,11 +159,21 @@ public class ClientViewModel extends AndroidViewModel {
         result.observeForever(response -> {
             isLoading.setValue(false);
             if (response != null) {
+                android.util.Log.d("ClientViewModel", "Response received - Success: " + response.isSuccess());
+                android.util.Log.d("ClientViewModel", "Response message: " + response.getMessage());
+                android.util.Log.d("ClientViewModel", "Response code: " + response.getStatusCode());
+                
                 if (response.isSuccess()) {
-                    successMessage.setValue(response.getMessage());
+                    String message = response.getMessage() != null ? response.getMessage() : "Cliente creado exitosamente";
+                    successMessage.setValue(message);
                 } else {
-                    errorMessage.setValue(response.getMessage());
+                    String errorMsg = buildDetailedErrorMessage(response);
+                    android.util.Log.e("ClientViewModel", "Error creating client: " + errorMsg);
+                    errorMessage.setValue(errorMsg);
                 }
+            } else {
+                android.util.Log.e("ClientViewModel", "Response is null");
+                errorMessage.setValue("Error desconocido: No se recibió respuesta del servidor");
             }
         });
         
@@ -165,17 +184,39 @@ public class ClientViewModel extends AndroidViewModel {
      * Actualiza un cliente existente
      */
     public LiveData<ApiResponse<Client>> updateClient(int clientId, Client client) {
+        android.util.Log.d("ClientViewModel", "=== UPDATE CLIENT START ===");
+        android.util.Log.d("ClientViewModel", "Client ID: " + clientId);
+        
         if (!NetworkUtils.isNetworkAvailable(getApplication())) {
+            android.util.Log.e("ClientViewModel", "No network available for update");
             MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
             ApiResponse<Client> errorResponse = new ApiResponse<>(
                 false, 
-                "No hay conexión a internet", 
+                "No hay conexión a internet. Verifica tu conexión y vuelve a intentar.", 
                 null, 
                 0
             );
             result.setValue(errorResponse);
+            errorMessage.setValue("No hay conexión a internet");
             return result;
         }
+        
+        if (client == null) {
+            android.util.Log.e("ClientViewModel", "Client object is null for update");
+            MutableLiveData<ApiResponse<Client>> result = new MutableLiveData<>();
+            ApiResponse<Client> errorResponse = new ApiResponse<>(
+                false, 
+                "Error interno: Datos del cliente no válidos", 
+                null, 
+                400
+            );
+            result.setValue(errorResponse);
+            errorMessage.setValue("Error interno: Datos del cliente no válidos");
+            return result;
+        }
+        
+        android.util.Log.d("ClientViewModel", "Client validation passed, starting update network call");
+        android.util.Log.d("ClientViewModel", "Client data: " + client.toString());
         
         isLoading.setValue(true);
         
@@ -184,11 +225,21 @@ public class ClientViewModel extends AndroidViewModel {
         result.observeForever(response -> {
             isLoading.setValue(false);
             if (response != null) {
+                android.util.Log.d("ClientViewModel", "Update response received - Success: " + response.isSuccess());
+                android.util.Log.d("ClientViewModel", "Update response message: " + response.getMessage());
+                android.util.Log.d("ClientViewModel", "Update response code: " + response.getStatusCode());
+                
                 if (response.isSuccess()) {
-                    successMessage.setValue(response.getMessage());
+                    String message = response.getMessage() != null ? response.getMessage() : "Cliente actualizado exitosamente";
+                    successMessage.setValue(message);
                 } else {
-                    errorMessage.setValue(response.getMessage());
+                    String errorMsg = buildDetailedErrorMessage(response);
+                    android.util.Log.e("ClientViewModel", "Error updating client: " + errorMsg);
+                    errorMessage.setValue(errorMsg);
                 }
+            } else {
+                android.util.Log.e("ClientViewModel", "Update response is null");
+                errorMessage.setValue("Error desconocido: No se recibió respuesta del servidor");
             }
         });
         
@@ -518,6 +569,68 @@ public class ClientViewModel extends AndroidViewModel {
         });
     }
     
+    /**
+     * Construye un mensaje de error detallado basado en la respuesta de la API
+     */
+    private String buildDetailedErrorMessage(ApiResponse<?> response) {
+        if (response == null) {
+            return "Error desconocido: No se recibió respuesta del servidor";
+        }
+        
+        StringBuilder errorMsg = new StringBuilder();
+        int statusCode = response.getStatusCode();
+        String message = response.getMessage();
+        
+        switch (statusCode) {
+            case 400:
+                errorMsg.append("Error de validación: ");
+                if (message != null && !message.isEmpty()) {
+                    errorMsg.append(message);
+                } else {
+                    errorMsg.append("Los datos enviados no son válidos. Revisa los campos obligatorios.");
+                }
+                break;
+            case 401:
+                errorMsg.append("Sesión expirada: Debes iniciar sesión nuevamente.");
+                break;
+            case 403:
+                errorMsg.append("Acceso denegado: No tienes permisos para realizar esta acción.");
+                break;
+            case 404:
+                errorMsg.append("Recurso no encontrado: El cliente no existe o fue eliminado.");
+                break;
+            case 409:
+                errorMsg.append("Conflicto: ");
+                if (message != null && message.contains("document")) {
+                    errorMsg.append("Ya existe un cliente con este número de documento.");
+                } else if (message != null && message.contains("email")) {
+                    errorMsg.append("Ya existe un cliente con este email.");
+                } else {
+                    errorMsg.append(message != null ? message : "Los datos ya existen en el sistema.");
+                }
+                break;
+            case 422:
+                errorMsg.append("Datos inválidos: ");
+                errorMsg.append(message != null ? message : "Revisa los formatos de los campos.");
+                break;
+            case 500:
+                errorMsg.append("Error del servidor: ");
+                errorMsg.append(message != null ? message : "Error interno. Intenta nuevamente más tarde.");
+                break;
+            case 0:
+                errorMsg.append("Sin conexión: Verifica tu conexión a internet y vuelve a intentar.");
+                break;
+            default:
+                errorMsg.append("Error ");
+                errorMsg.append(statusCode);
+                errorMsg.append(": ");
+                errorMsg.append(message != null ? message : "Error desconocido");
+                break;
+        }
+        
+        return errorMsg.toString();
+    }
+
     /**
      * Limpia los mensajes de error y éxito
      */

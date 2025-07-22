@@ -40,7 +40,30 @@ public class ClientRepository {
             new NetworkUtils.ApiCallback<ClientsResponse>() {
                 @Override
                 public void onSuccess(ClientsResponse data) {
-                    List<Client> clients = data != null ? data.getClients() : null;
+                    android.util.Log.d("ClientRepository", "=== CLIENTS RESPONSE RECEIVED ===");
+                    android.util.Log.d("ClientRepository", "Data is null: " + (data == null));
+                    android.util.Log.d("ClientRepository", "Data toString: " + (data != null ? data.toString() : "null"));
+                    
+                    List<Client> clients = null;
+                    if (data != null) {
+                        clients = data.getClients();
+                        android.util.Log.d("ClientRepository", "Clients list is null: " + (clients == null));
+                        if (clients != null) {
+                            android.util.Log.d("ClientRepository", "Number of clients: " + clients.size());
+                            for (int i = 0; i < Math.min(clients.size(), 3); i++) {
+                                Client client = clients.get(i);
+                                android.util.Log.d("ClientRepository", "Client " + i + " - ID: " + client.getId());
+                                android.util.Log.d("ClientRepository", "  firstName: '" + client.getFirstName() + "'");
+                                android.util.Log.d("ClientRepository", "  lastName: '" + client.getLastName() + "'");
+                                // Can't access private field directly, use getter
+                                android.util.Log.d("ClientRepository", "  fullName (via reflection): trying to access...");
+                                android.util.Log.d("ClientRepository", "  getFullName(): '" + client.getFullName() + "'");
+                                android.util.Log.d("ClientRepository", "  businessName: '" + client.getBusinessName() + "'");
+                                android.util.Log.d("ClientRepository", "  clientType: '" + client.getClientType() + "'");
+                            }
+                        }
+                    }
+                    
                     ApiResponse<List<Client>> response = new ApiResponse<>(
                         true, 
                         "Clientes obtenidos exitosamente", 

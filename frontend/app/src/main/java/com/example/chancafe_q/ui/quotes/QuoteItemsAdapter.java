@@ -157,7 +157,7 @@ public class QuoteItemsAdapter extends RecyclerView.Adapter<QuoteItemsAdapter.Qu
             tvQuantity.setText(String.valueOf(item.getQuantity()));
 
             // Precio unitario
-            tvUnitPrice.setText(String.format(Locale.getDefault(), "S/ %.2f", item.getUnitPrice()));
+            tvUnitPrice.setText(String.format(Locale.getDefault(), "S/ %.2f", item.getUnitPriceAsDouble()));
 
             // Descuento
             if (item.getDiscount() != null && item.getDiscount() > 0) {
@@ -170,7 +170,7 @@ public class QuoteItemsAdapter extends RecyclerView.Adapter<QuoteItemsAdapter.Qu
             }
 
             // Precio total
-            tvTotalPrice.setText(String.format(Locale.getDefault(), "S/ %.2f", item.getTotalPrice()));
+            tvTotalPrice.setText(String.format(Locale.getDefault(), "S/ %.2f", item.getTotalPriceAsDouble()));
 
             // Notas
             if (item.getNotes() != null && !item.getNotes().isEmpty()) {
