@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Notas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="bg-white rounded-lg shadow-xl p-8">
+            <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">
+                📊 Calculadora de Notas Académicas
+            </h1>
+            
+            <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                <h2 class="text-lg font-semibold text-blue-800 mb-2">Fórmula de Evaluación:</h2>
+                <p class="text-blue-700">
+                    <span class="font-mono">Nota Final = EC×0.25 + ED×0.30 + EP×0.40 + EA×0.05</span>
+                </p>
+            </div>
+
+            <form id="notasForm" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="ec" class="block text-sm font-medium text-gray-700 mb-2">
+                            📝 Exámenes Cortos (EC) - 25%
+                        </label>
+                        <input type="number" id="ec" min="0" max="100" step="0.1" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                               placeholder="Ingresa tu nota">
+                    </div>
+
+                    <div>
+                        <label for="ed" class="block text-sm font-medium text-gray-700 mb-2">
+                            📚 Exámenes Departamentales (ED) - 30%
+                        </label>
+                        <input type="number" id="ed" min="0" max="100" step="0.1"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                               placeholder="Ingresa tu nota">
+                    </div>
+
+                    <div>
+                        <label for="ep" class="block text-sm font-medium text-gray-700 mb-2">
+                            🎯 Examen Parcial (EP) - 40%
+                        </label>
+                        <input type="number" id="ep" min="0" max="100" step="0.1"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                               placeholder="Ingresa tu nota">
+                    </div>
+
+                    <div>
+                        <label for="ea" class="block text-sm font-medium text-gray-700 mb-2">
+                            ⭐ Evaluación Actitudinal (EA) - 5%
+                        </label>
+                        <input type="number" id="ea" min="0" max="100" step="0.1"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                               placeholder="Ingresa tu nota">
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label for="notaAprobacion" class="block text-sm font-medium text-gray-700 mb-2">
+                        ✅ Nota mínima para aprobar
+                    </label>
+                    <input type="number" id="notaAprobacion" min="0" max="100" step="0.1" value="70"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                </div>
+
+                <button type="button" onclick="calcularNota()" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 transform hover:scale-105">
+                    🧮 Calcular Nota Final
+                </button>
+            </form>
+
+            <div id="resultado" class="mt-8 hidden">
+                <div class="p-6 rounded-lg border-2">
+                    <h3 class="text-xl font-bold mb-4">📋 Resultados:</h3>
+                    <div id="notaFinal" class="text-2xl font-bold mb-3"></div>
+                    <div id="estadoAprobacion" class="text-lg mb-3"></div>
+                    <div id="faltaAprobar" class="text-lg"></div>
+                    
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="font-semibold text-gray-700 mb-2">Desglose del cálculo:</h4>
+                        <div id="desglose" class="text-sm text-gray-600 space-y-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h3 class="font-semibold text-yellow-800 mb-2">💡 Consejos:</h3>
+                <ul class="text-yellow-700 space-y-1 text-sm">
+                    <li>• Puedes dejar campos vacíos si aún no tienes esas notas</li>
+                    <li>• El sistema calculará qué nota necesitas en los exámenes restantes</li>
+                    <li>• Todas las notas deben estar en una escala de 0 a 100</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calcularNota() {
+            const ec = parseFloat(document.getElementById('ec').value) || 0;
+            const ed = parseFloat(document.getElementById('ed').value) || 0;
+            const ep = parseFloat(document.getElementById('ep').value) || 0;
+            const ea = parseFloat(document.getElementById('ea').value) || 0;
+            const notaAprobacion = parseFloat(document.getElementById('notaAprobacion').value) || 70;
+
+            // Verificar qué campos están completos
+            const camposCompletos = {
+                ec: document.getElementById('ec').value !== '',
+                ed: document.getElementById('ed').value !== '',
+                ep: document.getElementById('ep').value !== '',
+                ea: document.getElementById('ea').value !== ''
+            };
+
+            // Calcular nota actual con los valores ingresados
+            const notaFinal = (ec * 0.25) + (ed * 0.30) + (ep * 0.40) + (ea * 0.05);
+
+            // Mostrar resultado
+            const resultadoDiv = document.getElementById('resultado');
+            const notaFinalDiv = document.getElementById('notaFinal');
+            const estadoDiv = document.getElementById('estadoAprobacion');
+            const faltaDiv = document.getElementById('faltaAprobar');
+            const desgloseDiv = document.getElementById('desglose');
+
+            resultadoDiv.classList.remove('hidden');
+
+            // Determinar el color y mensaje según la nota
+            let colorClase, mensaje, estado;
+            if (notaFinal >= notaAprobacion) {
+                colorClase = 'text-green-600 bg-green-50 border-green-200';
+                estado = '✅ ¡APROBADO!';
+                mensaje = `¡Felicidades! Has aprobado con ${notaFinal.toFixed(2)} puntos.`;
+            } else {
+                colorClase = 'text-red-600 bg-red-50 border-red-200';
+                estado = '❌ REPROBADO';
+                const falta = notaAprobacion - notaFinal;
+                mensaje = `Te faltan ${falta.toFixed(2)} puntos para aprobar.`;
+            }
+
+            resultadoDiv.firstElementChild.className = `p-6 rounded-lg border-2 ${colorClase}`;
+            notaFinalDiv.innerHTML = `Nota Final: <span class="text-3xl">${notaFinal.toFixed(2)}</span>`;
+            estadoDiv.innerHTML = estado;
+            faltaDiv.innerHTML = mensaje;
+
+            // Mostrar desglose
+            let desgloseHTML = '';
+            desgloseHTML += `<div>EC (25%): ${ec.toFixed(1)} × 0.25 = ${(ec * 0.25).toFixed(2)}</div>`;
+            desgloseHTML += `<div>ED (30%): ${ed.toFixed(1)} × 0.30 = ${(ed * 0.30).toFixed(2)}</div>`;
+            desgloseHTML += `<div>EP (40%): ${ep.toFixed(1)} × 0.40 = ${(ep * 0.40).toFixed(2)}</div>`;
+            desgloseHTML += `<div>EA (5%): ${ea.toFixed(1)} × 0.05 = ${(ea * 0.05).toFixed(2)}</div>`;
+            desgloseHTML += `<div class="font-semibold border-t pt-2 mt-2">Total: ${notaFinal.toFixed(2)}</div>`;
+
+            // Calcular qué nota necesita en exámenes faltantes
+            if (notaFinal < notaAprobacion) {
+                const faltante = notaAprobacion - notaFinal;
+                desgloseHTML += `<div class="mt-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">`;
+                desgloseHTML += `<strong>Para aprobar necesitas:</strong><br>`;
+                
+                if (!camposCompletos.ec && !camposCompletos.ed && !camposCompletos.ep) {
+                    desgloseHTML += `Si distribuyeras el faltante proporcionalmente, necesitarías aproximadamente ${(faltante / 0.95 * 100).toFixed(1)} puntos promedio en los exámenes restantes.`;
+                } else if (!camposCompletos.ep) {
+                    const notaNecesariaEP = faltante / 0.40;
+                    if (notaNecesariaEP <= 100) {
+                        desgloseHTML += `${notaNecesariaEP.toFixed(1)} puntos en el Examen Parcial (EP)`;
+                    } else {
+                        desgloseHTML += `${notaNecesariaEP.toFixed(1)} puntos en EP (imposible, máximo 100)`;
+                    }
+                } else {
+                    desgloseHTML += `Ya no es posible aprobar con las notas ingresadas.`;
+                }
+                desgloseHTML += `</div>`;
+            }
+
+            desgloseDiv.innerHTML = desgloseHTML;
+        }
+
+        // Calcular automáticamente cuando se cambie cualquier input
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                if (document.getElementById('resultado').classList.contains('hidden') === false) {
+                    calcularNota();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

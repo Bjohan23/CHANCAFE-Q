@@ -368,38 +368,290 @@ class CreditRequestRepository {
   async getCreditRequestStats() {
     try {
       const CreditRequest = getCreditRequestModel();
+      const { Op } = require('sequelize');
       
-      const [totalRequests, pendingRequests, approvedRequests, rejectedRequests, byStatus] = await Promise.all([
+      // Fechas para análisis temporal
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const last30Days = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+      const last7Days = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+
+      const [
+        totalRequests, 
+        pendingRequests, 
+        approvedRequests, 
+        rejectedRequests, 
+        reviewRequests,
+        byStatus,
+        byPriority,
+        byCurrency,
+        byRiskAssessment,
+        monthlyStats,
+        yearlyStats,
+        last30DaysStats,
+        last7DaysStats,
+        averageStats,
+        topClients,
+        expiringRequests
+      ] = await Promise.all([
+        // Conteos básicos
         CreditRequest.count(),
         CreditRequest.count({ where: { status: 'pending' } }),
         CreditRequest.count({ where: { status: 'approved' } }),
         CreditRequest.count({ where: { status: 'rejected' } }),
+        CreditRequest.count({ where: { status: 'under_review' } }),
+        
+        // Estadísticas por status
         CreditRequest.findAll({
           attributes: [
             'status',
             [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'count'],
             [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested'],
-            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('approved_amount')), 'total_approved']
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('approved_amount')), 'total_approved'],
+            [CreditRequest.sequelize.fn('AVG', CreditRequest.sequelize.col('requested_amount')), 'avg_requested'],
+            [CreditRequest.sequelize.fn('MAX', CreditRequest.sequelize.col('requested_amount')), 'max_requested'],
+            [CreditRequest.sequelize.fn('MIN', CreditRequest.sequelize.col('requested_amount')), 'min_requested']
           ],
           group: ['status']
+        }),
+        
+        // Estadísticas por prioridad
+        CreditRequest.findAll({
+          attributes: [
+            'priority',
+            [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'count'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested']
+          ],
+          group: ['priority']
+        }),
+        
+        // Estadísticas por moneda
+        CreditRequest.findAll({
+          attributes: [
+            'currency',
+            [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'count'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested']
+          ],
+          group: ['currency']
+        }),
+        
+        // Estadísticas por evaluación de riesgo
+        CreditRequest.findAll({
+          attributes: [
+            'risk_assessment',
+            [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'count'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested']
+          ],
+          where: {
+            risk_assessment: { [Op.not]: null }
+          },
+          group: ['risk_assessment']
+        }),
+        
+        // Estadísticas del mes actual
+        CreditRequest.findAll({
+          attributes: [
+            [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'count'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('approved_amount')), 'total_approved']
+          ],
+          where: {
+            created_at: { [Op.gte]: startOfMonth }
+          }
+        }),
+        
+        // Estadísticas del año actual
+        CreditRequest.findAll({
+          attributes: [
+            [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'count'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('approved_amount')), 'total_approved']
+          ],
+          where: {
+            created_at: { [Op.gte]: startOfYear }
+          }
+        }),
+        
+        // Estadísticas últimos 30 días
+        CreditRequest.findAll({
+          attributes: [
+            [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'count'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('approved_amount')), 'total_approved']
+          ],
+          where: {
+            created_at: { [Op.gte]: last30Days }
+          }
+        }),
+        
+        // Estadísticas últimos 7 días
+        CreditRequest.findAll({
+          attributes: [
+            [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'count'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('approved_amount')), 'total_approved']
+          ],
+          where: {
+            created_at: { [Op.gte]: last7Days }
+          }
+        }),
+        
+        // Promedios generales
+        CreditRequest.findAll({
+          attributes: [
+            [CreditRequest.sequelize.fn('AVG', CreditRequest.sequelize.col('requested_amount')), 'avg_requested'],
+            [CreditRequest.sequelize.fn('AVG', CreditRequest.sequelize.col('approved_amount')), 'avg_approved'],
+            [CreditRequest.sequelize.fn('MAX', CreditRequest.sequelize.col('requested_amount')), 'max_requested'],
+            [CreditRequest.sequelize.fn('MIN', CreditRequest.sequelize.col('requested_amount')), 'min_requested'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('approved_amount')), 'total_approved']
+          ]
+        }),
+        
+        // Top 10 clientes con más solicitudes
+        CreditRequest.findAll({
+          attributes: [
+            'client_id',
+            [CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'request_count'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('requested_amount')), 'total_requested'],
+            [CreditRequest.sequelize.fn('SUM', CreditRequest.sequelize.col('approved_amount')), 'total_approved']
+          ],
+          group: ['client_id'],
+          order: [[CreditRequest.sequelize.fn('COUNT', CreditRequest.sequelize.col('id')), 'DESC']],
+          limit: 10
+        }),
+        
+        // Solicitudes próximas a expirar (próximos 7 días)
+        CreditRequest.count({
+          where: {
+            status: 'pending',
+            expires_at: {
+              [Op.between]: [now, new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000))]
+            }
+          }
         })
       ]);
 
+      // Procesar estadísticas por status
       const statusStats = byStatus.reduce((acc, item) => {
         acc[item.status] = {
           count: parseInt(item.dataValues.count),
           totalRequested: parseFloat(item.dataValues.total_requested) || 0,
-          totalApproved: parseFloat(item.dataValues.total_approved) || 0
+          totalApproved: parseFloat(item.dataValues.total_approved) || 0,
+          avgRequested: parseFloat(item.dataValues.avg_requested) || 0,
+          maxRequested: parseFloat(item.dataValues.max_requested) || 0,
+          minRequested: parseFloat(item.dataValues.min_requested) || 0
         };
         return acc;
       }, {});
 
+      // Procesar estadísticas por prioridad
+      const priorityStats = byPriority.reduce((acc, item) => {
+        acc[item.priority || 'no_priority'] = {
+          count: parseInt(item.dataValues.count),
+          totalRequested: parseFloat(item.dataValues.total_requested) || 0
+        };
+        return acc;
+      }, {});
+
+      // Procesar estadísticas por moneda
+      const currencyStats = byCurrency.reduce((acc, item) => {
+        acc[item.currency || 'PEN'] = {
+          count: parseInt(item.dataValues.count),
+          totalRequested: parseFloat(item.dataValues.total_requested) || 0
+        };
+        return acc;
+      }, {});
+
+      // Procesar estadísticas por evaluación de riesgo
+      const riskStats = byRiskAssessment.reduce((acc, item) => {
+        acc[item.risk_assessment] = {
+          count: parseInt(item.dataValues.count),
+          totalRequested: parseFloat(item.dataValues.total_requested) || 0
+        };
+        return acc;
+      }, {});
+
+      // Procesar datos de períodos
+      const monthlyData = monthlyStats[0]?.dataValues || { count: 0, total_requested: 0, total_approved: 0 };
+      const yearlyData = yearlyStats[0]?.dataValues || { count: 0, total_requested: 0, total_approved: 0 };
+      const last30DaysData = last30DaysStats[0]?.dataValues || { count: 0, total_requested: 0, total_approved: 0 };
+      const last7DaysData = last7DaysStats[0]?.dataValues || { count: 0, total_requested: 0, total_approved: 0 };
+      const averageData = averageStats[0]?.dataValues || {};
+
+      // Procesar top clientes
+      const topClientsData = topClients.map(item => ({
+        clientId: item.client_id,
+        requestCount: parseInt(item.dataValues.request_count),
+        totalRequested: parseFloat(item.dataValues.total_requested) || 0,
+        totalApproved: parseFloat(item.dataValues.total_approved) || 0
+      }));
+
+      // Calcular tasas de aprobación
+      const approvalRate = totalRequests > 0 ? ((approvedRequests / totalRequests) * 100).toFixed(2) : 0;
+      const rejectionRate = totalRequests > 0 ? ((rejectedRequests / totalRequests) * 100).toFixed(2) : 0;
+      const pendingRate = totalRequests > 0 ? ((pendingRequests / totalRequests) * 100).toFixed(2) : 0;
+
       return {
+        overview: {
+          total: totalRequests,
+          pending: pendingRequests,
+          approved: approvedRequests,
+          rejected: rejectedRequests,
+          underReview: reviewRequests,
+          expiringInWeek: expiringRequests
+        },
+        rates: {
+          approvalRate: parseFloat(approvalRate),
+          rejectionRate: parseFloat(rejectionRate),
+          pendingRate: parseFloat(pendingRate)
+        },
+        amounts: {
+          totalRequested: parseFloat(averageData.total_requested) || 0,
+          totalApproved: parseFloat(averageData.total_approved) || 0,
+          averageRequested: parseFloat(averageData.avg_requested) || 0,
+          averageApproved: parseFloat(averageData.avg_approved) || 0,
+          maxRequested: parseFloat(averageData.max_requested) || 0,
+          minRequested: parseFloat(averageData.min_requested) || 0
+        },
+        periods: {
+          thisMonth: {
+            count: parseInt(monthlyData.count) || 0,
+            totalRequested: parseFloat(monthlyData.total_requested) || 0,
+            totalApproved: parseFloat(monthlyData.total_approved) || 0
+          },
+          thisYear: {
+            count: parseInt(yearlyData.count) || 0,
+            totalRequested: parseFloat(yearlyData.total_requested) || 0,
+            totalApproved: parseFloat(yearlyData.total_approved) || 0
+          },
+          last30Days: {
+            count: parseInt(last30DaysData.count) || 0,
+            totalRequested: parseFloat(last30DaysData.total_requested) || 0,
+            totalApproved: parseFloat(last30DaysData.total_approved) || 0
+          },
+          last7Days: {
+            count: parseInt(last7DaysData.count) || 0,
+            totalRequested: parseFloat(last7DaysData.total_requested) || 0,
+            totalApproved: parseFloat(last7DaysData.total_approved) || 0
+          }
+        },
+        byStatus: statusStats,
+        byPriority: priorityStats,
+        byCurrency: currencyStats,
+        byRiskAssessment: riskStats,
+        topClients: topClientsData,
+        alerts: {
+          expiringInWeek: expiringRequests,
+          pendingRequests: pendingRequests,
+          highPriorityPending: statusStats.pending?.count || 0
+        },
+        // Mantener compatibilidad con la estructura anterior
         total: totalRequests,
         pending: pendingRequests,
         approved: approvedRequests,
-        rejected: rejectedRequests,
-        byStatus: statusStats
+        rejected: rejectedRequests
       };
     } catch (error) {
       console.error('❌ Error en CreditRequestRepository.getCreditRequestStats:', error.message);
