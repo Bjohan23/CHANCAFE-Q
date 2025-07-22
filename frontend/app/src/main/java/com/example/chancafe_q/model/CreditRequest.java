@@ -10,24 +10,18 @@ import java.util.List;
 public class CreditRequest {
     private int id;
     
-    @SerializedName(value = "clientId", alternate = {"client_id"})
     private int clientId;
     
-    @SerializedName(value = "userId", alternate = {"user_id"})
     private int userId;
     
-    @SerializedName(value = "requestedAmount", alternate = {"requested_amount"})
     private Double requestedAmount;
     
-    @SerializedName(value = "requestNumber", alternate = {"request_number"})
     private String requestNumber;
     
     private String currency;
     
-    @SerializedName(value = "exchangeRate", alternate = {"exchange_rate"})
     private Double exchangeRate;
     
-    @SerializedName(value = "paymentTerms", alternate = {"payment_terms"})
     private Integer paymentTerms;
     
     private String purpose;
@@ -35,56 +29,41 @@ public class CreditRequest {
     
     private String priority; // "low", "medium", "high", "urgent"
     
-    @SerializedName(value = "riskAssessment", alternate = {"risk_assessment"})
     private String riskAssessment;
     
     private List<String> documents;
     
-    @SerializedName(value = "approvalConditions", alternate = {"approval_conditions"})
     private String approvalConditions;
     
     private String status; // "pending", "approved", "rejected", "expired"
     
-    @SerializedName(value = "approvedAmount", alternate = {"approved_amount"})
     private Double approvedAmount;
     
-    @SerializedName(value = "approvedTerms", alternate = {"approved_terms"})
     private String approvedTerms;
     
-    @SerializedName(value = "approvedBy", alternate = {"approved_by"})
     private Integer approvedBy;
     
-    @SerializedName(value = "approvedAt", alternate = {"approved_at"})
     private Date approvedAt;
     
-    @SerializedName(value = "rejectionReason", alternate = {"rejection_reason"})
     private String rejectionReason;
     
-    @SerializedName(value = "expiresAt", alternate = {"expires_at"})
     private Date expiresAt;
     
     private String notes;
     
-    @SerializedName(value = "internalNotes", alternate = {"internal_notes"})
     private String internalNotes;
     
-    @SerializedName(value = "createdAt", alternate = {"created_at"})
     private Date createdAt;
     
-    @SerializedName(value = "updatedAt", alternate = {"updated_at"})
     private Date updatedAt;
     
     // Campos adicionales para cálculos de crédito
-    @SerializedName(value = "requestedTerms", alternate = {"requested_terms"})
     private int requestedTerms;
     
-    @SerializedName(value = "monthlyIncome", alternate = {"monthly_income"})
     private double monthlyIncome;
     
-    @SerializedName(value = "currentDebts", alternate = {"current_debts"})
     private double currentDebts;
     
-    @SerializedName(value = "riskLevel", alternate = {"risk_level"})
     private String riskLevel;
     
     // Relaciones
