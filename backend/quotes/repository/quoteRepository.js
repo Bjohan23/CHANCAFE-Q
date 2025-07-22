@@ -173,21 +173,35 @@ class QuoteRepository {
       const Client = getClientModel();
       const User = getUserModel();
       
+      const QuoteItem = getQuoteItemModel();
+      
+      const includes = [
+        {
+          model: Client,
+          as: 'client',
+          required: false,
+          attributes: ['id', 'business_name', 'first_name', 'last_name', 'email', 'phone', 'document_number', 'document_type', 'tax_id', 'credit_score', 'risk_classification', 'suggested_credit_limit', 'is_banked', 'client_type', 'status']
+        },
+        {
+          model: User,
+          as: 'advisor', 
+          required: false,
+          attributes: ['id', 'first_name', 'last_name', 'email', 'role']
+        }
+      ];
+
+      // Agregar QuoteItems si el modelo está disponible
+      if (QuoteItem) {
+        includes.push({
+          model: QuoteItem,
+          as: 'items',
+          required: false,
+          order: [['sort_order', 'ASC']]
+        });
+      }
+
       const queryOptions = {
-        include: [
-          {
-            model: Client,
-            as: 'client',
-            required: false,
-            attributes: ['id', 'business_name', 'first_name', 'last_name', 'email', 'phone', 'document_number', 'document_type', 'tax_id', 'credit_score', 'risk_classification', 'suggested_credit_limit', 'is_banked', 'client_type', 'status']
-          },
-          {
-            model: User,
-            as: 'advisor', 
-            required: false,
-            attributes: ['id', 'first_name', 'last_name', 'email', 'role']
-          }
-        ],
+        include: includes,
         ...options
       };
       

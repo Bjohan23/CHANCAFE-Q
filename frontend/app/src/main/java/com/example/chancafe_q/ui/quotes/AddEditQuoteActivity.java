@@ -188,8 +188,8 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
         
         // Nuevo cliente
         btnNewClient.setOnClickListener(v -> {
-            // TODO: Abrir actividad de agregar cliente
-            Toast.makeText(this, "Agregar cliente - Próximamente", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, com.example.chancafe_q.ui.clients.AddEditClientActivity.class);
+            startActivity(intent);
         });
         
         // Actualizar evaluación crediticia
@@ -458,13 +458,8 @@ public class AddEditQuoteActivity extends AppCompatActivity implements QuoteItem
             layoutCreditInfo.setVisibility(View.VISIBLE);
             
             try {
-                // Extraer información del cliente
-                Map<String, Object> clientData = (Map<String, Object>) creditAssessment.get("client");
-                Map<String, Object> creditInfo = null;
-                
-                if (clientData != null) {
-                    creditInfo = (Map<String, Object>) clientData.get("creditInfo");
-                }
+                // Extraer información crediticia directamente de la respuesta
+                Map<String, Object> creditInfo = (Map<String, Object>) creditAssessment.get("creditInfo");
                 
                 if (creditInfo != null) {
                     // Mostrar score y clasificación

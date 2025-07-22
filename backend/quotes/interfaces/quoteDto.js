@@ -14,7 +14,7 @@ class QuoteDTO {
         currency = 'PEN',
         exchangeRate = 1,
         validUntil,
-        status = 'draft',
+        status,
         notes,
         internalNotes,
         revision = 1,
@@ -36,7 +36,7 @@ class QuoteDTO {
         this.currency = currency;
         this.exchangeRate = exchangeRate;
         this.validUntil = validUntil;
-        this.status = status;
+        this.status = status || 'draft';
         this.notes = notes;
         this.internalNotes = internalNotes;
         this.revision = revision;

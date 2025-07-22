@@ -27,6 +27,9 @@ npm run start:prod
 npm run migrate
 npm run db:improve
 
+# Database maintenance
+node scripts/fix-indexes.js
+
 # Testing (not configured yet)
 npm test
 ```
@@ -52,6 +55,9 @@ cd frontend
 # Run instrumented tests
 ./gradlew connectedAndroidTest
 
+# Build debug APK
+./gradlew assembleDebug
+
 # Build release APK
 ./gradlew assembleRelease
 
@@ -63,11 +69,12 @@ cd frontend
 
 ### High-Level Structure
 
-**CHANCAFE Q** is a sales advisor application consisting of:
+**CHANCAFE Q** is a sales advisor application for a retail company specializing in electrical appliances, consisting of:
 
 - **Backend**: Node.js Express REST API with MySQL database (backend/)
 - **Frontend**: Android application using Java/MVVM architecture (frontend/)
 - **Integration**: Sentinel Credit Bureau API for automated credit assessment
+- **Scripts**: Database maintenance and improvement scripts (scripts/)
 
 ### Backend Architecture
 
@@ -83,6 +90,7 @@ Each business domain has its own module with consistent 3-layer architecture:
 /quotes/            - Quote generation with automatic credit checks
 /suppliers/         - Supplier management
 /external-apis/     - Sentinel API integration
+/scripts/           - Database maintenance scripts
 ```
 
 #### Layer Structure (Each Module)
@@ -93,10 +101,11 @@ Each business domain has its own module with consistent 3-layer architecture:
 - **interfaces/**: DTOs and data validation
 
 #### Shared Components
-- **shared/models/**: Sequelize models for database entities
+- **shared/models/**: Sequelize models for database entities (User, Client, Quote, ActivityLog, UserSession, etc.)
 - **shared/config/**: Database configuration and response helpers
 - **shared/middlewares/**: Authentication and authorization middleware
 - **shared/utils/**: Utility functions including `routerFactory.js`
+- **storage/img/**: Image assets and file storage
 
 ### Frontend Architecture
 
@@ -108,6 +117,8 @@ com.example.chancafe_q/
 │   ├── dashboard/         # Main dashboard
 │   ├── clients/           # Client management
 │   ├── quotes/            # Quote management
+│   ├── credit/            # Credit request management
+│   ├── agenda/            # Schedule and agenda management
 │   └── profile/           # User profile
 ├── viewmodel/             # ViewModels for business logic
 ├── model/                 # Data models
@@ -122,7 +133,9 @@ com.example.chancafe_q/
 - **Language**: Java
 - **Min SDK**: 25 (Android 7.0)
 - **Target SDK**: 35
-- **Build System**: Gradle with Kotlin DSL
+- **Build System**: Gradle with Kotlin DSL and Version Catalog (libs.versions.toml)
+- **Java Version**: 11
+- **AGP Version**: 8.9.2
 - **UI**: Material Design Components with View Binding
 - **Architecture**: MVVM with LiveData and ViewModel
 
@@ -131,6 +144,7 @@ com.example.chancafe_q/
 ### Backend Environment Variables
 
 The application uses environment-specific .env files:
+- `.env` - Base environment configuration
 - `.env.development` - Development environment
 - `.env.production` - Production environment
 
@@ -168,11 +182,16 @@ To switch environments, modify the `CURRENT_ENVIRONMENT` constant in `Configurat
 private static final Environment CURRENT_ENVIRONMENT = Environment.DEVELOPMENT;
 ```
 
-Available development URLs (uncomment as needed):
+#### Development URL Options
+Available development URLs in `Configuration.java` (uncomment as needed):
 - `http://10.0.2.2:3000/api/` - For Android emulator (localhost)
 - `http://192.168.0.112/api/` - For physical device on local network
 - `http://172.21.208.1:3000/api/` - For WSL environment
 - Cloudflare tunnel URL - For remote development
+
+#### Configuration Classes
+- **NetworkConfig**: Environment-specific timeout configurations
+- **AppConfig**: Environment-specific app names and settings
 
 ## Database Configuration
 
@@ -294,6 +313,11 @@ npm test
 - Development uses `alter: true` for schema modifications
 - Production uses safe sync without destructive changes
 
+### Database Maintenance
+- Use `node scripts/fix-indexes.js` to clean duplicate database indexes
+- Monitor database performance and optimize as needed
+- Scripts located in `/scripts/` directory for maintenance tasks
+
 ## Common Development Workflows
 
 ### Adding New Backend Module
@@ -303,10 +327,11 @@ npm test
 4. Update authentication middleware as needed
 
 ### Adding New Android Feature
-1. Create UI components in ui/[feature]/
+1. Create UI components in ui/[feature]/ (following existing patterns like credit/ or agenda/)
 2. Add corresponding ViewModel
 3. Update models and repositories
 4. Configure navigation in bottom navigation
+5. Update Configuration.java if environment-specific settings are needed
 
 ### API Integration
 - Backend APIs follow RESTful conventions

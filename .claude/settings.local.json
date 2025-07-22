@@ -8,7 +8,8 @@
       "Bash(node:*)",
       "Bash(timeout 30 npm run start:dev)",
       "Bash(timeout 20 npm run start:dev)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

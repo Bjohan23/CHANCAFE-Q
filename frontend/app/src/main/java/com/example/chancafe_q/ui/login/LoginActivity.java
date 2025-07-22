@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.chancafe_q.R;
 import com.example.chancafe_q.ui.dashboard.DashboardActivity;
+import com.example.chancafe_q.utils.Configuration;
 import com.example.chancafe_q.viewmodel.LoginViewModel;
 
 /**
@@ -28,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUser;
     private EditText etPassword;
     private Button btnLogin;
+    private Button btnQuickLogin;
     private TextView tvForgotPassword;
     private ProgressBar progressBar;
 
@@ -63,7 +65,15 @@ public class LoginActivity extends AppCompatActivity {
         etUser = findViewById(R.id.et_user);
         etPassword = findViewById(R.id.et_password);
         btnLogin = findViewById(R.id.btn_login);
+        btnQuickLogin = findViewById(R.id.btn_quick_login);
         tvForgotPassword = findViewById(R.id.tv_forgot_password);
+        
+        // Mostrar/ocultar botón de login rápido según configuración
+        if (Configuration.AppConfig.isQuickLoginEnabled()) {
+            btnQuickLogin.setVisibility(View.VISIBLE);
+        } else {
+            btnQuickLogin.setVisibility(View.GONE);
+        }
         
         // Crear ProgressBar programáticamente para mostrar loading
         progressBar = new ProgressBar(this);
@@ -145,6 +155,16 @@ public class LoginActivity extends AppCompatActivity {
             
             // Llamar al ViewModel para hacer login
             loginViewModel.login(userCode, password);
+        });
+
+        // Botón de login rápido (solo en desarrollo)
+        btnQuickLogin.setOnClickListener(v -> {
+            // Rellenar campos con datos de admin
+            etUser.setText("admin@example.com");
+            etPassword.setText("admin123");
+            
+            // Ejecutar login automáticamente
+            loginViewModel.login("admin@example.com", "admin123");
         });
 
         tvForgotPassword.setOnClickListener(v -> {

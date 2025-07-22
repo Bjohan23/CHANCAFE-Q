@@ -93,7 +93,7 @@ class QuoteService {
         currency,
         exchangeRate: finalExchangeRate,
         validUntil: finalValidUntil,
-        status: 'draft',
+        status: quoteData.status || 'draft',
         notes,
         internalNotes: finalInternalNotes,
         revision: 1,
@@ -592,6 +592,11 @@ class QuoteService {
         email: quote.advisor.email,
         role: quote.advisor.role
       };
+    }
+
+    // Incluir quote_items si están disponibles
+    if (quote.quote_items && Array.isArray(quote.quote_items)) {
+      formattedQuote.quote_items = quote.quote_items.map(item => this.formatQuoteItemResponse(item));
     }
 
     return formattedQuote;
