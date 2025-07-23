@@ -16,45 +16,45 @@ public class Client implements java.io.Serializable {
     private String ruc;
     private String username;
     
-    @SerializedName("first_name")
+    @SerializedName("firstName")
     private String firstName;
     
-    @SerializedName("last_name")
+    @SerializedName("lastName")
     private String lastName;
     
-    @SerializedName("document_type")
+    @SerializedName("documentType")
     private String documentType;
     
-    @SerializedName("document_number")
+    @SerializedName("documentNumber")
     private String documentNumber;
     
     private String email;
     private String phone;
     private String address;
     
-    @SerializedName("client_type")
+    @SerializedName("clientType")
     private String clientType; // "individual" o "business"
     
-    @SerializedName("business_name")
+    @SerializedName("businessName")
     private String businessName;
     
-    @SerializedName("phone_secondary")
+    @SerializedName("phoneSecondary")
     private String phoneSecondary;
     
     private String district;
     private String province;
     private String department;
     
-    @SerializedName("postal_code")
+    @SerializedName("postalCode")
     private String postalCode;
     
-    @SerializedName("payment_terms")
+    @SerializedName("paymentTerms")
     private Integer paymentTerms;
     
-    @SerializedName("contact_method")
+    @SerializedName("contactMethod")
     private String contactMethod; // "email", "phone", "whatsapp", "visit"
     
-    @SerializedName("contact_preference")
+    @SerializedName("contactPreference")
     private String contactPreference; // "morning", "afternoon", "evening", "anytime"
     
     private String notes;
@@ -62,60 +62,60 @@ public class Client implements java.io.Serializable {
     private String website;
     private String industry;
     
-    @SerializedName("company_size")
+    @SerializedName("companySize")
     private String companySize; // "micro", "small", "medium", "large"
     
-    @SerializedName("tax_id")
+    @SerializedName("taxId")
     private String taxId;
     
-    @SerializedName("credit_limit")
+    @SerializedName("creditLimit")
     private Double creditLimit;
     
-    @SerializedName("assigned_user_id")
+    @SerializedName("assignedUserId")
     private Integer assignedUserId;
     
     // Campos de evaluación crediticia (Sentinel API)
-    @SerializedName("credit_score")
+    @SerializedName("creditScore")
     private Integer creditScore;
     
-    @SerializedName("risk_classification")
+    @SerializedName("riskClassification")
     private String riskClassification;
     
-    @SerializedName("total_debts")
+    @SerializedName("totalDebts")
     private Double totalDebts;
     
-    @SerializedName("automatic_evaluation")
+    @SerializedName("automaticEvaluation")
     private String automaticEvaluation;
     
-    @SerializedName("suggested_credit_limit")
+    @SerializedName("suggestedCreditLimit")
     private Double suggestedCreditLimit;
     
-    @SerializedName("is_banked")
+    @SerializedName("isBanked")
     private Boolean isBanked;
     
-    @SerializedName("last_credit_check")
+    @SerializedName("lastCreditCheck")
     private Date lastCreditCheck;
     
     private String status; // "active", "inactive", "blocked"
     
-    @SerializedName("created_at")
+    @SerializedName("createdAt")
     private Date createdAt;
     
-    @SerializedName("updated_at")
+    @SerializedName("updatedAt")
     private Date updatedAt;
     
     // Campos adicionales de la respuesta JSON
-    @SerializedName("full_name")
+    @SerializedName("fullName")
     private String fullName;
     
-    @SerializedName("is_active")
+    @SerializedName("isActive")
     private Boolean isActive;
     
-    @SerializedName("is_business")
+    @SerializedName("isBusiness")
     private Boolean isBusiness;
     
     // Información crediticia completa
-    @SerializedName("credit_info")
+    @SerializedName("creditInfo")
     private CreditInfo creditInfo;
 
     // Constructor vacío

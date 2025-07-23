@@ -125,7 +125,8 @@ const updateQuote = async (req, res) => {
 const changeQuoteStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status } = req.query;
+    console.log(`🔄 [Quote Controller] Changing status for quote ${id} to: ${status}`);
     const result = await quoteService.changeQuoteStatus(id, status);
     sendSuccess(res, result, result.message);
   } catch (error) {

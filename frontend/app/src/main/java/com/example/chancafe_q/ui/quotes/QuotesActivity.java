@@ -299,12 +299,14 @@ public class QuotesActivity extends AppCompatActivity implements QuotesAdapter.O
 
     @Override
     public void onChangeStatus(Quote quote, String newStatus) {
+        android.util.Log.d("QuotesActivity", "onChangeStatus called with newStatus: '" + newStatus + "'");
         String statusMessage = getStatusChangeMessage(newStatus);
         
         new AlertDialog.Builder(this)
                 .setTitle("Cambiar estado")
                 .setMessage("¿Confirmas cambiar el estado de la cotización a '" + statusMessage + "'?")
                 .setPositiveButton("Confirmar", (dialog, which) -> {
+                    android.util.Log.d("QuotesActivity", "Calling changeQuoteStatus with ID: " + quote.getId() + ", status: '" + newStatus + "'");
                     quoteViewModel.changeQuoteStatus(quote.getId(), newStatus);
                 })
                 .setNegativeButton("Cancelar", null)

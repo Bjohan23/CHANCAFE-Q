@@ -111,30 +111,12 @@ public class EmailSender {
             body.append("• Título: ").append(quote.getTitle()).append("\n");
         }
         
-        try {
-            Date createdDate = quote.getCreatedAtAsDate();
-            if (createdDate != null) {
-                body.append("• Fecha: ").append(dateFormat.format(createdDate)).append("\n");
-            } else if (quote.getCreatedAt() != null) {
-                body.append("• Fecha: ").append(quote.getCreatedAt()).append("\n");
-            }
-        } catch (Exception e) {
-            if (quote.getCreatedAt() != null) {
-                body.append("• Fecha: ").append(quote.getCreatedAt()).append("\n");
-            }
+        if (quote.getCreatedAt() != null && !quote.getCreatedAt().isEmpty()) {
+            body.append("• Fecha: ").append(quote.getCreatedAt()).append("\n");
         }
         
-        try {
-            Date validDate = quote.getValidUntilAsDate();
-            if (validDate != null) {
-                body.append("• Válida hasta: ").append(dateFormat.format(validDate)).append("\n");
-            } else if (quote.getValidUntil() != null) {
-                body.append("• Válida hasta: ").append(quote.getValidUntil()).append("\n");
-            }
-        } catch (Exception e) {
-            if (quote.getValidUntil() != null) {
-                body.append("• Válida hasta: ").append(quote.getValidUntil()).append("\n");
-            }
+        if (quote.getValidUntil() != null && !quote.getValidUntil().isEmpty()) {
+            body.append("• Válida hasta: ").append(quote.getValidUntil()).append("\n");
         }
         
         // Total amount
@@ -181,21 +163,10 @@ public class EmailSender {
         body.append("• Los precios están expresados en ").append(currency.equals("USD") ? "Dólares Americanos" : "Soles Peruanos").append("\n");
         body.append("• Los precios incluyen IGV (18%)\n");
         
-        try {
-            Date validDate = quote.getValidUntilAsDate();
-            if (validDate != null) {
-                body.append("• Cotización válida hasta el ").append(dateFormat.format(validDate)).append("\n");
-            } else if (quote.getValidUntil() != null) {
-                body.append("• Cotización válida hasta el ").append(quote.getValidUntil()).append("\n");
-            } else {
-                body.append("• Cotización válida por 30 días calendario\n");
-            }
-        } catch (Exception e) {
-            if (quote.getValidUntil() != null) {
-                body.append("• Cotización válida hasta el ").append(quote.getValidUntil()).append("\n");
-            } else {
-                body.append("• Cotización válida por 30 días calendario\n");
-            }
+        if (quote.getValidUntil() != null && !quote.getValidUntil().isEmpty()) {
+            body.append("• Cotización válida hasta el ").append(quote.getValidUntil()).append("\n");
+        } else {
+            body.append("• Cotización válida por 30 días calendario\n");
         }
         
         body.append("• Tiempo de entrega: 5-7 días hábiles (sujeto a disponibilidad)\n");

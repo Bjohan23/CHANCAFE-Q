@@ -392,6 +392,7 @@ public class QuoteRepository {
 
     // Cambiar estado de cotización
     public void changeQuoteStatus(int id, String status) {
+        android.util.Log.d("QuoteRepository", "changeQuoteStatus called with ID: " + id + ", status: '" + status + "'");
         loadingLiveData.postValue(true);
         
         Call<ApiResponse<Quote>> call = apiService.changeQuoteStatus(id, status);
