@@ -90,24 +90,35 @@ class ClientService {
         document_type: clientDto.documentType,
         document_number: clientDto.documentNumber,
         client_type: clientDto.clientType,
-        business_name: clientDto.businessName,
-        first_name: clientDto.firstName,
-        last_name: clientDto.lastName,
-        email: clientDto.email,
-        phone: clientDto.phone,
-        address: clientDto.address,
-        district: clientDto.district,
-        province: clientDto.province,
-        department: clientDto.department,
-        postal_code: clientDto.postalCode,
-        credit_limit: clientDto.creditLimit,
-        payment_terms: clientDto.paymentTerms,
-        contact_method: clientDto.contactMethod,
-        contact_preference: clientDto.contactPreference,
-        industry: clientDto.industry,
-        company_size: clientDto.companySize,
-        website: clientDto.website,
-        notes: clientDto.notes,
+        // business_name solo para empresas
+        business_name: (clientType === 'business' && businessName) ? businessName : null,
+        // first_name y last_name solo para individuales  
+        first_name: (clientType === 'individual' && firstName) ? firstName : null,
+        last_name: (clientType === 'individual' && lastName) ? lastName : null,
+        email: clientDto.email || null,
+        phone: clientDto.phone || null,
+        address: clientDto.address || null,
+        district: clientDto.district || null,
+        province: clientDto.province || null,
+        department: clientDto.department || null,
+        postal_code: clientDto.postalCode || null,
+        credit_limit: clientDto.creditLimit || 0,
+        payment_terms: clientDto.paymentTerms || 30,
+        // contact_method - validar valores ENUM válidos
+        contact_method: (['email', 'phone', 'whatsapp', 'visit'].includes(contactMethod)) 
+          ? contactMethod 
+          : 'email',
+        // contact_preference - validar valores ENUM válidos
+        contact_preference: (['morning', 'afternoon', 'evening', 'anytime'].includes(contactPreference)) 
+          ? contactPreference 
+          : 'anytime',
+        industry: (clientType === 'business' && industry) ? industry : null,
+        // company_size solo para empresas y con valores ENUM válidos
+        company_size: (clientType === 'business' && companySize && ['micro', 'small', 'medium', 'large'].includes(companySize)) 
+          ? companySize 
+          : null,
+        website: (clientType === 'business' && website) ? website : null,
+        notes: clientDto.notes || null,
         status: clientDto.status,
         assigned_user_id: assignedUserId
       };
