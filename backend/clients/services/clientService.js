@@ -85,10 +85,34 @@ class ClientService {
         status
       });
 
-      const newClient = await clientRepository.create({
-        ...clientDto,
+      // Mapear los campos a snake_case para la base de datos
+      const dbData = {
+        document_type: clientDto.documentType,
+        document_number: clientDto.documentNumber,
+        client_type: clientDto.clientType,
+        business_name: clientDto.businessName,
+        first_name: clientDto.firstName,
+        last_name: clientDto.lastName,
+        email: clientDto.email,
+        phone: clientDto.phone,
+        address: clientDto.address,
+        district: clientDto.district,
+        province: clientDto.province,
+        department: clientDto.department,
+        postal_code: clientDto.postalCode,
+        credit_limit: clientDto.creditLimit,
+        payment_terms: clientDto.paymentTerms,
+        contact_method: clientDto.contactMethod,
+        contact_preference: clientDto.contactPreference,
+        industry: clientDto.industry,
+        company_size: clientDto.companySize,
+        website: clientDto.website,
+        notes: clientDto.notes,
+        status: clientDto.status,
         assigned_user_id: assignedUserId
-      });
+      };
+
+      const newClient = await clientRepository.create(dbData);
 
       return {
         client: this.formatClientResponse(newClient),
