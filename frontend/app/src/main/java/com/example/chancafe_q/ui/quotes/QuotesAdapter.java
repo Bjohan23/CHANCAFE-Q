@@ -157,9 +157,7 @@ public class QuotesAdapter extends RecyclerView.Adapter<QuotesAdapter.QuoteViewH
 
             // Cliente
             if (quote.getClient() != null) {
-                String clientName = quote.getClient().getBusinessName() != null 
-                    ? quote.getClient().getBusinessName()
-                    : (quote.getClient().getFirstName() + " " + quote.getClient().getLastName()).trim();
+                String clientName = quote.getClient().getFullName();
                 tvClientName.setText(clientName);
                 
                 // Mostrar score crediticio si está disponible

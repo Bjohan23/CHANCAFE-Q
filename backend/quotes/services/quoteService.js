@@ -570,6 +570,7 @@ class QuoteService {
         businessName: quote.client.business_name,
         firstName: quote.client.first_name,
         lastName: quote.client.last_name,
+        fullName: `${quote.client.first_name || ''} ${quote.client.last_name || ''}`.trim(),
         email: quote.client.email,
         phone: quote.client.phone,
         documentNumber: quote.client.document_number,

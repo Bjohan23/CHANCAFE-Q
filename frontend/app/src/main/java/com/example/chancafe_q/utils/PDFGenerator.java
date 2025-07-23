@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -145,14 +146,38 @@ public class PDFGenerator {
             currentY += 20;
         }
         
-        if (quote.getCreatedAt() != null) {
-            canvas.drawText("Fecha: " + dateFormat.format(quote.getCreatedAt()), MARGIN, currentY, normalPaint);
+        try {
+            Date createdDate = quote.getCreatedAtAsDate();
+            if (createdDate != null) {
+                canvas.drawText("Fecha: " + dateFormat.format(createdDate), MARGIN, currentY, normalPaint);
+            } else if (quote.getCreatedAt() != null) {
+                canvas.drawText("Fecha: " + quote.getCreatedAt(), MARGIN, currentY, normalPaint);
+            }
+        } catch (Exception e) {
+            // Fallback si hay error de formateo
+            if (quote.getCreatedAt() != null) {
+                canvas.drawText("Fecha: " + quote.getCreatedAt(), MARGIN, currentY, normalPaint);
+            }
         }
         
-        if (quote.getValidUntil() != null) {
-            String validText = "Válida hasta: " + dateFormat.format(quote.getValidUntil());
-            float validX = PAGE_WIDTH - MARGIN - normalPaint.measureText(validText);
-            canvas.drawText(validText, validX, currentY, normalPaint);
+        try {
+            Date validDate = quote.getValidUntilAsDate();
+            if (validDate != null) {
+                String validText = "Válida hasta: " + dateFormat.format(validDate);
+                float validX = PAGE_WIDTH - MARGIN - normalPaint.measureText(validText);
+                canvas.drawText(validText, validX, currentY, normalPaint);
+            } else if (quote.getValidUntil() != null) {
+                String validText = "Válida hasta: " + quote.getValidUntil();
+                float validX = PAGE_WIDTH - MARGIN - normalPaint.measureText(validText);
+                canvas.drawText(validText, validX, currentY, normalPaint);
+            }
+        } catch (Exception e) {
+            // Fallback si hay error de formateo
+            if (quote.getValidUntil() != null) {
+                String validText = "Válida hasta: " + quote.getValidUntil();
+                float validX = PAGE_WIDTH - MARGIN - normalPaint.measureText(validText);
+                canvas.drawText(validText, validX, currentY, normalPaint);
+            }
         }
         currentY += 20;
         
