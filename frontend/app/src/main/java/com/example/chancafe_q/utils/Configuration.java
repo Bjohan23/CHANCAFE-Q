@@ -22,7 +22,7 @@ public class Configuration {
     // private static final String DEV_BASE_URL = "http://172.21.208.1:3000/v1/api/"; // Si usas WSL
     //private static final String DEV_BASE_URL = "https://guyana-active-decorative-individually.trycloudflare.com/api/"; //con tunel de cloudflare (no funciona)
     //private static final String DEV_BASE_URL = "https://anonymous-prize-conferences-reynolds.trycloudflare.com/api/"; // Tunnel que no funciona
-    private static final String DEV_BASE_URL = "https://vampire-optimize-fig-gamma.trycloudflare.com/api/"; // Nuevo tunnel de Cloudflare activo
+    private static final String DEV_BASE_URL = "https://certification-everyone-browsing-taking.trycloudflare.com/api/"; // Nuevo tunnel de Cloudflare activo
     private static final String STAGING_BASE_URL = "https://staging.chancafe.com/api/";
     private static final String PROD_BASE_URL = "https://api.chancafe.com/api/";
     

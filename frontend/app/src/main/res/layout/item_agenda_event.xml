@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Indicador de prioridad y tipo -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginEnd="16dp">
+
+            <!-- Icono de tipo de evento -->
+            <ImageView
+                android:id="@+id/iv_event_type"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:layout_marginBottom="8dp"
+                tools:src="@android:drawable/ic_menu_agenda" />
+
+            <!-- Indicador de prioridad -->
+            <View
+                android:id="@+id/view_priority_indicator"
+                android:layout_width="4dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/holo_blue_dark"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <!-- Contenido principal -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Hora y título -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/tv_event_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="09:30"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/chancafe_red"
+                    android:layout_marginEnd="8dp"
+                    tools:text="09:30" />
+
+                <TextView
+                    android:id="@+id/tv_event_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Reunión con cliente"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="Reunión con cliente" />
+
+            </LinearLayout>
+
+            <!-- Cliente y ubicación -->
+            <TextView
+                android:id="@+id/tv_event_client"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Juan Pérez"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="2dp"
+                android:drawableStart="@android:drawable/ic_menu_myplaces"
+                android:drawablePadding="4dp"
+                android:gravity="center_vertical"
+                tools:text="Juan Pérez" />
+
+            <!-- Descripción -->
+            <TextView
+                android:id="@+id/tv_event_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Revisar cotización de electrodomésticos"
+                android:textSize="13sp"
+                android:textColor="@color/text_hint"
+                android:layout_marginBottom="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                tools:text="Revisar cotización de electrodomésticos" />
+
+            <!-- Estado y duración -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Estado -->
+                <TextView
+                    android:id="@+id/tv_event_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Programado"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_status_pending"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:layout_marginEnd="8dp"
+                    tools:text="Programado" />
+
+                <!-- Duración -->
+                <TextView
+                    android:id="@+id/tv_event_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1h 30m"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_hint"
+                    android:drawableStart="@android:drawable/ic_menu_recent_history"
+                    android:drawablePadding="4dp"
+                    android:gravity="center_vertical"
+                    tools:text="1h 30m" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <!-- Recordatorio -->
+                <ImageView
+                    android:id="@+id/iv_reminder"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_popup_reminder"
+                    android:visibility="gone"
+                    android:alpha="0.7"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Menú de opciones -->
+        <ImageButton
+            android:id="@+id/btn_event_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_more"
+            android:padding="8dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="Opciones del evento" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
